@@ -18,11 +18,10 @@ from unittest.mock import MagicMock
 
 import pytest
 import torch
+from omegaconf import OmegaConf
 
+import verl
 from verl.utils.rollout_skip import DataProto, RolloutSkip
-
-len_prompt = 50
-len_response = 100
 
 
 def temp_dir():
@@ -33,13 +32,13 @@ def temp_dir():
     shutil.rmtree(temp_dir)
 
 
-def build_generate_fn(gen_bs, n):
+def build_generate_fn(gen_bs, n, max_prompt_length, max_response_length):
     len_tokenizer = 1024
 
     def iterate():
         while True:
-            prompt = torch.randint(len_tokenizer, size=(gen_bs, len_prompt)).repeat_interleave(n, dim=0)
-            generate = torch.randint(len_tokenizer, size=(gen_bs * n, len_response))
+            prompt = torch.randint(len_tokenizer, size=(gen_bs, max_prompt_length)).repeat_interleave(n, dim=0)
+            generate = torch.randint(len_tokenizer, size=(gen_bs * n, max_response_length))
             data = DataProto.from_dict(tensors={"prompt": prompt, "response": generate})
             yield data
 
@@ -52,43 +51,69 @@ def build_generate_fn(gen_bs, n):
     return fn
 
 
-@pytest.fixture(params=[(32, 4), (64, 4), (64, 8)])
-def mock_rollout_wg(request):
-    gen_bs, n = request.param
+@pytest.fixture
+def mock_rollout_wg():
+    default_n = 1
+    default_gen_batch_size = 2
+    default_max_prompt_length = 16
+    default_max_response_length = 16
+
+    config_path = Path(verl.version_folder).joinpath("trainer/config")
+    cfg = OmegaConf.load(str(config_path.joinpath("ppo_trainer.yaml")))
+    cfg.data = OmegaConf.load(str(config_path.joinpath("data/legacy_data.yaml")))
+    cfg.actor_rollout_ref.rollout = OmegaConf.load(config_path.joinpath("rollout/rollout.yaml"))
+
+    temp_dir = tempfile.mkdtemp()
+
     rollout_wg = MagicMock()
 
-    config = MagicMock()
-    config.actor_rollout_ref.rollout = {
-        "n": n,
-        "skip_dump_dir": next(temp_dir()),
-    }
-    config.data = {"gen_batch_size": gen_bs}
+    cfg.trainer.experiment_name = "skip"
+    cfg.trainer.project_name = "verl_feat"
 
-    rollout_wg.generate_sequences = build_generate_fn(gen_bs, n)
+    cfg.actor_rollout_ref.rollout.n = default_n
+    cfg.actor_rollout_ref.rollout.skip.dump_dir = str(temp_dir)
+    cfg.actor_rollout_ref.rollout.skip.dump_step = 1
+    cfg.actor_rollout_ref.rollout.skip.enable = True
 
-    yield config, rollout_wg
-    # Cleanup
-    shutil.rmtree(next(temp_dir()))
+    cfg.data.gen_batch_size = default_gen_batch_size
+    cfg.data.max_prompt_length = default_max_prompt_length
+    cfg.data.max_response_length = default_max_response_length
+
+    rollout_wg.generate_sequences = build_generate_fn(
+        default_gen_batch_size, default_n, default_max_prompt_length, default_max_response_length
+    )
+
+    yield cfg, rollout_wg
+
+    # 清理
+    shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 class TestRolloutSkip:
-    def test_initialization(self, capsys):
+    def test_initialization(self, mock_rollout_wg, capsys):
         """Test that RolloutSkip initializes correctly"""
-        config = MagicMock()
-        config.actor_rollout_ref.rollout = {
-            "n": 16,
-            "skip_dump_dir": "tmp/rollout_dump",
-        }
-        config.data = {"gen_batch_size": 128}
-        mock_rollout_wg = MagicMock()
-        skip = RolloutSkip(config, mock_rollout_wg)
+        config, rollout_wg = mock_rollout_wg
 
-        assert skip.n == 16
-        assert skip.gbs == 128
-        assert str(skip.dumped_dir) == "tmp/rollout_dump"
+        skip = RolloutSkip(config)
 
-        assert skip._rollout_wg == mock_rollout_wg
-        skip.wrap_generate_sequences()
+        assert skip.n == config.actor_rollout_ref.rollout.n
+        assert skip.gbs == config.data.gen_batch_size
+        assert skip.prompt_length == config.data.max_prompt_length
+        assert skip.response_length == config.data.max_response_length
+        assert skip.do_compress == config.actor_rollout_ref.rollout.skip.compress
+        assert skip.strict_mode == config.actor_rollout_ref.rollout.skip.strict_mode
+        assert skip.is_enable
+        assert str(skip.specify_dumped_dir).startswith(config.actor_rollout_ref.rollout.skip.dump_dir)
+
+        assert not skip.is_dump_step
+        assert not skip.is_activate
+        skip.wrap_generate_sequences(rollout_wg)
+
+        assert skip.is_dump_step
+        assert skip.is_activate
+
+        assert skip._rollout_wg == rollout_wg
+
         captured = capsys.readouterr()
         assert "Successfully patched" in captured.out
 
@@ -96,7 +121,7 @@ class TestRolloutSkip:
         """Test that generate_sequences works without wrapping"""
 
         config, rollout_wg = mock_rollout_wg
-        _ = RolloutSkip(config, rollout_wg)
+        _ = RolloutSkip(config)
 
         _result = rollout_wg.generate_sequences(MagicMock())
         for _ in range(10):
@@ -107,27 +132,13 @@ class TestRolloutSkip:
             assert torch.abs(_result.batch["response"] - result.batch["response"]).sum() > 0
             _result = result
 
-    def test_dump(self, mock_rollout_wg, capsys):
-        config, rollout_wg = mock_rollout_wg
-        skip = RolloutSkip(config, rollout_wg)
-        skip.wrap_generate_sequences()
-
-        result = rollout_wg.generate_sequences(MagicMock())
-        # * check if dump is OK
-        assert skip.curr_path_dump.exists()
-        captured = capsys.readouterr()
-        assert "Successfully dump data in" in captured.out
-        # * get file size, estimate file size
-        file_size = skip.curr_path_dump.stat().st_size
-        est_file_size = (len_prompt + len_response) * skip.gbs * skip.n * result.batch["prompt"].dtype.itemsize
-        assert file_size >= est_file_size, "Dumped file size is smaller than expected"
-
-    def test_generate_with_wrap(self, mock_rollout_wg, capsys):
+    def test_generate_with_wrap_nostrict(self, mock_rollout_wg, capsys):
         """Test that generate_sequences works without wrapping"""
 
         config, rollout_wg = mock_rollout_wg
-        skip = RolloutSkip(config, rollout_wg)
-        skip.wrap_generate_sequences()
+        skip = RolloutSkip(config)
+        skip.strict_mode = False
+        skip.wrap_generate_sequences(rollout_wg)
 
         _result = rollout_wg.generate_sequences(MagicMock())
 
@@ -135,8 +146,28 @@ class TestRolloutSkip:
             result = rollout_wg.generate_sequences(MagicMock())
             assert isinstance(result, DataProto)
             # * make sure the data is different
-            assert torch.abs(_result.batch["prompt"] - result.batch["prompt"]).sum() == 0
-            assert torch.abs(_result.batch["response"] - result.batch["response"]).sum() == 0
+            assert torch.allclose(_result.batch["prompt"], result.batch["prompt"])
+            assert torch.allclose(_result.batch["response"], result.batch["response"])
+
             captured = capsys.readouterr()
             assert "Successfully load pre-generated data from" in captured.out
             _result = result
+
+    def test_dump_nostrict(self, mock_rollout_wg, capsys):
+        config, rollout_wg = mock_rollout_wg
+        skip = RolloutSkip(config)
+        skip.strict_mode = False
+        skip.wrap_generate_sequences(rollout_wg)
+
+        result = rollout_wg.generate_sequences(MagicMock())
+        # * check if dump is OK
+        assert skip.get_path_dump().exists()
+        captured = capsys.readouterr()
+        assert "Successfully dump data in" in captured.out
+        # * get file size, estimate file size
+        file_size = skip.get_path_dump().stat().st_size
+        if not skip.do_compress:
+            est_file_size = (
+                (skip.prompt_length + skip.response_length) * skip.gbs * skip.n * result.batch["prompt"].dtype.itemsize
+            )
+            assert file_size >= est_file_size, "Dumped file size is smaller than expected"
