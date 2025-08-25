@@ -76,6 +76,17 @@ class TraceConfig(BaseConfig):
 
 
 @dataclass
+class SkipConfig(BaseConfig):
+    enable: bool = False
+    dump_step: int = 1
+    post_dump_action: str = "replicate"
+    dump_dir: str = "/tmp/rollout_dump"
+    dump_compress: bool = True
+    strict_mode: bool = True
+    compress: bool = True
+
+
+@dataclass
 class ServerConfig(BaseConfig):
     """
     Configuration for SGLang server when running in server mode
@@ -149,9 +160,7 @@ class RolloutConfig(BaseConfig):
 
     update_weights_bucket_megabytes: int = 512
 
-    skip_rollout: bool = False
-
-    skip_dump_dir: str = "/tmp/rollout_dump"
+    skip: SkipConfig = field(default_factory=SkipConfig)
 
     profiler: ProfilerConfig = field(default_factory=ProfilerConfig)
 
