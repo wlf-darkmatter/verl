@@ -62,7 +62,7 @@ gen_world_size=$((NNODES * 16))
 #    +actor_rollout_ref.rollout.dp_model_parallel_size=${gen_dp} \
 #    +actor_rollout_ref.rollout.rollout_world_size=${gen_world_size} \
 
-max_num_batched_tokens=$((ax_prompt_length + max_response_length))
+max_num_batched_tokens=$((max_prompt_length + max_response_length))
 
 # Megatron backen
 train_tp=4
