@@ -138,6 +138,7 @@ ray job submit --no-wait --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.rollout.enable_chunked_prefill=True \
     actor_rollout_ref.rollout.enable_prefix_caching=False \
     actor_rollout_ref.rollout.max_num_batched_tokens=${max_num_batched_tokens} \
+    actor_rollout_ref.rollout.max_model_len=$((max_prompt_length + max_response_length)) \
     actor_rollout_ref.rollout.temperature=${temperature} \
     actor_rollout_ref.rollout.top_p=${top_p} \
     actor_rollout_ref.rollout.top_k=${top_k} \
