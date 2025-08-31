@@ -79,11 +79,11 @@ class TraceConfig(BaseConfig):
 class SkipConfig(BaseConfig):
     enable: bool = False
     dump_step: int = 1
-    post_dump_action: str = "replicate"
+    post_dump_action: str = "repeat"
     dump_dir: str = "/tmp/rollout_dump"
-    dump_compress: bool = True
+
     strict_mode: bool = True
-    compress: bool = True
+    compress: bool = False
 
 
 @dataclass

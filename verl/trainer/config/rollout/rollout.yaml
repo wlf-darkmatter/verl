@@ -172,7 +172,7 @@ multi_turn:
 
 # support logging rollout prob for debugging purpose
 # "Truncated importance sampling" requires rollout log probs, set to True when turning on Truncated importance sampling
-calculate_log_probs: False 
+calculate_log_probs: False
 
 # [Experimental] agent loop based rollout configs
 agent:
@@ -261,11 +261,13 @@ skip:
   # This mode is recommended since it helps detect potential issues early. And ensures that the dumped data aligns with the training data.
   strict_mode: True
 
-  # When enabled, the dumped data will be compressed using `lzma` to save disk space.
-  # The compression ratio is typically between 0.1% to 10%, with minimal performance overhead compared to inference time.
-  compress: True
+  # When enabled, the dumped data will be compressed using `zlib` to save disk space.
+  # The compression ratio is typically between 0.1% to 10%.
+  # 3rd module `pyzstd` is strongly recommended over zlib for better performance.
+  #todo 这里给一个pr的链接，在链接中说明使用pyzstd带来的好处，修改后删除本行
+  compress: False
 
-# profile the rollout model in `generate_sequence` 
+# profile the rollout model in `generate_sequence`
 profiler:
 
   # Required when using verl.utils.omega_conf_to_dataclass to instantiate dataclass configs
@@ -277,7 +279,7 @@ profiler:
 
   # whether enable profile on ref
   enable: ${oc.select:actor_rollout_ref.actor.profiler.enable,false}
-  
+
   # Whether to profile all ranks.
   all_ranks: ${oc.select:actor_rollout_ref.actor.profiler.all_ranks,false}
 

@@ -11,8 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import lzma  # * 压缩率最高，耗时最多，内存占用最少
 import pickle
+import time
 from enum import Enum
 from pathlib import Path
 
@@ -90,7 +90,7 @@ class RolloutSkip:
 
         self.strict_mode = self.skip_config.get("strict_mode", True)
         self.do_compress = self.skip_config.get("compress", True)
-        self.dump_step = self.skip_config.get("dump_step", 1)
+        self.dump_step = max(1, self.skip_config.get("dump_step", 1))  # at least dump once
         self.post_dump_action = self.skip_config.get("post_dump_action", PostDumpAction.REPEAT)
         self.post_dump_action = PostDumpAction(self.post_dump_action)
 
@@ -161,7 +161,7 @@ class RolloutSkip:
         if self._rollout_wg is None:
             return
         if self._flag_record is False:
-            # * 保证一个 record 对应一次 skip
+            # make sure one record only corresponds to one skip
             self._flag_record = True
             self._new_batch = new_batch
         else:
@@ -222,6 +222,15 @@ class RolloutSkip:
         return dumped_new_batch, dumped_gen_batch
 
     def dump(self, outputs: DataProto):
+        if self.strict_mode:
+            if self._flag_record is False or self._new_batch is None:
+                raise AssertionError(
+                    f"{self.print_mark}\033[33mError: \n"
+                    + "In rollout_skip with strict_mode, the new_batch record is required."
+                    + "Please record the new_batch using `RolloutSkip.record(new_batch)` in trainer.fit().\033[0m"
+                )
+        self._flag_record = False
+
         data_dump = {
             "new_batch": self._new_batch,
             "gen_batch": outputs,
@@ -232,12 +241,13 @@ class RolloutSkip:
             info_compress = ""
             if self.do_compress:
                 data_dump["compressed"] = ["gen_batch", "new_batch"]
-                size_zip, size_data = dataproto_compress(data_dump)
+                dict_info = dataproto_compress(data_dump)
+                size_zip = dict_info["size_compressed_data"]
+                size_data = dict_info["size_data"]
+                ratio = dict_info["ratio"]
+
                 if size_data != 0:
-                    ratio = size_zip / size_data
-                    info_compress = (
-                        f"Compressed Ratio: {ratio:.1%} ({size_data / 1024**2:.3f}MB -> {size_zip / 1024**2:.3f}MB)"
-                    )
+                    info_compress = f"{size_data / 1024**2:.3f}MB -> {size_zip / 1024**2:.3f}MB ({ratio:.1%} )"
 
             with open(str(self.get_path_dump()), "wb") as f:
                 pickle.dump(data_dump, f)
@@ -260,7 +270,16 @@ class RolloutSkip:
         """Replace the current new_batch's content with that from the dumped_new_batch.
         In case of [Answer] mismatch.
         """
+
         if self.strict_mode:
+            if self._flag_record is False:
+                raise AssertionError(
+                    f"{self.print_mark}\033[33mError: \n"
+                    + "The new_batch is not recorded. Please record the new_batch"
+                    + "using `RolloutSkip.record(new_batch)`. \033[0m"
+                )
+            self._flag_record = False
+
             self._new_batch.batch = dumped_new_batch.batch
             self._new_batch.non_tensor_batch = dumped_new_batch.non_tensor_batch
             self._new_batch.meta_info = dumped_new_batch.meta_info
@@ -270,78 +289,137 @@ def wrap_generate_sequences(rolloutskip: RolloutSkip, rollout_wg):
     generate_sequences = rollout_wg.generate_sequences
 
     def rollout_skip_wrap_fn(batch, **kwargs) -> DataProto:
-        rolloutskip._flag_record = False
         rolloutskip.curr_step += 1
+        return_batch = None
 
         if rolloutskip.is_dump_step:
             # * try load
-            dumped_new_batch, dumped_gen_batch = rolloutskip.try_load()
-            # * Check if new_batch's prompt matches dumped_batch's prompt
-            if dumped_gen_batch is not None:
-                return dumped_gen_batch
-            else:
-                # * 1. Generation
-                gen_batch = generate_sequences(batch, **kwargs)
-                # * 2. Dump
-                rolloutskip.dump(gen_batch)
-                # * 3 Replace new_batch
-                rolloutskip.replace_curr_new_batch(dumped_new_batch)
+            dumped_new_batch, return_batch = rolloutskip.try_load()
 
-                return gen_batch
+            if return_batch is None:
+                # 1. Generation
+                return_batch = generate_sequences(batch, **kwargs)
+                # 2. Dump
+                rolloutskip.dump(return_batch)
+            else:
+                rolloutskip.replace_curr_new_batch(dumped_new_batch)
 
         else:
             if rolloutskip.post_dump_action == PostDumpAction.REPEAT:
                 target_step = rolloutskip.list_dumped_steps[(rolloutskip.curr_step - 1) % rolloutskip.num_dumped_step]
-                dumped_new_batch, dumped_gen_batch = rolloutskip.try_load(step=target_step)
-                rolloutskip.replace_curr_new_batch(dumped_new_batch)
-                return dumped_gen_batch
+                dumped_new_batch, return_batch = rolloutskip.try_load(step=target_step)
+                if return_batch is not None:
+                    rolloutskip.replace_curr_new_batch(dumped_new_batch)
 
             elif rolloutskip.post_dump_action == PostDumpAction.REPEAT_LAST:
                 target_step = rolloutskip.list_dumped_steps[-1]
-                dumped_new_batch, dumped_gen_batch = rolloutskip.try_load(step=target_step)
-                rolloutskip.replace_curr_new_batch(dumped_new_batch)
-                return dumped_gen_batch
+                dumped_new_batch, return_batch = rolloutskip.try_load(step=target_step)
+                if return_batch is not None:
+                    rolloutskip.replace_curr_new_batch(dumped_new_batch)
 
             elif rolloutskip.post_dump_action == PostDumpAction.ROLLOUT:
-                return generate_sequences(batch, **kwargs)
+                return_batch = generate_sequences(batch, **kwargs)
 
             elif rolloutskip.post_dump_action == PostDumpAction.ROLLOUT_WITH_DUMP:
-                dumped_gen_batch = generate_sequences(batch, **kwargs)
-                rolloutskip.dump(dumped_gen_batch)
-                return dumped_gen_batch
+                return_batch = generate_sequences(batch, **kwargs)
+                rolloutskip.dump(return_batch)
 
             elif rolloutskip.post_dump_action == PostDumpAction.EXIT:
                 exit(0)
 
             # clean
+        return return_batch
 
     return rollout_skip_wrap_fn
 
 
 def dataproto_compress(dict_data: dict) -> dict[str, DataProto]:
+    try:
+        import pyzstd
+
+        compresser = pyzstd
+    except ImportError:
+        import zlib
+
+        compresser = zlib
+    dict_data["compresser_name"] = compresser.__name__
+
     key_compress = dict_data.get("compressed", [])
 
     size_data = 0
     size_compressed_data = 0
 
+    print("Compress dumped data...", flush=True)
+    time_pickle = 0
+    time_compress = 0
     for key in key_compress:
+        time_start = time.time()
         _data = pickle.dumps(dict_data[key])
+        time_pickle += time.time() - time_start
         size_data += len(_data)
 
-        compressed_data = lzma.compress(_data)
+        time_start = time.time()
+        compressed_data = compresser.compress(_data)
+        time_compress += time.time() - time_start
+
         size_compressed_data += len(compressed_data)
 
         dict_data[key] = compressed_data
 
-    return size_compressed_data, size_data
+    dict_info = {
+        "size_compressed_data": size_compressed_data,
+        "size_data": size_data,
+        "time_pickle": time_pickle,
+        "time_compress": time_compress,
+        "ratio": size_compressed_data / size_data if size_data != 0 else None,
+    }
+
+    return dict_info
 
 
 def dataproto_decompress(dict_data: dict[str, DataProto]) -> dict[str, DataProto]:
+    key_compresser_name = dict_data.get("compresser_name", "zlib")
+    if key_compresser_name == "zlib":
+        import zlib
+
+        compresser = zlib
+    elif key_compresser_name == "pyzstd":
+        import pyzstd
+
+        compresser = pyzstd
+
     key_compress = dict_data.get("compressed", [])
 
     for key in key_compress:
-        compressed_data = lzma.decompress(dict_data[key])
+        compressed_data = compresser.decompress(dict_data[key])
         _data = pickle.loads(compressed_data)
         dict_data[key] = _data
 
     dict_data["compressed"] = []
+
+
+def read_dumped_data(path_dump: Path) -> dict[str, DataProto]:
+    """
+    Common function to read and decompress dumped data from a specified path.
+
+    ```
+    import verl
+    from verl.utils.rollout_skip import read_dumped_data
+
+    dumped_data = read_dumped_data("tmp/rollout_dump/DAPO-Qwen2.5-0.5B_DAPO/GBS4_N4_in2048_out4096/genstep_000001.pkl")
+
+    print(dumped_data["new_batch"])
+    print(dumped_data["gen_batch"])
+    ```
+
+    """
+    path_dump = Path(path_dump)
+    if path_dump.is_file():
+        with open(path_dump, "rb") as f:
+            data_dump = pickle.load(f)
+    else:
+        raise FileNotFoundError(f"File {path_dump} does not exist.")
+
+    dataproto_decompress(data_dump)
+
+    return data_dump
