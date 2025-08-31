@@ -27,6 +27,7 @@ __all__ = [
     "AgentLoopConfig",
     "TraceConfig",
     "RolloutConfig",
+    "SkipConfig",
 ]
 
 
