@@ -16,8 +16,6 @@ import pickle
 from enum import Enum
 from pathlib import Path
 
-import torch
-
 from verl.protocol import DataProto
 
 
@@ -88,7 +86,7 @@ class RolloutSkip:
 
         self._rollout_wg = None
         self._new_batch = None
-        self._curr_step: int = 0
+        self.curr_step: int = 0
 
         self.strict_mode = self.skip_config.get("strict_mode", True)
         self.do_compress = self.skip_config.get("compress", True)
@@ -112,11 +110,7 @@ class RolloutSkip:
         """
         Determine if the current step is a dump step based on the configured dump interval.
         """
-        return self.is_activate and self._curr_step <= self.dump_step
-
-    @property
-    def curr_step(self) -> int:
-        return self._curr_step
+        return self.is_activate and self.curr_step <= self.dump_step
 
     @property
     def num_dumped_step(self) -> int:
@@ -124,7 +118,7 @@ class RolloutSkip:
 
     def get_path_dump(self, step: int = None) -> Path:
         if step is None:
-            step = self._curr_step
+            step = self.curr_step
         return self.specify_dumped_dir.joinpath(f"genstep_{step:06d}.pkl").absolute()
 
     def _create_dump_path(self):
@@ -253,8 +247,8 @@ class RolloutSkip:
                 info_compress,
                 flush=True,
             )
-            if self._curr_step not in self.list_dumped_steps:
-                self.list_dumped_steps.append(self._curr_step)
+            if self.curr_step not in self.list_dumped_steps:
+                self.list_dumped_steps.append(self.curr_step)
 
         except Exception as e:
             print(
@@ -271,59 +265,13 @@ class RolloutSkip:
             self._new_batch.non_tensor_batch = dumped_new_batch.non_tensor_batch
             self._new_batch.meta_info = dumped_new_batch.meta_info
 
-    @torch.no_grad()
-    def check_data(
-        self,
-        input_batch: DataProto,
-        dumped_batch: DataProto,
-        verbose=False,
-    ):
-        """
-        Compare the prompts in the current batch with those in the dumped batch to ensure they match.
-
-        Returns: True if the prompts match, False otherwise.
-        """
-        # strict = strict or self.strict_mode
-
-        len_prompt = self.prompt_length
-        size_input = input_batch.batch["input_ids"].shape
-        check_prompt = True
-        info = ""
-        # * strong check
-        if size_input[1] != len_prompt:
-            info += f"Input prompt length({size_input[1]}) mismatch with max_prompt_length({len_prompt}). "
-            check_prompt = False
-
-        if size_input[0] != (self.gbs * self.n):
-            info += f"Input prompt bs({size_input[0]}) mismatch with gen_batch_size({self.gbs}) * n({self.n}). "
-            check_prompt = False
-
-        if self.strict_mode and check_prompt and dumped_batch is not None:
-            # strict check
-            ind_check = len_prompt
-            ids_diff = input_batch.batch["input_ids"][:, :ind_check] == dumped_batch.batch["input_ids"][:, :ind_check]
-            if not ids_diff.all().item():
-                check_prompt = False
-                info += "Prompt of `input_batch` != prompt of `dumped_batch`. "
-                info += f"Element-wise Similarity : {ids_diff.sum() / ids_diff.numel():.2%}"
-
-        if verbose and check_prompt is False:
-            print(
-                f"{self.print_mark}\033[33mWarning: Prompt mismatch detected at gen_step {self.curr_step}: "
-                f"{info}"
-                "Possible dataset change or unseeded shuffle.\033[0m",
-                flush=True,
-            )
-
-        return check_prompt
-
 
 def wrap_generate_sequences(rolloutskip: RolloutSkip, rollout_wg):
     generate_sequences = rollout_wg.generate_sequences
 
     def rollout_skip_wrap_fn(batch, **kwargs) -> DataProto:
         rolloutskip._flag_record = False
-        rolloutskip._curr_step += 1
+        rolloutskip.curr_step += 1
 
         if rolloutskip.is_dump_step:
             # * try load
@@ -336,9 +284,9 @@ def wrap_generate_sequences(rolloutskip: RolloutSkip, rollout_wg):
                 gen_batch = generate_sequences(batch, **kwargs)
                 # * 2. Dump
                 rolloutskip.dump(gen_batch)
-                # * 3 Check
-                if rolloutskip.check_data(batch, dumped_gen_batch, verbose=True) is False:
-                    rolloutskip.replace_curr_new_batch(dumped_new_batch)
+                # * 3 Replace new_batch
+                rolloutskip.replace_curr_new_batch(dumped_new_batch)
+
                 return gen_batch
 
         else:
