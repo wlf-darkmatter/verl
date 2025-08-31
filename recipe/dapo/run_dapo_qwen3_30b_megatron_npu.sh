@@ -70,10 +70,16 @@ train_ep=2
 train_pp=2
 train_cp=1
 
+MEGATRON_DUMP_PATH=${MEGATRON_DUMP_PATH:-"/tmp/megatron_dump"}
+
 ray job submit --no-wait --runtime-env="${RUNTIME_ENV}" \
     --address "${RAY_ADDRESS}" \
     -- python3 -m recipe.dapo.main_dapo \
     --config-name="dapo_megatron_trainer" \
+    actor_rollout_ref.rollout.skip.enable=True \
+    actor_rollout_ref.rollout.skip.dump_step=100 \
+    actor_rollout_ref.rollout.skip.post_dump_action="rollout" \
+    actor_rollout_ref.rollout.skip.dump_dir="$MEGATRON_DUMP_PATH" \
     data.filter_overlong_prompts=False \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
