@@ -42,29 +42,6 @@ class RolloutSkip:
         and saved under different filenames.
 
 
-    行为模式有2种:
-
-    A: 如果未超出设置的 dump 步长:
-
-        I: 发现对应步数的 dump 内容存在, 则使用 dump 内容，跳过生成 ✅
-        II: 发现对应步数的 dump 内容不存在, 则进行推理，并进行 dump ✅
-
-    B. 如果超出设置的 dump 步长，
-
-        按照 post_dump_action 的设置行为处理
-        # circular, replicate, exit, continues
-            1. "REPEAT": 循环使用之前的 dump 内容
-            2. "REPEAT_LAST": 重复使用最后的 dump 内容
-            3. "EXIT": 退出程序 ✅
-            4. "ROLLOUT": 恢复正常的 rollout，不使用 dump，也不进行 dump ✅
-            5. "ROLLOUT_WITH_DUMP": 恢复正常的 rollout，进行 dump ✅
-
-
-    功能增强：
-        1. 默认支持 strict_mode，开启后会对比 prompt 的一致性，不一致则会对 new_batch 的 prompt 和 answer 进行修改
-        2. 默认支持 compress，开启后会对 dump 的内容进行压缩，节省存储空间
-        3. 添加输入匹配检查 ✅
-
     """
 
     print_mark = "[RolloutSkip()] "
