@@ -82,8 +82,6 @@ class SkipConfig(BaseConfig):
     dump_step: int = 1
     post_dump_action: str = "repeat"
     dump_dir: str = "/tmp/rollout_dump"
-
-    strict_mode: bool = True
     compress: bool = False
 
 

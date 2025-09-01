@@ -64,8 +64,12 @@ class RolloutSkip:
         self._rollout_wg = None
         self._new_batch = None
         self.curr_step: int = 0
+        # Strict mode will raise error if `new_batch` not received by
+        # RolloutSkip.record() in trainer.fit().
+        # This mode is recommended since it helps detect potential issues early.
+        # And ensures that the dumped data aligns with the training data.
+        self.strict_mode = True
 
-        self.strict_mode = self.skip_config.get("strict_mode", True)
         self.do_compress = self.skip_config.get("compress", True)
         self.dump_step = max(1, self.skip_config.get("dump_step", 1))  # at least dump once
         self.post_dump_action = self.skip_config.get("post_dump_action", PostDumpAction.REPEAT)
@@ -301,9 +305,6 @@ def wrap_generate_sequences(rolloutskip: RolloutSkip, rollout_wg):
                 return_batch = generate_sequences(batch, **kwargs)
                 rolloutskip.dump(return_batch)
 
-            elif rolloutskip.post_dump_action == PostDumpAction.EXIT:
-                exit(0)
-
             # clean
         return return_batch
 
@@ -319,6 +320,7 @@ def dataproto_compress(dict_data: dict) -> dict[str, DataProto]:
         import zlib
 
         compresser = zlib
+
     dict_data["compresser_name"] = compresser.__name__
 
     key_compress = dict_data.get("compressed", [])
