@@ -549,7 +549,16 @@ def load_mcore_dist_weights(parallel_model, dist_weight_path, is_value_model=Fal
             for k in list(ssd.keys()):
                 if "output_layer" in k:
                     ssd.pop(k)
-        dist_checkpointing.load(ssd, dist_weight_path, strict=strict)
+        if os.getenv('USE_GEMM', '0') == '1':
+            new_ssd = dist_checkpointing.load(ssd, dist_weight_path, strict=strict)
+            sd = unwrap_model(model).state_dict()
+            for key in list(ssd.keys()):
+                if "mlp.experts.weight" in key:
+                    with torch.no_grad():
+                        ssd[key].data.copy_(new_ssd[key])
+                        sd[key].copy_(new_ssd[key])                
+        else:
+            dist_checkpointing.load(ssd, dist_weight_path, strict=strict)
 
     return
 
