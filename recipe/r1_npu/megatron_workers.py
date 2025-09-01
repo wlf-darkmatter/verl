@@ -7,7 +7,6 @@ import logging
 import torch
 from omegaconf import DictConfig
 from verl.utils.device import get_device_name
-from verl.verl.models.mcore import weight_converter
 from verl.workers.megatron_workers import ActorRolloutRefWorker as ARRWorker
 from verl.workers.megatron_workers import AsyncActorRolloutRefWorker, CriticWorker
 
@@ -21,7 +20,7 @@ logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
 
 class ActorRolloutRefWorker(ARRWorker):
     def __init__(self, config: DictConfig, role: str, **kwargs):
-        super().__init__(cfg, role)
+        super().__init__(config, role)
     
     def _build_rollout(self, trust_remote_code=False):
         from torch.distributed.device_mesh import init_device_mesh
@@ -90,4 +89,4 @@ class ActorRolloutRefWorker(ARRWorker):
         else:
             raise NotImplementedError("Only vllmRollout is supported with Megatron now")
         print(f"rollout and sharding manager init done sharding_manager: {sharding_manager}")
-        return rollout_worker, sharding_manager
+        return rollout, sharding_manager

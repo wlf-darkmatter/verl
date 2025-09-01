@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-import asyncio
 import getpass
 import logging
 import os
@@ -23,27 +21,24 @@ import socket
 from contextlib import contextmanager
 from types import MethodType
 from typing import Any
+import gc
 
 import numpy as np
 import ray
 import torch
 import torch.distributed
 import zmq
-import zmq.asyncio
 from filelock import FileLock
 from omegaconf import DictConfig, ListConfig
 from tensordict import TensorDict
 from vllm import LLM, SamplingParams
-from vllm.config import CompilationConfig, CompilationLevel
 from vllm.distributed import parallel_state as vllm_ps
 from vllm.lora.request import LoRARequest
 from vllm.model_executor.sampling_metadata import SamplingMetadata
 from vllm.worker.worker_base import WorkerWrapperBase
 
 from verl import DataProto
-from verl.third_party.vllm import VLLM_SLEEP_LEVEL
 from verl.utils.profiler import GPUMemoryLogger
-from verl.utils.ray_utils import ray_noset_visible_devices
 from verl.utils.torch_functional import get_response_mask, pad_2d_list_to_length
 from verl.workers.config import RolloutConfig
 from verl.workers.rollout.base import BaseRollout
@@ -85,7 +80,7 @@ class vLLMRollout(vLLMRolloutBase):
             vllm_ps.initialize_model_parallel(tensor_model_parallel_size=tensor_parallel_size)
         
         # if VLLM_DP_SIZE is configured, the DP communication domain needs to be explicitly initialized
-        if int(os.getenv("VLLM_DP_SIZE", "1")) > 1:
+        if int(os.environ.get("VLLM_DP_SIZE", "1")) > 1:
             from recipe.r1_npu.vllm_parallel_state import init_parallel_state
             init_parallel_state(tensor_parallel_size)
 

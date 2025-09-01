@@ -4,7 +4,6 @@ import os
 
 import torch
 import torch.distributed
-from megatron.core import parallel_state as mpu
 from omegaconf import DictConfig
 from torch import nn
 

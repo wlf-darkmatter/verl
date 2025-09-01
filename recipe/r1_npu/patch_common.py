@@ -2,7 +2,7 @@ import torch
 
 from mindspeed.patch_utils import MindSpeedPatchesManager
 from verl.models.mcore.weight_converter import McoreToHFWeightConverterDpskv3 as McoreToHFWeightConverterDpskv3Base
-from mindspeed.core.megatron_bsic.requirements_basic import dummy_compile
+from mindspeed.core.megatron_basic.requirements_basic import dummy_compile
 
 MindSpeedPatchesManager.patches_info['torch.compile'].remove_patch()
 TRUE_COMPILE = torch.compile
@@ -52,7 +52,7 @@ class McoreToHFWeightConverterDpskv3(McoreToHFWeightConverterDpskv3Base):
                     convert_names.append(f"model.layers.{layer_number}.mlp.experts.{expert_id}.gate_proj.weight")
                     convert_names.append(f"model.layers.{layer_number}.mlp.experts.{expert_id}.up_proj.weight")
             elif "mlp.experts.weight2" in name:
-                num_moe_experts = int(len(params) // 2)
+                num_moe_experts = len(params)
                 for expert_id in range(num_moe_experts):
                     convert_names.append(f"model.layers.{layer_number}.mlp.experts.{expert_id}.down_proj.weight")
             else:
@@ -62,8 +62,8 @@ class McoreToHFWeightConverterDpskv3(McoreToHFWeightConverterDpskv3Base):
 
 
 def mcore_models_adaptation():
-    from verl.models.mcore.registry import MODEL_CONFIG_CONVERTER_REGISTRY, SupportedModel
+    from verl.models.mcore.registry import MODEL_WEIGHT_CONVERTER_REGISTRY, SupportedModel
 
-    MODEL_CONFIG_CONVERTER_REGISTRY[SupportedModel.DEEPSEEK_V3] = McoreToHFWeightConverterDpskv3
+    MODEL_WEIGHT_CONVERTER_REGISTRY[SupportedModel.DEEPSEEK_V3] = McoreToHFWeightConverterDpskv3
 
 mcore_models_adaptation()

@@ -17,15 +17,13 @@
 """Pretrain utilities."""
 
 import gc
-import inspect
 import os
 import warnings
-from dataclasses import dataclass
 from typing import Any
 
 import torch
 import torch.nn.functional as F
-from megatron.core import ModelParallelConfig, mpu, parallel_state, tensor_parallel
+from megatron.core import ModelParallelConfig, mpu, tensor_parallel
 from megatron.core.distributed import DistributedDataParallel as DDP
 from megatron.core.distributed import DistributedDataParallelConfig
 from megatron.core.enums import ModelType
@@ -44,7 +42,15 @@ from vllm.distributed.parallel_state import get_ep_group
 from verl.utils.megatron_utils import broadcast_from_megatron_pp, broadcast_str_from_megatron_pp, unwrap_model
 
 
-def default_tp_concat_fn(layer_name_mapping, name, train_params, infer_params, model_config, convert_qkv_gate_up_by_simple_split=False):
+def default_tp_concat_fn(
+        layer_name_mapping, 
+        name, 
+        train_params,
+        infer_params,
+        model_config,
+        hf_config=None,
+        convert_qkv_gate_up_by_simple_split=False
+    ):
     """
     name: name of the parameter
     train_params: training parameters
@@ -99,7 +105,11 @@ def default_tp_concat_fn(layer_name_mapping, name, train_params, infer_params, m
         v = torch.cat(v_lst, dim=0)
         infer_params = torch.cat((q, k, v), dim=0) if not convert_qkv_gate_up_by_simple_split else [q, k, v]
 
-    elif layer_name_mapping.get("gate_proj_layer_name") in name:
+    elif (
+            layer_name_mapping.get("gate_proj_layer_name") in name
+            and "layer_norm" not in name
+            and "vision_model.projection" not in name
+        ):
         # if the tensor is gate and proj
         gate_lst = []
         up_lst = []
@@ -115,12 +125,12 @@ def default_tp_concat_fn(layer_name_mapping, name, train_params, infer_params, m
         gate_pp_lst = []
         up_pp_lst = []
 
-        if os.getenv('NO_ALL_TO_ALL_RESHARD', '0') == '1':
+        if os.getenv('ALL_TO_ALL_RESHARD', '0') == '0':
             for infer_param in infer_params:
                 split_size = [
                     model_config.moe_intermediate_size,
                     model_config.moe_intermediate_size,
-                ] * (model_config.n_routed_experts // mpu.get_tensor_and_expert_parallel_world_size())
+                ] * (num_experts // mpu.get_expert_tensor_and_model_parallel_world_size())
                 experts_weight = infer_param.split(split_size, dim=1)
                 gate_pp_lst.extend(experts_weight[::2])
                 up_pp_lst.extend(experts_weight[1::2])
@@ -131,11 +141,11 @@ def default_tp_concat_fn(layer_name_mapping, name, train_params, infer_params, m
 
     elif "mlp.experts.weight2" in name:  # for moe group matmul
         down_pp_lst = []
-        if os.getenv('NO_ALL_TO_ALL_RESHARD', '0') == '1':
+        if os.getenv('ALL_TO_ALL_RESHARD', '0') == '0':
             for infer_param in infer_params:
                 split_size = [
                     model_config.moe_intermediate_size
-                ] * (model_config.n_routed_experts // mpu.get_tensor_and_expert_parallel_world_size())
+                ] * (num_experts // mpu.get_expert_tensor_and_model_parallel_world_size())
                 experts_weight = infer_param.split(split_size, dim=0)
                 down_pp_lst.extend(experts_weight)
             experts_down_pp = [downs.transpose(0, 1) for downs in down_pp_lst]
@@ -150,6 +160,8 @@ def default_tp_concat_fn(layer_name_mapping, name, train_params, infer_params, m
     else:
         # concat tensor
         infer_params = torch.cat(infer_params, dim=tp_utils.get_tensor_parallel_partition_dim(train_params))
+    
+    return infer_params
 
 
 def per_tensor_generator(
@@ -170,7 +182,7 @@ def per_tensor_generator(
     vpp_size = len(actor_module)
     all_gather_group = mpu.get_tensor_model_parallel_group()
     all_gather_group_size = torch.distributed.get_world_size(group=all_gather_group)
-    etmp_group = mpu.get_expert_tensor_model_parallel_group()
+    etmp_group = mpu.get_expert_tensor_and_model_parallel_group()
 
     def tensor_generator():
         for scan_vpp_idx in range(vpp_size):
@@ -277,10 +289,10 @@ def per_tensor_generator(
             
             if os.getenv('ALL_TO_ALL_RESHARD', '0') == '0':
                 ep_params = [torch.empty_like(broad_pp_tensor) for _ in range(ep_size)]
-                torch.distributed.all_to_all(ep_params, broad_pp_tensor, group=etmp_group)
+                torch.distributed.all_gather(ep_params, broad_pp_tensor, group=etmp_group)
             else:
                 # EP param reshard method based on AllToAllV, efficient in both memory usage and performance
-                etp_params = ep_param_reshard_by_alltoallv(
+                ep_params = ep_param_reshard_by_alltoallv(
                     param_name=cur_name,
                     ep_param_train=broad_pp_tensor,
                     num_experts=weight_converter.mcore_config.num_moe_experts,
@@ -291,7 +303,7 @@ def per_tensor_generator(
                 layer_name_mapping, 
                 cur_name, 
                 broad_pp_tensor, 
-                etp_params, 
+                ep_params, 
                 model_config, 
                 convert_qkv_gate_up_by_simple_split
             )
@@ -354,14 +366,13 @@ def ep_param_reshard_by_alltoallv(
     the send tensors for global rank 4 is: [empty, empty, empty, empty]
     the recv tensors for global rank 4 is: [empty, empty, shard_from_rank6, empty]
 
-    NOTE: Global ranks must be consecutive within each training EP group, which is guaranteed by TP_extend_EP.
     """
-    ep_size_train = mpu.get_tensor_and_expert_parallel_world_size()
-    ep_rank_train = mpu.get_tensor_and_expert_parallel_rank()
+    ep_size_train = mpu.get_expert_tensor_and_model_parallel_world_size()
+    ep_rank_train = mpu.get_expert_tensor_and_model_parallel_rank()
     ep_group_rollout = get_ep_group().device_group
     ep_size_rollout = torch.distributed.get_world_size(ep_group_rollout)
     ep_rank_rollout = torch.distributed.get_rank(group=ep_group_rollout)
-    assert ep_size_rollout % ep_size_train == 0, "EP size of rollout must be divisible by EP size of training"
+    assert ep_size_rollout % ep_size_train == 0, f"EP size of rollout {ep_size_rollout} must be divisible by EP size of training {ep_size_train}"
     micro_ep_size = ep_size_rollout // ep_size_train
 
     assert num_experts % ep_size_train == 0 and num_experts % ep_size_rollout == 0
@@ -419,7 +430,7 @@ def ep_param_reshard_by_alltoallv(
         else:
             recv_tensors.append(torch.empty(0, dtype=ep_param_train.dtype, device=ep_param_train.device)) # placeholder
 
-    torch.distributed.all_to_all(recv_tensors, send_tensors, group=mpu.get_tensor_and_expert_parallel_group())
+    torch.distributed.all_to_all(recv_tensors, send_tensors, group=mpu.get_expert_tensor_and_model_parallel_group())
     # filter out empty tensors and retain only the ep params required by this rank in rollout
     ep_params = [param for param in recv_tensors if param.numel() > 0]
     return ep_params
@@ -437,7 +448,12 @@ def get_rollout_expert_after_resharding(infer_params, model_config, is_weight1):
     rollout_ep_group = get_ep_group().device_group
     rollout_ep_size = torch.distributed.get_world_size(rollout_ep_group)
     ep_rank_rollout = torch.distributed.get_rank(group=rollout_ep_group)
-    num_experts = model_config.n_routed_experts
+    if hasattr(model_config, 'n_routed_experts'):
+        num_experts = model_config.n_routed_experts
+    elif hasattr(model_config, 'num_experts'):
+        num_experts = model_config.num_experts
+    else:
+        raise ValueError("model_config must have either 'n_routed_experts' or 'num_experts'")
     num_experts_rollout = num_experts // rollout_ep_size
 
     # expert ids held by current rank in rollout
