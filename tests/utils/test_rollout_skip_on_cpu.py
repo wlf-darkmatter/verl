@@ -131,7 +131,7 @@ class TestRolloutSkip:
         assert skip.prompt_length == config.data.max_prompt_length
         assert skip.response_length == config.data.max_response_length
         assert skip.do_compress == config.actor_rollout_ref.rollout.skip.compress
-        assert skip.strict_mode == config.actor_rollout_ref.rollout.skip.strict_mode
+
         assert skip.is_enable
         assert str(skip.specify_dumped_dir).startswith(config.actor_rollout_ref.rollout.skip.dump_dir)
 
@@ -305,20 +305,6 @@ class TestPostDumpAction:
         skip.record(new_batch_generator())
         rollout_wg.generate_sequences(MagicMock())
         assert skip.get_path_dump().exists
-
-    @pytest.mark.parametrize("step", [1, 16])
-    def test_rollout_with_EXIT(self, mock_rollout_wg, step, capsys):
-        config, rollout_wg, new_batch_generator = mock_rollout_wg
-        config.actor_rollout_ref.rollout.skip.post_dump_action = "exit"
-        skip = RolloutSkip(config)
-
-        for _ in range(step):
-            gen_batch = new_batch_generator()
-            skip.record(gen_batch)
-            rollout_wg.generate_sequences(MagicMock())
-
-        skip.record(new_batch_generator())
-        rollout_wg.generate_sequences(MagicMock())
 
 
 class TestCompress:

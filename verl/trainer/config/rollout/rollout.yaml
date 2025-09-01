@@ -252,19 +252,15 @@ skip:
   # Action after dump_step
   # 1. "REPEAT": repeat using previous dump content
   # 2. "REPEAT_LAST": repeat using the last dump content
-  # 3. "EXIT": exit program
-  # 4. "ROLLOUT": resume normal rollout, not using dump, not dumping
-  # 5. "ROLLOUT_WITH_DUMP": resume normal rollout, dumping
+  # 3. "ROLLOUT": resume normal rollout, not using dump, not dumping
+  # 4. "ROLLOUT_WITH_DUMP": resume normal rollout, dumping
   post_dump_action: "repeat"
 
-  # Strict mode will raise error if `new_batch` not received by RolloutSkip.record() in trainer.fit().
-  # This mode is recommended since it helps detect potential issues early. And ensures that the dumped data aligns with the training data.
-  strict_mode: True
 
   # When enabled, the dumped data will be compressed using `zlib` to save disk space.
   # The compression ratio is typically between 0.1% to 10%.
   # 3rd module `pyzstd` is strongly recommended over zlib for better performance.
-  #todo 这里给一个pr的链接，在链接中说明使用pyzstd带来的好处，修改后删除本行
+  # refer to https://github.com/volcengine/verl/pull/3283
   compress: False
 
 # profile the rollout model in `generate_sequence`
