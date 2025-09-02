@@ -9,15 +9,15 @@ from torch import nn
 
 from verl.models.mcore.weight_converter import McoreToHFWeightConverterBase
 from verl.utils.device import get_torch_device
-from verl.utils.megatron_utils import load_megatron_model_to_gpu, offload_megatron_model_to_cpu
+from verl.utils.megatron_utils import load_megatron_model_to_gpu, offload_megatron_model_to_cpu, per_tensor_generator
 from verl.utils.memory_utils import aggressive_empty_cache
 from verl.utils.profiler import GPUMemoryLogger, log_gpu_memory_usage
 from verl.utils.profiler.performance import simple_timer
 from verl.workers.sharding_manager.megatron_vllm import MegatronVLLMShardingManager as MVShardingManager
-from recipe.r1_npu.megatron_utils import per_tensor_generator
 
 logger = logging.getLogger(__file__)
 logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
+
 
 class MegatronVLLMShardingManager(MVShardingManager):
     def __init__(

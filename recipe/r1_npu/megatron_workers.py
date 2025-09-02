@@ -13,7 +13,7 @@ from verl.workers.megatron_workers import AsyncActorRolloutRefWorker, CriticWork
 from verl.utils.config import omega_conf_to_dataclass
 from verl.utils.profiler import log_gpu_memory_usage
 from verl.utils.fs import copy_to_local
-from .patch_common import TRUE_COMPILE, DUMMY_COMPILE
+from .patch_compile import TRUE_COMPILE, DUMMY_COMPILE
 
 logger = logging.getLogger(__file__)
 logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
