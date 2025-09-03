@@ -63,7 +63,7 @@ class vLLMRollout(vLLMRolloutBase):
 
         from vllm_ascend.patch import platform
         from vllm_ascend.patch import worker
-        from recipe.r1_npu import engine_core
+        from recipe.r1_ascend import engine_core
 
         tensor_parallel_size = self.config.get("tensor_model_parallel_size", 1)
         assert tensor_parallel_size <= torch.distributed.get_world_size(), (
@@ -81,7 +81,7 @@ class vLLMRollout(vLLMRolloutBase):
         
         # if VLLM_DP_SIZE is configured, the DP communication domain needs to be explicitly initialized
         if int(os.environ.get("VLLM_DP_SIZE", "1")) > 1:
-            from recipe.r1_npu.vllm_parallel_state import init_parallel_state
+            from recipe.r1_ascend.vllm_parallel_state import init_parallel_state
             init_parallel_state(tensor_parallel_size)
 
         rope_scaling_config = getattr(model_hf_config, "rope_scaling", None)
