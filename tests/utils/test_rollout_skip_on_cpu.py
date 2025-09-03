@@ -162,46 +162,6 @@ class TestRolloutSkip:
             assert not torch.allclose(_result.batch["response"], result.batch["response"])
             _result = result
 
-    def test_generate_with_wrap_nostrict(self, mock_rollout_wg, capsys):
-        """Test that generate_sequences works without wrapping"""
-
-        config, rollout_wg, _ = mock_rollout_wg
-        skip = RolloutSkip(config)
-        skip.strict_mode = False
-        skip.wrap_generate_sequences(rollout_wg)
-
-        _result = rollout_wg.generate_sequences(MagicMock())
-
-        for _ in range(10):
-            result = rollout_wg.generate_sequences(MagicMock())
-            assert isinstance(result, DataProto)
-            # * make sure the data is different
-            assert torch.allclose(_result.batch["prompt"], result.batch["prompt"])
-            assert torch.allclose(_result.batch["response"], result.batch["response"])
-
-            captured = capsys.readouterr()
-            assert "Successfully load pre-generated data from" in captured.out
-            _result = result
-
-    def test_dump_nostrict(self, mock_rollout_wg, capsys):
-        config, rollout_wg, _ = mock_rollout_wg
-        skip = RolloutSkip(config)
-        skip.strict_mode = False
-        skip.wrap_generate_sequences(rollout_wg)
-
-        result = rollout_wg.generate_sequences(MagicMock())
-        # * check if dump is OK
-        assert skip.get_path_dump().exists()
-        captured = capsys.readouterr()
-        assert "Successfully dump data in" in captured.out
-        # * get file size, estimate file size
-        file_size = skip.get_path_dump().stat().st_size
-        if not skip.do_compress:
-            est_file_size = (
-                (skip.prompt_length + skip.response_length) * skip.gbs * skip.n * result.batch["prompt"].dtype.itemsize
-            )
-            assert file_size >= est_file_size, "Dumped file size is smaller than expected"
-
     def test_dump_strict(self, mock_rollout_wg, capsys):
         config, rollout_wg, new_batch_generator = mock_rollout_wg
         skip = RolloutSkip(config)

@@ -50,6 +50,7 @@ class RolloutSkip:
         self.rollout_config = config.actor_rollout_ref.rollout
         self.skip_config = self.rollout_config.skip
         self.is_enable = self.skip_config.get("enable", False)
+        self._rollout_wg = None
 
         if not self.is_enable:
             return
@@ -61,14 +62,8 @@ class RolloutSkip:
         self.response_length = config.data.get("max_response_length", 0)
         self.prompt_length = config.data.get("max_prompt_length", 0)
 
-        self._rollout_wg = None
         self._new_batch = None
         self.curr_step: int = 0
-        # Strict mode will raise error if `new_batch` not received by
-        # RolloutSkip.record() in trainer.fit().
-        # This mode is recommended since it helps detect potential issues early.
-        # And ensures that the dumped data aligns with the training data.
-        self.strict_mode = True
 
         self.do_compress = self.skip_config.get("compress", True)
         self.dump_step = max(1, self.skip_config.get("dump_step", 1))  # at least dump once
@@ -149,7 +144,8 @@ class RolloutSkip:
             print(f"{self.print_mark}Warning, duplicate record new_batch.", flush=True)
 
     def wrap_generate_sequences(self, rollout_wg):
-        self._rollout_wg = rollout_wg
+        if self.is_enable:
+            self._rollout_wg = rollout_wg
 
         try:
             self._rollout_wg.generate_sequences = wrap_generate_sequences(self, self._rollout_wg)
@@ -203,13 +199,13 @@ class RolloutSkip:
         return dumped_new_batch, dumped_gen_batch
 
     def dump(self, outputs: DataProto):
-        if self.strict_mode:
-            if self._flag_record is False or self._new_batch is None:
-                raise AssertionError(
-                    f"{self.print_mark}\033[33mError: \n"
-                    + "In rollout_skip with strict_mode, the new_batch record is required."
-                    + "Please record the new_batch using `RolloutSkip.record(new_batch)` in trainer.fit().\033[0m"
-                )
+        # todo raise error in dump is too late, fix it later.
+        if self._flag_record is False or self._new_batch is None:
+            raise AssertionError(
+                f"{self.print_mark}\033[33mError: \n"
+                + "The new_batch record is required."
+                + "Please record the new_batch using `RolloutSkip.record(new_batch)` in trainer.fit().\033[0m"
+            )
         self._flag_record = False
 
         data_dump = {
@@ -252,18 +248,17 @@ class RolloutSkip:
         In case of [Answer] mismatch.
         """
 
-        if self.strict_mode:
-            if self._flag_record is False:
-                raise AssertionError(
-                    f"{self.print_mark}\033[33mError: \n"
-                    + "The new_batch is not recorded. Please record the new_batch"
-                    + "using `RolloutSkip.record(new_batch)`. \033[0m"
-                )
-            self._flag_record = False
+        if self._flag_record is False:
+            raise AssertionError(
+                f"{self.print_mark}\033[33mError: \n"
+                + "The new_batch is not recorded. Please record the new_batch"
+                + "using `RolloutSkip.record(new_batch)`. \033[0m"
+            )
+        self._flag_record = False
 
-            self._new_batch.batch = dumped_new_batch.batch
-            self._new_batch.non_tensor_batch = dumped_new_batch.non_tensor_batch
-            self._new_batch.meta_info = dumped_new_batch.meta_info
+        self._new_batch.batch = dumped_new_batch.batch
+        self._new_batch.non_tensor_batch = dumped_new_batch.non_tensor_batch
+        self._new_batch.meta_info = dumped_new_batch.meta_info
 
 
 def wrap_generate_sequences(rolloutskip: RolloutSkip, rollout_wg):
