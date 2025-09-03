@@ -66,9 +66,12 @@ class RolloutSkip:
         self.curr_step: int = 0
 
         self.do_compress = self.skip_config.get("compress", True)
-        self.dump_step = max(1, self.skip_config.get("dump_step", 1))  # at least dump once
+        self.dump_step = max(0, self.skip_config.get("dump_step", 1))  # at least dump once
         self.post_dump_action = self.skip_config.get("post_dump_action", PostDumpAction.REPEAT)
         self.post_dump_action = PostDumpAction(self.post_dump_action)
+
+        if self.dump_step <= 0:
+            assert self.post_dump_action in [PostDumpAction.ROLLOUT, PostDumpAction.ROLLOUT_WITH_DUMP]
 
         self._create_dump_path()
         self._flag_record = False
