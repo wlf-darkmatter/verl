@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euxo pipefail
+set -x pipefail
 
 project_name='GRPO'
 exp_name='GRPO-DeepSeekV3-671B-Megatron-256rank-gbs512'
@@ -21,11 +21,9 @@ ppo_mini_batch_size=512
 train_prompt_bsz=512
 n_resp_per_prompt=16
 
-RAY_ADDRESS=${RAY_ADDRESS:-"http://localhost:8265"}
-
 # Paths
 RAY_DATA_HOME=${RAY_DATA_HOME:-"${HOME}/verl"}
-CONFIG_PATH=${CONFIG_PATH:-"${RAY_DATA_HOME}/trainer/config"}
+CONFIG_PATH=${CONFIG_PATH:-"${RAY_DATA_HOME}/verl/trainer/config"}
 MODEL_PATH=${MODEL_PATH:-"${RAY_DATA_HOME}/models/DeepSeekV3-V3-hf"}
 CKPTS_DIR=${CKPTS_DIR:-"${RAY_DATA_HOME}/ckpts/DeepseekV3-dist-ckpts"}
 TRAIN_FILE=${TRAIN_FILE:-"${RAY_DATA_HOME}/data/gsm8k/train.parquet"}
@@ -42,8 +40,7 @@ max_num_seqs=64
 gen_tp=2
 
 
-ray job submit --no-wait \
-    -- python3 -m recipe.r1_ascend.main_ppo \
+python3 -m recipe.r1_ascend.main_ppo \
     --config-path="${CONFIG_PATH}" \
     --config-name='ppo_megatron_trainer.yaml' \
     data.train_files="${TRAIN_FILE}" \
@@ -56,7 +53,7 @@ ray job submit --no-wait \
     actor_rollout_ref.rollout.name=vllm \
     actor_rollout_ref.rollout.n=${n_resp_per_prompt} \
     actor_rollout_ref.rollout.max_num_seqs=${max_num_seqs} \
-    actor_rollout_ref.rollout.max_num_batched_tokens=$(max_num_batched_tokens)  \
+    actor_rollout_ref.rollout.max_num_batched_tokens=${max_num_batched_tokens}  \
     algorithm.adv_estimator=${adv_estimator} \
     algorithm.kl_ctrl.kl_coef=${kl_coef} \
     actor_rollout_ref.actor.use_kl_loss=${use_kl_loss} \
