@@ -7,8 +7,8 @@
 veRL上的NPU环境准备，可参考[ascend_quick_start.rst]()
 
 > 其中部分包的版本需要注意替换：
-1. [vLLM：0.9.1]()
-2. [vLLM_Ascend：0.9.1dev]() commit-id:
+1. [vLLM：0.9.1](https://github.com/vllm-project/vllm.git) tag:v0.9.1
+2. [vLLM_Ascend：0.9.1dev](https://github.com/vllm-project/vllm-ascend.git) tag:v0.9.1rc2
 3. [MindSpeed: master](https://gitee.com/ascend/MindSpeed) commit-id: 7ff81
 4. [veRL: master](https://github.com/volcengine/verl) commit-id:55e3c
 
