@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -x pipefail
+set -x
 
 project_name='GRPO'
 exp_name='GRPO-DeepSeekV3-671B-Megatron-256rank-gbs512'
@@ -10,7 +10,7 @@ NPUS_PER_NODE=16
 adv_estimator=grpo
 
 kl_coef=0.0
-use_kl_loss=False
+use_kl_loss=True
 kl_loss_coef=0.001
 
 max_prompt_length=$((1024 * 1))
@@ -24,7 +24,7 @@ n_resp_per_prompt=16
 # Paths
 RAY_DATA_HOME=${RAY_DATA_HOME:-"${HOME}/verl"}
 CONFIG_PATH=${CONFIG_PATH:-"${RAY_DATA_HOME}/verl/trainer/config"}
-MODEL_PATH=${MODEL_PATH:-"${RAY_DATA_HOME}/models/DeepSeekV3-V3-hf"}
+MODEL_PATH=${MODEL_PATH:-"${RAY_DATA_HOME}/models/DeepSeek-V3-hf"}
 CKPTS_DIR=${CKPTS_DIR:-"${RAY_DATA_HOME}/ckpts/DeepseekV3-dist-ckpts"}
 TRAIN_FILE=${TRAIN_FILE:-"${RAY_DATA_HOME}/data/gsm8k/train.parquet"}
 TEST_FILE=${TEST_FILE:-"${RAY_DATA_HOME}/data/gsm8k/test.parquet"}
@@ -75,6 +75,7 @@ python3 -m recipe.r1_ascend.main_ppo \
     actor_rollout_ref.actor.megatron.param_offload=${offload} \
     actor_rollout_ref.actor.megatron.grad_offload=${offload} \
     actor_rollout_ref.actor.megatron.optimizer_offload=False \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=4 \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.8 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=${gen_tp} \
     actor_rollout_ref.rollout.enable_chunked_prefill=True \
@@ -110,11 +111,11 @@ python3 -m recipe.r1_ascend.main_ppo \
     +actor_rollout_ref.actor.megatron.override_transformer_config.moe_grouped_gemm=True \
     +actor_rollout_ref.actor.megatron.override_transformer_config.use_fused_rotary_pos_emb=True \
     +actor_rollout_ref.actor.megatron.override_transformer_config.rope_scaling_type='yarn' \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.rope_scaling_factor=40 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.yarn_scaling_factor=40 \
     +actor_rollout_ref.actor.megatron.override_transformer_config.rope_scaling_mscale=1.0 \
     +actor_rollout_ref.actor.megatron.override_transformer_config.rope_scaling_mscale_all_dim=1.0 \
     +actor_rollout_ref.actor.megatron.override_transformer_config.use_fused_swiglu=True \
     +actor_rollout_ref.actor.megatron.override_transformer_config.seq_length=2048 \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_first_stage=6 \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_stage=7 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_first_pipeline_stage=6 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_pipeline_stage=7 \
     +actor_rollout_ref.actor.megatron.override_transformer_config.swap_optimizer=True $@

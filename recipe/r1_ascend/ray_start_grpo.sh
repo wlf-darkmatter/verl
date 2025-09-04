@@ -18,16 +18,10 @@ ray stop --force
 export RAY_DEDUP_LOGS=0            # 0: disable ray's log folding 1: enable ray's log folding
 export HYDRA_FULL_ERROR=1          # display the accurate error stack
 
-SOCKET_IFNAME="Your SOCKET IFNAME"
-
 ulimit -n 32768
 mkdir logs
 
 export HCCL_IF_BASE_PORT=24703
-export LD_PRELOAD=/usr/local/lib/libjemalloc.so.2
-export MALLOC_MMAP_THRESHOLD_=512768
-export LCAL_COMM_ID=127.0.0.1:27001
-
 
 NNODES=16                          # number of nodes
 NPUS_PER_NODE=16                   # the number of npus for each node
