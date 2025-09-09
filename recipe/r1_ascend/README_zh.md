@@ -27,9 +27,9 @@
 |  TP2 EP256  |  EP32 PP8  |  同Actor  |  全offload，优化器使用[Mindspeed卸载特性](https://gitee.com/ascend/MindSpeed/blob/master/docs/features/swap-optimizer.md)  |
 
 得到一步的训练性能如下：
-|  Step  | 平均问题长度 |  平均回复长度  |  单步总耗时(s) | generate_seq耗时(s) |  reshard耗时(s) | reward耗时(s) | old耗时(s) | ref耗时(s) | update耗时(s) |
-|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
-| 27 | 75.8 |  2553.0  |  1338.3  |  495.5  |  67.6  |  8.5  |  134.1  |  116.7  | 495.2 |
+|  Step  | 平均问题长度 |  平均回复长度  |  单步总耗时(s) | 吞吐(tps/A3) | generate_seq耗时(s) |  reshard耗时(s) | reward耗时(s) | old耗时(s) | ref耗时(s) | update耗时(s) |
+|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
+| 27 | 75.8 |  2553.0  |  1338.3  | 125.7 |  495.5  |  67.6  |  8.5  |  134.1  |  116.7  | 495.2 |
 
 
 ### 训练过程记录
@@ -46,27 +46,46 @@
 ## 快速开始
 
 ### 环境准备
-veRL上的NPU环境准备，可参考[ascend_quick_start.rst](./docs/ascend_tutorial/ascend_quick_start.rst)进行配置，也可使用该镜像：xxxxxxxxxxxxxx
+veRL上的NPU环境准备，可参考[ascend_quick_start.rst](../../docs/ascend_tutorial/ascend_quick_start.rst)进行配置。
+此外，也可使用我们提供的Dockerfile在本地构建项目运行环境：`docker build -f Dockerfile -t REPOSITORY:TAG ./`
 
-注意，其中部分包的版本需要替换：
-- [vLLM：0.9.1](https://github.com/vllm-project/vllm.git)
-    
-    `git clone -b v0.9.1 https://github.com/vllm-project/vllm.git`
-- [vLLM_Ascend：v0.9.1rc2](https://github.com/vllm-project/vllm-ascend/tree/v0.9.1rc2)
+本样准备源码的步骤如下：
+```shell
+# veRL (commit-id:55e3c)
+git clone https://github.com/volcengine/verl.git
+cd verl
+git checkout 55e3c
+cd ..
 
-    `git clone -b v0.9.1rc2 https://github.com/vllm-project/vllm-ascend.git`
+# vLLM (v0.9.1)
+git clone https://github.com/vllm-project/vllm.git
+cd vllm
+git checkout v0.9.1
+cp -r vllm ../verl
+cd ..
 
-- [MindSpeed: master](https://gitee.com/ascend/MindSpeed) (commit-id: 7ff81)
+# vLLM-Ascend (v0.9.1rc2)
+git clone https://github.com/vllm-project/vllm-ascend.git
+cd vllm-ascend
+git checkout v0.9.1rc2
+cp -r vllm-ascend ../verl
+cd ..
 
-    `git clone https://gitee.com/ascend/MindSpeed.git && cd MindSpeed && git checkout 7ff81`
-- [veRL: master](https://github.com/volcengine/verl) (commit-id:55e3c)
-    
-    `git clone https://github.com/volcengine/verl.git && cd veRL && git checkout 55e3c`
+# MindSpeed (commit-id: 7ff81)
+git clone https://gitee.com/ascend/MindSpeed.git
+cd MindSpeed
+git checkout 55e3c
+cd ..
+
+# Megatron-LM.core and others
+pip install git+https://github.com/NVIDIA/Megatron-LM.git@core_v0.12.1
+pip install mathruler
+```
 
 ### 准备训练数据集与模型权重
-- 数据集放入`./data`, 数据集准备参考: [veRL官方文档](https://verl.readthedocs.io/en/latest/preparation/prepare_data.html)
+- 数据集放入`./data`, 数据集准备参考: [veRL官方文档](https://verl.readthedocs.io/en/latest/preparation/prepare_data.html)。本样例使用了[deepscaler数据集](https://huggingface.co/datasets/agentica-org/DeepScaleR-Preview-Dataset/blob/main/deepscaler.json)。
 
-- 模型放入`./DeepSeek-V3-hf`, 模型下载地址：[DeepSeek-V3](https://huggingface.co/deepseek-ai/DeepSeek-V3)
+- 模型放入`./DeepSeek-V3-hf`, 模型下载地址：[DeepSeek-V3](https://huggingface.co/deepseek-ai/DeepSeek-V3)。
 
 - 分布式权重切分使用`verl/scripts/converter_hf_to_mcore.py`完成。实践中我们发现2T的CPU内存不足以完成671B模型的权重切分处理，为此我们对该脚本进行了专家并行的适配，并在64块NPU上用EP8 PP8分布式策略对权重进行了切分。
 
