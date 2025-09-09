@@ -21,15 +21,22 @@ import torch
 from omegaconf import DictConfig
 from verl.utils.device import get_device_name
 from verl.workers.megatron_workers import ActorRolloutRefWorker as ARRWorker
-from verl.workers.megatron_workers import AsyncActorRolloutRefWorker, CriticWorker
 
 from verl.utils.config import omega_conf_to_dataclass
 from verl.utils.profiler import log_gpu_memory_usage
 from verl.utils.fs import copy_to_local
-from .patch_compile import TRUE_COMPILE, DUMMY_COMPILE
+
+# NPU-ADAPTATION: Save the original and dummy copies of `torch.compile`.
+from mindspeed.patch_utils import MindSpeedPatchesManager
+from mindspeed.core.megatron_basic.requirements_basic import dummy_compile
+MindSpeedPatchesManager.patches_info['torch.compile'].remove_patch()
+TRUE_COMPILE = torch.compile
+DUMMY_COMPILE = dummy_compile
+# NPU-ADAPTATION END
 
 logger = logging.getLogger(__file__)
 logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
+
 
 class ActorRolloutRefWorker(ARRWorker):
     def __init__(self, config: DictConfig, role: str, **kwargs):
@@ -37,7 +44,9 @@ class ActorRolloutRefWorker(ARRWorker):
     
     def _build_rollout(self, trust_remote_code=False):
         from torch.distributed.device_mesh import init_device_mesh
+        # NPU-ADAPTATION:Enable TRUE_COMPILEduring rollout graph construction.
         torch.compile = TRUE_COMPILE
+        # NPU-ADAPTATION END
 
         layer_name_mapping = {
             "qkv_layer_name": "self_attention.linear_qkv.",
@@ -48,10 +57,10 @@ class ActorRolloutRefWorker(ARRWorker):
 
         if self.config.rollout.name == "vllm":
             from torch.distributed.device_mesh import init_device_mesh
-
+            # NPU-ADAPTATION: Use the adaptation file in this directory.
             from .vllm_rollout_spmd import vLLMRollout
             from .megatron_vllm import MegatronVLLMShardingManager
-
+            # NPU-ADAPTATION END
 
             infer_tp = self.config.rollout.tensor_model_parallel_size
             dp = self.world_size // infer_tp
@@ -80,6 +89,7 @@ class ActorRolloutRefWorker(ARRWorker):
             from verl.models.mcore import get_mcore_weight_converter
 
             weight_converter = get_mcore_weight_converter(self.actor_model_config, self.dtype)
+            # NPU-ADAPTATION: Change the input parameter to 'rollout' and replace the 'inference_engine'.
             sharding_manager = MegatronVLLMShardingManager(
                 rollout=rollout,
                 model_config=self.actor_model_config,
@@ -92,13 +102,16 @@ class ActorRolloutRefWorker(ARRWorker):
                 offload_param=self._is_offload_param,
                 bridge=self.bridge,
             )
+            # NPU-ADAPTATION END
             log_gpu_memory_usage("After building sharding manager", logger=logger)
 
             is_collect = rollout_device_mesh["infer_tp"].get_local_rank() == 0
             self._register_dispatch_collect_info(
                 "rollout", dp_rank=rollout_device_mesh["dp"].get_local_rank(), is_collect=is_collect
             )
+            # NPU-ADAPTATION:Enable DUMMY_COMPILE after rollout graph construction.
             torch.compile = DUMMY_COMPILE
+            # NPU-ADAPTATION END
         else:
             raise NotImplementedError("Only vllmRollout is supported with Megatron now")
         print(f"rollout and sharding manager init done sharding_manager: {sharding_manager}")

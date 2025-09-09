@@ -11,12 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import inspect
 import logging
 import os
 
-import torch
-import torch.distributed
 from omegaconf import DictConfig
 from torch import nn
 
@@ -71,7 +68,9 @@ class MegatronVLLMShardingManager(MVShardingManager):
                 load_megatron_model_to_gpu(self.actor_module, load_grad=False)
 
             if self.rollout_config.free_cache_engine:
+                # NPU-ADAPTATION: Onload the model to NPU
                 self.rollout.onload_model_weights()
+                # NPU-ADAPTATION END
             if self.bridge is not None:
                 per_tensor_param = self.bridge.export_weights(self.actor_module)
             else:
@@ -88,8 +87,10 @@ class MegatronVLLMShardingManager(MVShardingManager):
             patch_vllm_moe_model_weight_loader(model)
             loaded_params = model.load_weights(per_tensor_param)
 
+            # NPU-ADAPTATION:Perform special processing on the parameters of the MLA layer.
             if hasattr(model.model.layers[0].self_attn, "mla_attn"):
                 self._process_mla()
+            # NPU-ADAPTATION END
 
             info = f"vLLM load weights, loaded_params: {len(loaded_params)}"
             logger.info(info)
@@ -99,7 +100,9 @@ class MegatronVLLMShardingManager(MVShardingManager):
             aggressive_empty_cache(force_sync=True)
 
             if self.rollout_config.free_cache_engine:
+                # NPU-ADAPTATION: init kv caches
                 self.rollout.init_cache_engine()
+                # NPU-ADAPTATION END
 
             # important: need to manually set the random states of each tp to be identical.
             if self.device_mesh is not None:
@@ -109,8 +112,10 @@ class MegatronVLLMShardingManager(MVShardingManager):
     @GPUMemoryLogger(role="megatron vllm sharding_manager", logger=logger)
     def __exit__(self, exc_type, exc_value, traceback):
         if self.rollout_config.free_cache_engine:
+            # NPU-ADAPTATION: free kv caches and offload model
             self.rollout.free_cache_engine()
             self.rollout.offload_model_weights()
+            # NPU-ADAPTATION END
         for model in self.actor_module:
             model.train()
 
@@ -121,6 +126,7 @@ class MegatronVLLMShardingManager(MVShardingManager):
             self.gen_random_states = get_torch_device().get_rng_state()
             get_torch_device().set_rng_state(self.torch_random_states)
     
+    # NPU-ADAPTATION:Perform special processing on the parameters of the MLA layer.
     def _process_mla(self):
         for i in range(self.rollout_model.model.start_layer, self.rollout_model.model.end_layer):
             mla = self.rollout_model.model.layers[i].self_attn.mla_attn.impl
@@ -131,3 +137,4 @@ class MegatronVLLMShardingManager(MVShardingManager):
                 mla.W_UV = None
                 mla.W_UK_T = None
             mla.process_weights_after_loading(None)
+    # NPU-ADAPTATION END

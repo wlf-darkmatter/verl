@@ -122,7 +122,9 @@ class TaskRunner:
             ray_worker_group_cls = RayWorkerGroup
 
         elif config.actor_rollout_ref.actor.strategy == "megatron":
+            # NPU-ADAPTATION: Modify the Megatron worker entry point and rewrite some functions.
             from .megatron_workers import ActorRolloutRefWorker, AsyncActorRolloutRefWorker
+            # NPU-ADAPTATION END
 
             actor_rollout_cls = (
                 AsyncActorRolloutRefWorker

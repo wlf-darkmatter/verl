@@ -11,35 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import getpass
 import logging
 import os
-import pickle
-import socket
-from contextlib import contextmanager
-from types import MethodType
-from typing import Any
 import gc
 
-import numpy as np
-import ray
 import torch
 import torch.distributed
-import zmq
-from filelock import FileLock
-from omegaconf import DictConfig, ListConfig
-from tensordict import TensorDict
 from vllm import LLM, SamplingParams
 from vllm.distributed import parallel_state as vllm_ps
-from vllm.lora.request import LoRARequest
-from vllm.model_executor.sampling_metadata import SamplingMetadata
-from vllm.worker.worker_base import WorkerWrapperBase
 
-from verl import DataProto
-from verl.utils.profiler import GPUMemoryLogger
-from verl.utils.torch_functional import get_response_mask, pad_2d_list_to_length
 from verl.workers.config import RolloutConfig
-from verl.workers.rollout.base import BaseRollout
 from verl.workers.rollout.vllm_rollout import vLLMRollout as vLLMRolloutBase
 
 logger = logging.getLogger(__file__)
@@ -58,10 +39,11 @@ class vLLMRollout(vLLMRolloutBase):
             **kwargs: train_tp, for Megatron Backend to initialize hybrid engine (zero redundancy) process group
         """
         self.config = config
-
+        # NPU-ADAPTATION: import vLLM-Ascend patch
         from vllm_ascend.patch import platform
         from vllm_ascend.patch import worker
         from recipe.r1_ascend import engine_core
+        # NPU-ADAPTATION END
 
         tensor_parallel_size = self.config.get("tensor_model_parallel_size", 1)
         assert tensor_parallel_size <= torch.distributed.get_world_size(), (
@@ -77,10 +59,11 @@ class vLLMRollout(vLLMRolloutBase):
             os.environ["MEGATRON_IMPORT_TIMERS"] = "0"
             vllm_ps.initialize_model_parallel(tensor_model_parallel_size=tensor_parallel_size)
         
-        # if VLLM_DP_SIZE is configured, the DP communication domain needs to be explicitly initialized
+        # NPU-ADAPTATION: VLLM_DP_SIZE is configured, the DP communication domain needs to be explicitly initialized
         if int(os.environ.get("VLLM_DP_SIZE", "1")) > 1:
             from recipe.r1_ascend.vllm_parallel_state import init_parallel_state
             init_parallel_state(tensor_parallel_size)
+        # NPU-ADAPTATION END
 
         rope_scaling_config = getattr(model_hf_config, "rope_scaling", None)
         if not rope_scaling_config:
@@ -136,14 +119,16 @@ class vLLMRollout(vLLMRolloutBase):
         VLLM_ENABLE_GRAPGH_MODE = int(os.environ.get("VLLM_ENABLE_GRAPH_MODE", "0"))
         self.inference_engine = LLM(
             model=model_path,
+            # NPU-ADAPTATION: Enable inference EP and disable sleep mode.
             enable_sleep_mode=False,
+            enable_expert_parallel=True,
+            # NPU-ADAPTATION END
             tensor_parallel_size=tensor_parallel_size,
             distributed_executor_backend="external_launcher",
             dtype=config.dtype,
             enforce_eager=config.enforce_eager,
             gpu_memory_utilization=config.gpu_memory_utilization,
             disable_custom_all_reduce=True,
-            enable_expert_parallel=True,
             skip_tokenizer_init=False,
             max_model_len=max_model_len,
             max_num_seqs=config.max_num_seqs,
@@ -154,8 +139,9 @@ class vLLMRollout(vLLMRolloutBase):
             enable_prefix_caching=False,
             trust_remote_code=trust_remote_code,
             seed=config.get("seed", 0),
+            # NPU-ADAPTATION: Enable graph mode and configure the parameters.
             additional_config={
-            "torchair_graph_config": {
+                "torchair_graph_config": {
                     "enabled": VLLM_ENABLE_GRAPGH_MODE,
                     "use_cached_graph": False,
                     "graph_batch_sizes_init": False,
@@ -170,9 +156,11 @@ class vLLMRollout(vLLMRolloutBase):
                 },
                 "refresh": True,
             },
+            # NPU-ADAPTATION END
             **lora_kwargs,
             **engine_kwargs,
         )
+        # NPU-ADAPTATION: Weight onload and offload, and initialization configurations such as kv_cache.
         self.model = self.inference_engine.llm_engine.model_executor.driver_worker.worker.model_runner.get_model()
         self.kv_cache_configs = None
         self.cpu_model = {}
@@ -181,6 +169,7 @@ class vLLMRollout(vLLMRolloutBase):
             self.cpu_model[name] = torch.empty_like(params, device="cpu")
         self.free_cache_engine()
         self.offload_model_weights()
+        # NPU-ADAPTATION END
 
         kwargs = dict(
             n=1,
@@ -200,6 +189,7 @@ class vLLMRollout(vLLMRolloutBase):
 
         self.pad_token_id = tokenizer.pad_token_id
 
+    # NPU-ADAPTATION: Weight onload and offload, kv_cache init and free function
     def init_cache_engine(self):
         if os.environ['VLLM_USE_V1'] == '1':
             worker = self.inference_engine.llm_engine.model_executor.driver_worker.worker
@@ -279,3 +269,4 @@ class vLLMRollout(vLLMRolloutBase):
 
         gc.collect()
         torch.npu.empty_cache()
+    # NPU-ADAPTATION END

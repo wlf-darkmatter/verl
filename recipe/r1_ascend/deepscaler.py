@@ -7,26 +7,29 @@
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 
-from mathruler.grader import extract_boxed_content, grade_answer
+import re
+from mathruler.grader import extract_boxed_content
 
-def extract_solution(solution_str, ground_truth):
+from verl.utils.reward_score.prime_math import compute_score as compute_score_math
+
+
+def compute_score(data_source, solution_str, ground_truth, extra_info=None):
     extract_output = extract_boxed_content(solution_str)
     if ground_truth in solution_str or extract_output == ground_truth:
         return 1.0
+    
+    original_is_correct, original_format_correctness, extracted_model_output = compute_score_math(extract_output, ground_truth)
+    if original_is_correct:
+        return 1.0
+    
+    # process answers like r'\text{odd}'
+    cleaned_truth = ground_truth.strip()
+    cleaned_model = extracted_model_output.strip()
+    text_pattern = r'^\\text\s*{([^}]+)}$'
+    match = re.match(text_pattern, cleaned_model)
+    if match:
+        cleaned_model = match.group(1).strip()
+        if text_content == cleaned_truth:
+            return 1.0
+    
     return 0.0
-
-def compute_score(data_source, solution_str, ground_truth, extra_info=None, method="strict", format_score=0.0, score=1.0):
-    """The scoring function for deepscaler.
-
-    Reference: Trung, Luong
-    Args:
-        data_source (str): the data source
-        solution_str (str): the solution text
-        ground_truth (str): the ground truth
-        method: the method to use to compute the score. Defaults to "strict".
-        format_score: the format of the score. Defaults to 0.0.
-        score: the score. Defaults to 1.0.
-    """
-    assert data_source == 'deepscaler', 'expected data_source is deepscaler'
-    score = extract_solution(solution_str=solution_str, ground_truth=ground_truth)
-    return score

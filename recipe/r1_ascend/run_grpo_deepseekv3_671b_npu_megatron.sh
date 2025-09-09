@@ -26,8 +26,8 @@ RAY_DATA_HOME=${RAY_DATA_HOME:-"${HOME}/verl"}
 CONFIG_PATH=${CONFIG_PATH:-"${RAY_DATA_HOME}/verl/trainer/config"}
 MODEL_PATH=${MODEL_PATH:-"${RAY_DATA_HOME}/models/DeepSeek-V3-hf"}
 CKPTS_DIR=${CKPTS_DIR:-"${RAY_DATA_HOME}/ckpts/DeepseekV3-dist-ckpts"}
-TRAIN_FILE=${TRAIN_FILE:-"${RAY_DATA_HOME}/data/gsm8k/train.parquet"}
-TEST_FILE=${TEST_FILE:-"${RAY_DATA_HOME}/data/gsm8k/test.parquet"}
+TRAIN_FILE=${TRAIN_FILE:-"${RAY_DATA_HOME}/data/deepscaler/train.parquet"}
+TEST_FILE=${TEST_FILE:-"${RAY_DATA_HOME}/data/deepscaler/test.parquet"}
 
 # Algorithm
 temperature=0.9
@@ -39,10 +39,13 @@ offload=True
 max_num_seqs=64
 gen_tp=2
 
-
+# Currently, it is necessary to enable `enable_chunked_prefill` in the script. 
+# However, in vLLM ascend, this configuration is off by default and does not take effect.
 python3 -m recipe.r1_ascend.main_ppo \
     --config-path="${CONFIG_PATH}" \
     --config-name='ppo_megatron_trainer.yaml' \
+    custom_reward_function.path=recipe.r1_ascend.deepscaler.py \
+    custom_reward_function.name=compute_score \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
     data.truncation='error' \
