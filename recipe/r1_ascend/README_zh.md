@@ -55,7 +55,6 @@ veRL上的NPU环境准备，可参考[ascend_quick_start.rst](../../docs/ascend_
 # veRL (commit-id:55e3c)
 git clone https://github.com/volcengine/verl.git
 cd verl
-git checkout 55e3c
 cd ..
 
 # vLLM (v0.9.1)
