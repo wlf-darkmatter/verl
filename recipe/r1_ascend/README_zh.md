@@ -47,7 +47,8 @@
 
 ### 环境准备
 veRL上的NPU环境准备，可参考[ascend_quick_start.rst](../../docs/ascend_tutorial/ascend_quick_start.rst)进行配置。
-此外，也可使用我们提供的Dockerfile在本地构建项目运行环境：`docker build -f Dockerfile -t REPOSITORY:TAG ./`
+
+此外，也可使用我们提供的Dockerfile在本地构建项目运行环境：`docker build -f Dockerfile.vllm_ascend.mindspeed.deepseekV3 -t REPOSITORY:TAG ./`
 
 本样准备源码的步骤如下：
 ```shell
