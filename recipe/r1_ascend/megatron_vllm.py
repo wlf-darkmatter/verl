@@ -128,8 +128,8 @@ class MegatronVLLMShardingManager(MVShardingManager):
     
     # NPU-ADAPTATION:Perform special processing on the parameters of the MLA layer.
     def _process_mla(self):
-        for i in range(self.rollout_model.model.start_layer, self.rollout_model.model.end_layer):
-            mla = self.rollout_model.model.layers[i].self_attn.mla_attn.impl
+        for i in range(self.model_runner.model.model.start_layer, self.model_runner.model.model.end_layer):
+            mla = self.model_runner.model.model.layers[i].self_attn.mla_attn.impl
             if hasattr(mla, "w_kc"):
                 mla.w_kc = None
                 mla.w_vc = None

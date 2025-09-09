@@ -28,7 +28,7 @@ def compute_score(data_source, solution_str, ground_truth, extra_info=None):
     text_pattern = r'^\\text\s*{([^}]+)}$'
     match = re.match(text_pattern, cleaned_model)
     if match:
-        cleaned_model = match.group(1).strip()
+        text_content = match.group(1).strip()
         if text_content == cleaned_truth:
             return 1.0
     

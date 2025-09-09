@@ -25,6 +25,7 @@ from verl.workers.megatron_workers import ActorRolloutRefWorker as ARRWorker
 from verl.utils.config import omega_conf_to_dataclass
 from verl.utils.profiler import log_gpu_memory_usage
 from verl.utils.fs import copy_to_local
+from verl.workers.config import RolloutConfig
 
 # NPU-ADAPTATION: Save the original and dummy copies of `torch.compile`.
 from mindspeed.patch_utils import MindSpeedPatchesManager
