@@ -19,7 +19,7 @@ RUN pip config set global.index-url ${PIP_INDEX_URL}
 RUN git clone -b master https://gitee.com/ascend/apex.git && \
     cd apex/ && bash scripts/build.sh --python=3.11 && \
     cd apex/dist/ && \
-    pip3 install --upgrade apex-0.1+ascend-{version}.whl
+    pip3 install --upgrade apex-0.1+ascend-*.whl
 
 # verl
 RUN git clone https://github.com/volcengine/verl.git && \
