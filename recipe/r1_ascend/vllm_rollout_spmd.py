@@ -52,9 +52,6 @@ class vLLMRollout(vLLMRolloutBase):
         max_num_batched_tokens = self.config.get("max_num_batched_tokens", 8192)
 
         if kwargs.get("train_tp") is not None:
-            # deployed with megatron
-            import os
-
             os.environ["CUDA_TIMER_STREAM_KAFKA_ENABLE"] = "0"
             os.environ["MEGATRON_IMPORT_TIMERS"] = "0"
             vllm_ps.initialize_model_parallel(tensor_model_parallel_size=tensor_parallel_size)

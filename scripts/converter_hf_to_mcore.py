@@ -128,6 +128,8 @@ def convert_checkpoint_from_transformers_to_megatron(
     layer_start, layer_end = layer_start_end
     pp_rank = mpu.get_pipeline_model_parallel_rank()
     pp_size = mpu.get_pipeline_model_parallel_world_size()
+    ep_rank = mpu.get_expert_model_parallel_rank()
+    ep_size = mpu.get_expert_model_parallel_world_size()
     numel = 0
 
     num_attention_heads = hf_config.num_attention_heads
@@ -176,9 +178,17 @@ def convert_checkpoint_from_transformers_to_megatron(
         numel += safe_copy(hf_layer.mlp.gate.weight, layer.mlp.router.weight)
 
         for idx, hf_expert in enumerate(hf_layer.mlp.experts):
+            num_experts = len(hf_layer.mlp.experts)
+            num_local_experts = num_experts // ep_size
+            expert_idx_start = ep_rank * num_local_experts
+            expert_idx_end = (ep_rank + 1) * num_local_experts
+            if i < expert_idx_start or i >= expert_idx_end:
+                continue
+            local_expert_idx = i - expert_idx_start
+
             fc1_weight = torch.cat([hf_expert.gate_proj.weight, hf_expert.up_proj.weight])
-            numel += safe_copy(fc1_weight, layer.mlp.experts.linear_fc1._parameters[f"weight{idx}"])
-            numel += safe_copy(hf_expert.down_proj.weight, layer.mlp.experts.linear_fc2._parameters[f"weight{idx}"])
+            numel += safe_copy(fc1_weight, layer.mlp.experts.linear_fc1._parameters[f"weight{local_expert_idx}"])
+            numel += safe_copy(hf_expert.down_proj.weight, layer.mlp.experts.linear_fc2._parameters[f"weight{local_expert_idx}"])
 
         if has_share_expert:
             numel += safe_copy(hf_layer.mlp.shared_expert_gate.weight, layer.mlp.shared_experts.gate_weight)
