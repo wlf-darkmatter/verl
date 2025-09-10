@@ -84,9 +84,9 @@ class RayDAPOTrainer(RayPPOTrainer):
             if self.config.trainer.get("val_only", False):
                 return
 
-        if self.config.actor_rollout_ref.rollout.get("skip_rollout", False):
-            rollout_skip = RolloutSkip(self.config, self.actor_rollout_wg)
-            rollout_skip.wrap_generate_sequences()
+        rollout_skip = RolloutSkip(self.config)
+        if rollout_skip.is_enable:
+            rollout_skip.wrap_generate_sequences(self.actor_rollout_wg)
 
         # add tqdm
         progress_bar = tqdm(total=self.total_training_steps, initial=self.global_steps, desc="Training Progress")
@@ -134,11 +134,12 @@ class RayDAPOTrainer(RayPPOTrainer):
                     )
                 gen_batch = gen_batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.n, interleave=True)
 
-                is_last_step = self.gen_steps >= self.total_training_steps
+                is_last_step = self.global_steps >= self.total_training_steps
 
                 with marked_timer("step", timing_raw):
                     # generate a batch
                     with marked_timer("gen", timing_raw, "red"):
+                        rollout_skip.record(new_batch)
                         gen_batch_output = self.actor_rollout_wg.generate_sequences(gen_batch)
                         timing_raw.update(gen_batch_output.meta_info["timing"])
                         gen_batch_output.meta_info.pop("timing", None)
@@ -253,7 +254,7 @@ class RayDAPOTrainer(RayPPOTrainer):
                                 print(f"{num_gen_batches=}. Keep generating...")
                                 progress_bar.update(1)
                                 self.gen_steps += 1
-                                is_last_step = self.gen_steps >= self.total_training_steps
+                                is_last_step = self.global_steps >= self.total_training_steps
                                 continue
                             else:
                                 raise ValueError(
