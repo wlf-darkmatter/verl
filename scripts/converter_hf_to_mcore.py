@@ -182,9 +182,9 @@ def convert_checkpoint_from_transformers_to_megatron(
             num_local_experts = num_experts // ep_size
             expert_idx_start = ep_rank * num_local_experts
             expert_idx_end = (ep_rank + 1) * num_local_experts
-            if i < expert_idx_start or i >= expert_idx_end:
+            if idx < expert_idx_start or idx >= expert_idx_end:
                 continue
-            local_expert_idx = i - expert_idx_start
+            local_expert_idx = idx - expert_idx_start
 
             fc1_weight = torch.cat([hf_expert.gate_proj.weight, hf_expert.up_proj.weight])
             numel += safe_copy(fc1_weight, layer.mlp.experts.linear_fc1._parameters[f"weight{local_expert_idx}"])
