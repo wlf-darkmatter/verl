@@ -56,7 +56,7 @@ class MegatronVLLMShardingManager(MVShardingManager):
             bridge,
         )
         self.rollout = rollout
-    
+
     @GPUMemoryLogger(role="megatron vllm sharding_manager", logger=logger)
     def __enter__(self):
         self.timing = {}
@@ -125,7 +125,7 @@ class MegatronVLLMShardingManager(MVShardingManager):
         if self.device_mesh is not None:
             self.gen_random_states = get_torch_device().get_rng_state()
             get_torch_device().set_rng_state(self.torch_random_states)
-    
+
     # NPU-ADAPTATION:Perform special processing on the parameters of the MLA layer.
     def _process_mla(self):
         for i in range(self.model_runner.model.model.start_layer, self.model_runner.model.model.end_layer):

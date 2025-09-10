@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import gc
 import logging
 import os
-import gc
 
 import torch
 import torch.distributed
@@ -188,12 +188,13 @@ class vLLMRollout(vLLMRolloutBase):
 
     # NPU-ADAPTATION: Weight onload and offload, kv_cache init and free function
     def init_cache_engine(self):
-        if os.environ['VLLM_USE_V1'] == '1':
+        if os.environ["VLLM_USE_V1"] == "1":
             worker = self.inference_engine.llm_engine.model_executor.driver_worker.worker
             if not worker.model_runner.kv_caches:
                 # v1 use explicit initialization method
                 self.inference_engine.llm_engine.engine_core.engine_core.model_executor.initialize_from_config(
-                    self.inference_engine.llm_engine.engine_core.engine_core.kv_cache_configs)
+                    self.inference_engine.llm_engine.engine_core.engine_core.kv_cache_configs
+                )
                 self.inference_engine.llm_engine.reset_prefix_cache()
         else:
             if self.inference_engine.llm_engine.model_executor.driver_worker.worker.cache_engine is None:
@@ -231,7 +232,7 @@ class vLLMRollout(vLLMRolloutBase):
         torch.npu.empty_cache()
 
     def free_cache_engine(self):
-        if os.environ['VLLM_USE_V1'] == '1':
+        if os.environ["VLLM_USE_V1"] == "1":
             worker = self.inference_engine.llm_engine.model_executor.driver_worker.worker
             ctx = worker.model_runner.vllm_config.compilation_config.static_forward_context
         else:
@@ -240,7 +241,10 @@ class vLLMRollout(vLLMRolloutBase):
 
         layer_need_kv_cache = []
         for layer_name in ctx:
-            if hasattr(ctx[layer_name], 'attn_type') and ctx[layer_name].attn_type in (AttentionType.DECODER, AttentionType.ENCODER_DECODER):
+            if hasattr(ctx[layer_name], 'attn_type') and ctx[layer_name].attn_type in (
+                AttentionType.DECODER, 
+                AttentionType.ENCODER_DECODER,
+            ):
                 layer_need_kv_cache.append(layer_name)
 
         pipeline_parallel_size = self.inference_engine.llm_engine.vllm_config.parallel_config.pipeline_parallel_size
@@ -249,7 +253,7 @@ class vLLMRollout(vLLMRolloutBase):
             for _ in range(pipeline_parallel_size):
                 kv_cache.append(torch.tensor([]))
             ctx[layer_name].kv_cache = kv_cache
-        if os.environ['VLLM_USE_V1'] == '1':
+        if os.environ["VLLM_USE_V1"] == "1":
             worker = self.inference_engine.llm_engine.model_executor.driver_worker.worker
 
             worker.model_runner.kv_caches = []

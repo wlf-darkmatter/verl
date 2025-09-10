@@ -14,18 +14,19 @@
 """
 The main entry point to run the PPO algorithm
 """
-import os
+
 import logging
+import os
 
 import torch
 from omegaconf import DictConfig
-from verl.utils.device import get_device_name
-from verl.workers.megatron_workers import ActorRolloutRefWorker as ARRWorker
 
 from verl.utils.config import omega_conf_to_dataclass
-from verl.utils.profiler import log_gpu_memory_usage
+from verl.utils.device import get_device_name
 from verl.utils.fs import copy_to_local
+from verl.utils.profiler import log_gpu_memory_usage
 from verl.workers.config import RolloutConfig
+from verl.workers.megatron_workers import ActorRolloutRefWorker as ARRWorker
 
 # NPU-ADAPTATION: Save the original and dummy copies of `torch.compile`.
 from mindspeed.patch_utils import MindSpeedPatchesManager
@@ -42,9 +43,10 @@ logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
 class ActorRolloutRefWorker(ARRWorker):
     def __init__(self, config: DictConfig, role: str, **kwargs):
         super().__init__(config, role)
-    
+
     def _build_rollout(self, trust_remote_code=False):
         from torch.distributed.device_mesh import init_device_mesh
+
         # NPU-ADAPTATION:Enable TRUE_COMPILEduring rollout graph construction.
         torch.compile = TRUE_COMPILE
         # NPU-ADAPTATION END
@@ -53,11 +55,12 @@ class ActorRolloutRefWorker(ARRWorker):
             "qkv_layer_name": "self_attention.linear_qkv.",
             "gate_proj_layer_name": "linear_fc1.",
         }
-        
+
         rollout_config: RolloutConfig = omega_conf_to_dataclass(self.config.rollout)
 
         if self.config.rollout.name == "vllm":
             from torch.distributed.device_mesh import init_device_mesh
+
             # NPU-ADAPTATION: Use the adaptation file in this directory.
             from .vllm_rollout_spmd import vLLMRollout
             from .megatron_vllm import MegatronVLLMShardingManager

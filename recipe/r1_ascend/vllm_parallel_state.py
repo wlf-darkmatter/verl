@@ -1,10 +1,10 @@
+import logging
 import os
 import re
-import logging
 import socket
 import subprocess
-import torch
 
+import torch
 import vllm.envs as envs
 from vllm.distributed import parallel_state as vllm_ps
 from vllm.distributed.parallel_state import (
@@ -27,7 +27,7 @@ def _get_ip_by_ifname():
         if ifname:
             output = subprocess.check_output(["ifconfig", ifname], stderr=subprocess.STDOUT).decode()
             # Match IPv4 addresses using regex, and exclude 127.0.0.1
-            matches = re.findall(r'inet (?:addr:)?((?:\d{1,3}\.){3}\d{1,3})', output)
+            matches = re.findall(r"inet (?:addr:)?((?:\d{1,3}\.){3}\d{1,3})", output)
             for ip in matches:
                 if ip != "127.0.0.1":
                     return ip
@@ -84,10 +84,12 @@ def init_parallel_state(tensor_parallel_size):
     init_distributed_environment(world_size, rank, distributed_init_method, local_rank, backend)
 
     initialize_model_parallel(tensor_parallel_size)
-    logger.info(f"[DEBUG]: RANK[{rank}]: TP group: {vllm_ps._TP.ranks}\n"
-          f"[DEBUG]: RANK[{rank}]: PP group: {vllm_ps._PP.ranks}\n"
-          f"[DEBUG]: RANK[{rank}]: DP group: {vllm_ps._DP.ranks}\n"
-          f"[DEBUG]: RANK[{rank}]: EP group: {vllm_ps._EP.ranks}\n")
+    logger.info(
+        f"[DEBUG]: RANK[{rank}]: TP group: {vllm_ps._TP.ranks}\n"
+        f"[DEBUG]: RANK[{rank}]: PP group: {vllm_ps._PP.ranks}\n"
+        f"[DEBUG]: RANK[{rank}]: DP group: {vllm_ps._DP.ranks}\n"
+        f"[DEBUG]: RANK[{rank}]: EP group: {vllm_ps._EP.ranks}\n"
+    )
 
     os.environ["VLLM_DP_RANK"] = str(vllm_ps._DP.rank_in_group)
     envs.VLLM_DP_RANK = int(os.environ["VLLM_DP_RANK"])
@@ -96,9 +98,7 @@ def init_parallel_state(tensor_parallel_size):
 
     rank_0 = vllm_ps._DP.ranks[0]
     index = rank_0
-    os.environ["VLLM_DP_MASTER_PORT"] = str(
-        int(os.environ.get("MASTER_PORT")) + 1 + index
-    )
+    os.environ["VLLM_DP_MASTER_PORT"] = str(int(os.environ.get("MASTER_PORT")) + 1 + index)
     os.environ["VLLM_DP_MASTER_IP"] = ip_list[rank_0]
     envs.VLLM_DP_MASTER_PORT = int(os.environ["VLLM_DP_MASTER_PORT"])
     envs.VLLM_DP_MASTER_IP = os.environ["VLLM_DP_MASTER_IP"]

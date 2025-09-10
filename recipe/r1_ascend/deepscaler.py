@@ -18,7 +18,9 @@ def compute_score(data_source, solution_str, ground_truth, extra_info=None):
     if ground_truth in solution_str or extract_output == ground_truth:
         return 1.0
     
-    original_is_correct, original_format_correctness, extracted_model_output = compute_score_math(extract_output, ground_truth)
+    original_is_correct, original_format_correctness, extracted_model_output = compute_score_math(
+        extract_output, ground_truth
+    )
     if original_is_correct:
         return 1.0
     
