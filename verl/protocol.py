@@ -483,7 +483,7 @@ class DataProto:
 
         """
         if self.batch is not None:
-            self.batch = self.batch.to(device)
+            self.batch = self.batch.to(device, non_blocking=False)
         return self
 
     def select(self, batch_keys=None, non_tensor_batch_keys=None, meta_info_keys=None, deepcopy=False) -> "DataProto":
