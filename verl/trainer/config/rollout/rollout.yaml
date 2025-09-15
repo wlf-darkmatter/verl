@@ -49,6 +49,8 @@ free_cache_engine: True
 # TP size for rollout. Not effective for hf
 tensor_model_parallel_size: 2
 
+dp_model_parallel_size: 1
+
 # max number of tokens in a batch
 max_num_batched_tokens: 8192
 
@@ -172,7 +174,7 @@ multi_turn:
 
 # support logging rollout prob for debugging purpose
 # "Truncated importance sampling" requires rollout log probs, set to True when turning on Truncated importance sampling
-calculate_log_probs: False 
+calculate_log_probs: False
 
 # [Experimental] agent loop based rollout configs
 agent:
@@ -242,7 +244,7 @@ skip_rollout: False
 # Note: Giving path under /tmp/ray/session* is not recommended as these are temporary Ray cluster directories.
 skip_dump_dir: /tmp/rollout_dump
 
-# profile the rollout model in `generate_sequence` 
+# profile the rollout model in `generate_sequence`
 profiler:
 
   # Required when using verl.utils.omega_conf_to_dataclass to instantiate dataclass configs
@@ -254,7 +256,7 @@ profiler:
 
   # whether enable profile on ref
   enable: ${oc.select:actor_rollout_ref.actor.profiler.enable,false}
-  
+
   # Whether to profile all ranks.
   all_ranks: ${oc.select:actor_rollout_ref.actor.profiler.all_ranks,false}
 

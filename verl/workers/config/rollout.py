@@ -115,6 +115,8 @@ class RolloutConfig(BaseConfig):
     cudagraph_capture_sizes: Optional[list] = None
     free_cache_engine: bool = True
     tensor_model_parallel_size: int = 2
+    dp_model_parallel_size: int = 1
+
     max_num_batched_tokens: int = 8192
 
     # TODO: enable train_kwargs
