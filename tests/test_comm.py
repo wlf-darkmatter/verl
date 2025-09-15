@@ -167,6 +167,7 @@ class TestComm(BasrRay):
             dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
         # 同步所有进程
         dist.barrier()
+        print(f"AllReduce Done")
 
 
 if __name__ == "__main__":
