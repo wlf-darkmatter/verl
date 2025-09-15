@@ -7,6 +7,16 @@ export HYDRA_FULL_ERROR=1          # display the accurate error stack
 ulimit -n 32768
 mkdir logs
 
+export HCCL_SOCKET_IFNAME=ens45 # modify according to actual situation
+export TP_SOCKET_IFNAME=ens45   # modify according to actual situation
+export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
+
+source /etc/profile;
+source /usr/local/Ascend/driver/bin/setenv.bash;
+source /usr/local/Ascend/ascend-toolkit/set_env.sh;
+source /usr/local/Ascend/nnal/atb/set_env.sh;
+source /usr/local/Ascend/nnal/asdsip/set_env.sh;
+
 export HCCL_IF_BASE_PORT=24703
 
 NNODES=16                          # number of nodes
