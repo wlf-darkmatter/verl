@@ -46,7 +46,7 @@ logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
 """
 Megatron Hybrid Engine:
 - During training, only the current pp stage holds the parameters
-- Before inference, broadcast the parameters of the current pp rank 
+- Before inference, broadcast the parameters of the current pp rank
    to all other pp ranks (all pp ranks holds all the parameters)
 - Bind the parameters to the inference engine
 - Do inference in tp. pp is treated as additional dp
@@ -192,9 +192,9 @@ class MegatronVLLMShardingManager(BaseShardingManager):
         import torch_npu
         import torch
 
-        print(f"Set task_queue_enable 1", flush=True)
+
         torch.npu.synchronize()
-        torch_npu._C._set_task_queue_enable(1)
+
         get_torch_device().empty_cache()
         if self.rollout_config.free_cache_engine:
             self.inference_engine.sleep(level=1)

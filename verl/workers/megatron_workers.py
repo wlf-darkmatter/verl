@@ -622,9 +622,9 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
         assert self._is_rollout
 
         import torch_npu
-        print(f"Set task_queue_enable 2", flush=True)
+
         torch.npu.synchronize()
-        torch_npu._C._set_task_queue_enable(2)
+
 
         prompts.batch = prompts.batch.to(get_device_name())
         meta_info = {

@@ -729,9 +729,9 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
     def generate_sequences(self, prompts: DataProto):
         # Support all hardwares
         import torch_npu
-        print(f"Set task_queue_enable 2", flush=True)
+
         torch.npu.synchronize()
-        torch_npu._C._set_task_queue_enable(2)
+
 
         prompts = prompts.to(get_device_id())
 
