@@ -156,12 +156,16 @@ class TestComm(BasrRay):
     tensor_size = (100, 100)
     def __init__(self, rank_zero_info, config=None, device_name=None):
         super().__init__(rank_zero_info, config)
-        self.device_name = device_name
+        if device_name is None:
+            self.device_name = "cpu"
+        else:
+            self.device_name = device_name
+
 
     def init_process_group(self):
         backend = "cpu:gloo"
         if self.device_name == "npu":
-            backend = backend + f"{get_device_name()}:{get_nccl_backend()}"
+            backend = backend + f",{get_device_name()}:{get_nccl_backend()}"
 
         print(f"开始建链",flush=True)
         dist.init_process_group(
