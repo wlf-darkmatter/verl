@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deeepseek-16nnode-sleep  #sp-64-train-3b-moe-msrun #需要修改
+  name: 16nnode_sleep  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -45,9 +45,10 @@ spec:
               image: harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
               imagePullPolicy: IfNotPresent
               command:
-                - "/bin/bash -c "
+                - "/bin/bash"
+                - "-c "
                 - "source /etc/profile;"
-                - "export HCCL_SOCKET_IFNAME=ens45; export TP_SOCKET_IFNAME=ens45;export GLOO_SOCKET_IFNAME=ens45;"
+                - "export HCCL_SOCKET_IFNAME=ens45; export TP_SOCKET_IFNAME=ens45;export GLOO_SOCKET_IFNAME=ens45"
                 - "cd /opt/verl; python /data01/huawei-2025/wlf/verl/tests/test_comm.py --device npu --ray_master_ip $MASTER_ADDR --nnodes 16 2>&1 | tee /data01/huawei-2025/wlf/logs/$(hostname -I | awk '{print $1}')_test_comm.log;"
                 - "sleep 7d;"
 
@@ -107,7 +108,7 @@ spec:
                       - key: job-name
                         operator: In
                         values:
-                          - deepseek-16nnode-sleep
+                          - 16nnode_sleep
                       - key: replica-type
                         operator: In
                         values:
@@ -132,9 +133,10 @@ spec:
               image: harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
               imagePullPolicy: IfNotPresent
               command:
-                - "/bin/bash -c"
+                - "/bin/bash"
+                - "-c "
                 - "source /etc/profile;"
-                - "export HCCL_SOCKET_IFNAME=ens45; export TP_SOCKET_IFNAME=ens45;export GLOO_SOCKET_IFNAME=ens45;"
+                - "export HCCL_SOCKET_IFNAME=ens45; export TP_SOCKET_IFNAME=ens45;export GLOO_SOCKET_IFNAME=ens45"
                 - "cd /opt/verl; python /data01/huawei-2025/wlf/verl/tests/test_comm.py --device npu --ray_master_ip $MASTER_ADDR --nnodes 16 2>&1 ;"
                 - "sleep 7d;"
 
