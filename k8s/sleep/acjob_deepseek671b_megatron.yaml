@@ -44,16 +44,9 @@ spec:
             - name: ascend # do not modify
               image: harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
               imagePullPolicy: IfNotPresent
-              command: ["/bin/bash"]
+              command: ["/bin/bash", "-c"]
               args:
-                - "-c"
-                - "source /etc/profile;"
-                - "export HCCL_SOCKET_IFNAME=ens45;"
-                - "export TP_SOCKET_IFNAME=ens45;"
-                - "export GLOO_SOCKET_IFNAME=ens45;"
-                - "cd /opt/verl;"
-                - "python /data01/huawei-2025/wlf/verl/tests/test_comm.py --device npu --ray_master_ip $MASTER_ADDR --nnodes 16 2>&1 | tee /data01/huawei-2025/wlf/logs/$(hostname -I | awk '{print $1}')_test_comm.log;"
-                - "sleep 7d;"
+                - "source /etc/profile; export HCCL_SOCKET_IFNAME=ens45; export TP_SOCKET_IFNAME=ens45; export GLOO_SOCKET_IFNAME=ens45; cd /opt/verl; python /data01/huawei-2025/wlf/verl/tests/test_comm.py --device npu --ray_master_ip $MASTER_ADDR --nnodes 16 2>&1 | tee /data01/huawei-2025/wlf/logs/$(hostname -I | awk '{print $1}')_test_comm.log; sleep 7d;"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #
                 - containerPort: 60350        # determined by user
@@ -135,16 +128,9 @@ spec:
             - name: ascend # do not modify
               image: harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
               imagePullPolicy: IfNotPresent
-              command: ["/bin/bash"]
+              command: ["/bin/bash", "-c"]
               args:
-                - "-c"
-                - "source /etc/profile;"
-                - "export HCCL_SOCKET_IFNAME=ens45;"
-                - "export TP_SOCKET_IFNAME=ens45;"
-                - "export GLOO_SOCKET_IFNAME=ens45;"
-                - "cd /opt/verl;"
-                - "python /data01/huawei-2025/wlf/verl/tests/test_comm.py --device npu --ray_master_ip $MASTER_ADDR --nnodes 16 2>&1 | tee /data01/huawei-2025/wlf/logs/$(hostname -I | awk '{print $1}')_test_comm.log;"
-                - "sleep 7d;"
+                - "source /etc/profile; export HCCL_SOCKET_IFNAME=ens45; export TP_SOCKET_IFNAME=ens45; export GLOO_SOCKET_IFNAME=ens45; cd /opt/verl; python /data01/huawei-2025/wlf/verl/tests/test_comm.py --device npu --ray_master_ip $MASTER_ADDR --nnodes 16 2>&1 | tee /data01/huawei-2025/wlf/logs/$(hostname -I | awk '{print $1}')_test_comm.log; sleep 7d;"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #
                 - containerPort: 60350        # determined by user
