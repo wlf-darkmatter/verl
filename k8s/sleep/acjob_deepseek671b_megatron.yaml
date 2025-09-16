@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: &metadata.name 16nnode_sleep  #sp-64-train-3b-moe-msrun #需要修改
+  name: 16nnode_sleep  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -42,7 +42,7 @@ spec:
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: &image_name harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
+              image: harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
               imagePullPolicy: IfNotPresent
               command:
                 - "/bin/bash -c;"
@@ -107,7 +107,7 @@ spec:
                       - key: job-name
                         operator: In
                         values:
-                          - *metadata.name  #train-32x7b-256-moe-o0   #train-64x28b-256-moe-o1 #需要修改, 必须与metadata.name一致
+                          - 16nnode_sleep
                       - key: replica-type
                         operator: In
                         values:
@@ -129,7 +129,7 @@ spec:
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: *image_name  ##image
+              image: harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
               imagePullPolicy: IfNotPresent
               command:
                 - "/bin/bash -c;"
