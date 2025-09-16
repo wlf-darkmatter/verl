@@ -120,3 +120,5 @@ class ActorRolloutRefWorker(ARRWorker):
             raise NotImplementedError("Only vllmRollout is supported with Megatron now")
         print(f"rollout and sharding manager init done sharding_manager: {sharding_manager}")
         return rollout, sharding_manager
+class AsyncActorRolloutRefWorker(ARRWorker):
+    pass
