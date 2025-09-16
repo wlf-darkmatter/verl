@@ -120,8 +120,7 @@ def build_task(task_cls, config=None, device_name=None):
             }
             if device_name == "npu":
                 options["resources"] = {"NPU": 1}
-            # task = Vllm_Worker(info, config)
-            # task = Vllm_Worker.remote(info, config)
+
             task = task_cls.options(**options).remote(info, config)
             tasks.append(task)
     return tasks
