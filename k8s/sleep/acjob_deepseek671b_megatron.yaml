@@ -44,7 +44,8 @@ spec:
             - name: ascend # do not modify
               image: harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
               imagePullPolicy: IfNotPresent
-              command: ["/bin/bash", "-c", "/data01/huawei-2025/wlf/verl/k8s/sleep/run_test_comm.sh"]
+              command: ["/bin/bash"]
+              args: ["-c", "/data01/huawei-2025/wlf/verl/k8s/sleep/run_test_comm.sh"]
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #
                 - containerPort: 60350        # determined by user
@@ -126,7 +127,8 @@ spec:
             - name: ascend # do not modify
               image: harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
               imagePullPolicy: IfNotPresent
-              command: ["/bin/bash", "-c", "/data01/huawei-2025/wlf/verl/k8s/sleep/run_test_comm.sh"]
+              command: ["/bin/bash"]
+              args: ["-c", "/data01/huawei-2025/wlf/verl/k8s/sleep/run_test_comm.sh"]
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #
                 - containerPort: 60350        # determined by user
