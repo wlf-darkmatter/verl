@@ -112,13 +112,14 @@ def build_task(task_cls, config=None, device_name=None):
 
             options = {
                 "runtime_env": {"env_vars": env_vars},
-                # "resources": {"CPU": 1}, #* NPU:1
                 "scheduling_strategy": PlacementGroupSchedulingStrategy(
                     placement_group=pg,
                     placement_group_bundle_index=local_rank,
                 ),
                 "name": actor_name,
             }
+            if device_name == "npu":
+                options["resources"] = {"NPU": 1}
             # task = Vllm_Worker(info, config)
             # task = Vllm_Worker.remote(info, config)
             task = task_cls.options(**options).remote(info, config)
