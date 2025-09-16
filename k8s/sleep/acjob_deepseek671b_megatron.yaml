@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: 16nnode_sleep  #sp-64-train-3b-moe-msrun #需要修改
+  name: deeepseek-16nnode-sleep  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -107,7 +107,7 @@ spec:
                       - key: job-name
                         operator: In
                         values:
-                          - 16nnode_sleep
+                          - deepseek-16nnode-sleep
                       - key: replica-type
                         operator: In
                         values:
