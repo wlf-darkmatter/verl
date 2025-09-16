@@ -1,14 +1,17 @@
-
 import argparse
-import ray
 import os
-import torch
 import socket
-from verl.single_controller.ray.base import sort_placement_group_by_node_ip
+import datetime
+from functools import partial
+
+import ray
+import numpy as np
+import torch
+import torch.distributed as dist
 from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
 from verl.single_controller.ray import RayResourcePool
+from verl.single_controller.ray.base import sort_placement_group_by_node_ip
 from verl.utils.device import get_device_name, get_nccl_backend
-import torch.distributed as dist
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--nnodes", type=int, default=1)
@@ -17,6 +20,7 @@ parser.add_argument("--ray_master_ip", type=str, default=None)
 parser.add_argument("--ray_master_port", type=int, default=6379)
 parser.add_argument("--ray_dashboard_port", type=int, default=8265)
 args = parser.parse_args()
+
 
 def get_availale_curr_addr_port():
     host_ip_by_sdk = ray._private.services.get_node_ip_address()
@@ -36,10 +40,12 @@ def ray_init():
 
     if args.nnodes > 1:
         if args.ray_master_ip is None:
-            raise RuntimeError(f"`--ray_master_ip` should be set if nnodes({args.nnodes}) > 1.")
+            raise RuntimeError(
+                f"`--ray_master_ip` should be set if nnodes({args.nnodes}) > 1."
+            )
 
         curr_addr, _ = get_availale_curr_addr_port()
-        print(curr_addr, flush=True)
+        print(f"curr_addr = {curr_addr}", flush=True)
 
         if curr_addr == args.ray_master_ip:
             pass
@@ -47,20 +53,15 @@ def ray_init():
             ret = os.popen(f"ray start --head --port {args.ray_master_port}").read()
         else:
             print("\033[32mSlaver\033[0m", flush=True)
-            ret = os.popen(f"ray start --address={args.ray_master_ip}:{args.ray_master_port}").read()
+            ret = os.popen(
+                f"ray start --address={args.ray_master_ip}:{args.ray_master_port}"
+            ).read()
             exit(0)
         print(ret, flush=True)
 
     if not ray.is_initialized():
         ray.init()
 
-class TestComm:
-
-    def __init__(self):
-        pass
-
-    def test_allreduce(self):
-        pass
 
 def build_task(task_cls, config=None, device_name=None):
     if device_name is None:
@@ -70,7 +71,11 @@ def build_task(task_cls, config=None, device_name=None):
 
     n_gpus_per_node = int(args.n_gpus_per_node)
     nnodes = int(args.nnodes)
-    resource_pool = RayResourcePool(process_on_nodes=[n_gpus_per_node] * nnodes, max_colocate_count=1, use_gpu=use_gpu)
+    resource_pool = RayResourcePool(
+        process_on_nodes=[n_gpus_per_node] * nnodes,
+        max_colocate_count=1,
+        use_gpu=use_gpu,
+    )
 
     strategy = "PACK"
     pgs = resource_pool.get_placement_groups(strategy=strategy, device_name=device_name)
@@ -119,6 +124,8 @@ def build_task(task_cls, config=None, device_name=None):
             task = task_cls.options(**options).remote(info, config)
             tasks.append(task)
     return tasks
+
+
 def pool_exec(list_task, func_name, *args, **kwargs):
     task_runnint_list = []
     for i, task_i in enumerate(list_task):
@@ -133,49 +140,83 @@ class BasrRay:
         self.rank_zero_info = rank_zero_info
         self.world_size = int(os.environ.get("WORLD_SIZE", 1))
         self.rank = int(os.environ["RANK"])
+
     def ray_exec(self, func_name, *args, **kwargs):
         return getattr(self, func_name)(*args, **kwargs)
+
     def get_attr(self, key):
         return getattr(self, key)
+
     def print_rank(self):
-        print(f"Rank: {self.rank}")
+        print(f"Rank: {self.rank}", flush=True)
+
 
 @ray.remote
 class TestComm(BasrRay):
-    pass
-    def __init__(self, rank_zero_info, config=None):
+    tensor_size = (100, 100)
+    def __init__(self, rank_zero_info, config=None, device_name=None):
         super().__init__(rank_zero_info, config)
+        self.device_name = device_name
 
     def init_process_group(self):
+        backend = "cpu:gloo"
+        if self.device_name == "npu":
+            backend = backend + f"{get_device_name()}:{get_nccl_backend()}"
 
+        print(f"开始建链",flush=True)
         dist.init_process_group(
-                backend=f"cpu:gloo",
-                # backend=f"cpu:gloo,{get_device_name()}:{get_nccl_backend()}",
-                rank=self.rank,
-                world_size=self.world_size,
-
-                                )
-        print(f"建联完成")
+            backend=backend,
+            rank=self.rank,
+            world_size=self.world_size,
+            timeout=datetime.timedelta(seconds=300), #* 默认给一个 5min 的超时时间
+        )
+        print(f"\033[32m建链完成\033[0m",flush=True)
         return dist.get_rank(), dist.get_world_size()
 
     def test_allreduce(self):
-        tensor_size = 10000
+
         # 创建测试张量
-        tensor = torch.ones(tensor_size, dtype=torch.float32) * self.rank
-        print(f"Testing AllReduce with tensor size: {tensor_size}")
-        for _ in range(2):
-            dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
+        tensor = torch.ones(self.tensor_size, dtype=torch.float32) * self.rank
+        tensor = tensor.to(self.device_name)
+
+        ground_truth = np.sum(np.arange(self.world_size))
+        print(f"Testing AllReduce with tensor size: {self.tensor_size}", flush=True)
+
+        dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
+
+        assert tensor[0][0] == ground_truth
         # 同步所有进程
         dist.barrier()
-        print(f"AllReduce Done")
+        print(f"\033[32mAllReduce Done\033[0m")
 
+
+    def test_allgather(self):
+        pass
+        tensor = torch.ones(self.tensor_size, dtype=torch.float32) * self.rank
+
+        gather_list = [torch.zeros_like(tensor) for _ in range(self.world_size)]
+
+        dist.all_gather(gather_list, tensor)
+
+        if self.rank==0:
+            gathered_data = torch.cat(gather_list)
+            print([i[0][0] for i in gathered_data.chunk(self.world_size)])
+        print(f"\033[32mAllGather Done\033[0m", flush=True)
+        dist.barrier()
+
+    def test_alltoall(self):
+        tensor = torch.ones(self.tensor_size, dtype=torch.float32) * self.rank
+        pass
 
 if __name__ == "__main__":
     ray_init()
-    list_task = build_task(TestComm, device_name=None)
+    device = None
+
+    cls = partial(TestComm, device_name=device)
+    list_task = build_task(TestComm, device_name=device)
 
     pool_exec(list_task, "print_rank")
     pool_exec(list_task, "init_process_group")
     pool_exec(list_task, "test_allreduce")
+    pool_exec(list_task, "test_allgather")
     pass
-
