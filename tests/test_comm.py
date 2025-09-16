@@ -15,6 +15,7 @@ from verl.utils.device import get_device_name, get_nccl_backend
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--nnodes", type=int, default=1)
+parser.add_argument("--device", type=str, default=None)
 parser.add_argument("--n_gpus_per_node", type=int, default=8)
 parser.add_argument("--ray_master_ip", type=str, default=None)
 parser.add_argument("--ray_master_port", type=int, default=6379)
@@ -214,7 +215,7 @@ class TestComm(BasrRay):
 
 if __name__ == "__main__":
     ray_init()
-    device = None
+    device = args.device
 
     cls = partial(TestComm, device_name=device)
     list_task = build_task(TestComm, device_name=device)
