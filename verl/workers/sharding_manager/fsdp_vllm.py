@@ -236,6 +236,13 @@ class FSDPVLLMShardingManager(BaseShardingManager):
 
     @GPUMemoryLogger(role="fsdp vllm sharding_manager", logger=logger)
     def __exit__(self, exc_type, exc_value, traceback):
+        import torch_npu
+        import torch
+
+        print(f"Set task_queue_enable 1", flush=True)
+        torch.npu.synchronize()
+        torch_npu._C._set_task_queue_enable(1)
+        get_torch_device().empty_cache()
         if self.rollout_config.free_cache_engine:
             self.inference_engine.sleep(level=1)
 

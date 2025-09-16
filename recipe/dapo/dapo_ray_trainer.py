@@ -131,7 +131,7 @@ class RayDAPOTrainer(RayPPOTrainer):
                         batch_keys=["input_ids", "attention_mask", "position_ids"],
                         non_tensor_batch_keys=["raw_prompt_ids"],
                     )
-                gen_batch = gen_batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.n, interleave=True)
+                gen_batch = gen_batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.n, interleave=False)
 
                 is_last_step = self.gen_steps >= self.total_training_steps
 
@@ -162,7 +162,7 @@ class RayDAPOTrainer(RayPPOTrainer):
                         [str(uuid.uuid4()) for _ in range(len(new_batch.batch))], dtype=object
                     )
                     # repeat to align with repeated responses in rollout
-                    new_batch = new_batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.n, interleave=True)
+                    new_batch = new_batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.n, interleave=False)
                     new_batch = new_batch.union(gen_batch_output)
 
                     with marked_timer("reward", timing_raw, "yellow"):
@@ -224,6 +224,33 @@ class RayDAPOTrainer(RayPPOTrainer):
                             new_batch.non_tensor_batch["uid"], new_batch.non_tensor_batch[metric_name], strict=True
                         ):
                             prompt_uid2metric_vals[uid].append(metric_val)
+                        ################################
+                        try:
+                            import copy
+                            all_zero = 0
+                            all_one = 0
+                            others = 0
+                            acc_val = []
+                            uid2vals = copy.deepcopy(prompt_uid2metric_vals)
+                            for vals in uid2vals.values():
+                                acc_val += vals
+                                unique_vals = set(vals)
+                                if len(unique_vals) == 1:
+                                    if 0.0 in unique_vals:
+                                        all_zero += 1
+                                    elif 1.0 in unique_vals:
+                                        all_one += 1
+                                    else:
+                                        others += 1
+                                else:
+                                    others += 1
+
+                            total = len(uid2vals)
+                            print(f"[INFO] Filter前全错-全0: {all_zero}个，占比: {all_zero / total:.2%}",flush=True)
+                            print(f"[INFO] Filter前全对-全1: {all_one}个，占比: {all_one / total:.2%}",flush=True)
+                            print(f"[INFO] Filter前ACC: {sum(acc_val) / len(acc_val)}, 求和:{sum(acc_val)}， 长度:{len(acc_val)}", flush=True)
+                        except Exception as e:
+                            print(f"Print filter failed! \nreason is {e.__repr__()}")
 
                         prompt_uid2metric_std = {}
                         for prompt_uid, metric_vals in prompt_uid2metric_vals.items():
