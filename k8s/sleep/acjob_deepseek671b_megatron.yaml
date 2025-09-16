@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek671-16-verl-moe-verl  #sp-64-train-3b-moe-msrun #需要修改
+  name: &metadata.name deepseek671-16-verl-moe-verl  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -42,9 +42,15 @@ spec:
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
+              image: &image_name harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
               imagePullPolicy: IfNotPresent
-              command: ["/bin/bash", "-c", "cd /opt/verl; python /data01/huawei-2025/wlf/verl/tests/test_comm.py --ray_master_ip $MASTER_ADDR --nnodes 16 2>&1 | tee /data01/huawei-2025/wlf/logs/$(hostname)_test_comm.log; sleep 7d"]
+              command:
+                - "/bin/bash -c;"
+                - "source /etc/profile;"
+                - "export HCCL_SOCKET_IFNAME=ens45; export TP_SOCKET_IFNAME=ens45;export GLOO_SOCKET_IFNAME=ens45"
+                - "cd /opt/verl; python /data01/huawei-2025/wlf/verl/tests/test_comm.py --ray_master_ip $MASTER_ADDR --nnodes 16 2>&1 | tee /data01/huawei-2025/wlf/logs/$(hostname -I | awk '{print $1}')_test_comm.log;"
+                - "sleep 7d;"
+
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify
@@ -101,7 +107,7 @@ spec:
                       - key: job-name
                         operator: In
                         values:
-                          -  deepseek671-16-verl-moe-verl  #train-32x7b-256-moe-o0   #train-64x28b-256-moe-o1 #需要修改, 必须与metadata.name一致
+                          - *metadata.name  #train-32x7b-256-moe-o0   #train-64x28b-256-moe-o1 #需要修改, 必须与metadata.name一致
                       - key: replica-type
                         operator: In
                         values:
@@ -123,10 +129,16 @@ spec:
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
+              image: *image_name  ##image
               imagePullPolicy: IfNotPresent
-              command: ["/bin/bash", "-c", "cd /opt/verl; python /data01/huawei-2025/wlf/verl/tests/test_comm.py --ray_master_ip $MASTER_ADDR --nnodes 16 2>&1; sleep 7d"]
-              ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
+              command:
+                - "/bin/bash -c;"
+                - "source /etc/profile;"
+                - "export HCCL_SOCKET_IFNAME=ens45; export TP_SOCKET_IFNAME=ens45;export GLOO_SOCKET_IFNAME=ens45"
+                - "cd /opt/verl; python /data01/huawei-2025/wlf/verl/tests/test_comm.py --ray_master_ip $MASTER_ADDR --nnodes 16 2>&1 ;"
+                - "sleep 7d;"
+
+              ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify
                 - containerPort: 6666 #modify according to actual situation
