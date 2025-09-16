@@ -17,7 +17,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--nnodes", type=int, default=1)
 parser.add_argument("--device", type=str, default=None)
 parser.add_argument("--n_gpus_per_node", type=int, default=8)
-parser.add_argument("--ray_master_ip", type=str, default=None)
+parser.add_argument("--is_master", action="store_true", help="直接设置当前机器为 master")
+parser.add_argument("--ray_master_ip", type=str, default=None, help="会自动判断 gloo 网卡的 ip 是否和指定的这个 ip 一致，一致则认为是 master")
 parser.add_argument("--ray_master_port", type=int, default=6379)
 parser.add_argument("--ray_dashboard_port", type=int, default=8265)
 args = parser.parse_args()
@@ -48,7 +49,7 @@ def ray_init():
         curr_addr, _ = get_availale_curr_addr_port()
         print(f"curr_addr = {curr_addr}", flush=True)
 
-        if curr_addr == args.ray_master_ip:
+        if args.is_master or curr_addr == args.ray_master_ip:
             pass
             print("\033[32mMaster\033[0m", flush=True)
             ret = os.popen(f"ray start --head --port {args.ray_master_port}").read()
