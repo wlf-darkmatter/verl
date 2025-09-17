@@ -39,7 +39,7 @@ def ray_init():
     os.environ["VLLM_LOGGING_LEVEL"] = "WARN"
     os.environ["VLLM_ALLOW_RUNTIME_LORA_UPDATING"] = "true"
     os.environ["RAY_EXPERIMENTAL_NOSET_ASCEND_RT_VISIBLE_DEVICES"] = "1"
-
+    print(f"建链规模: NNODES={args.nnodes}, WORLD_SISE={args.nnodes*args.n_gpus_per_node}", flush=True)
     if args.nnodes > 1:
         if args.ray_master_ip is None:
             raise RuntimeError(
@@ -49,10 +49,10 @@ def ray_init():
         curr_addr, _ = get_availale_curr_addr_port()
         print(f"curr_addr = {curr_addr}", flush=True)
 
-        if args.is_master: # or curr_addr == args.ray_master_ip
+        if args.is_master or curr_addr == args.ray_master_ip:
             pass
             print("\033[32mMaster\033[0m", flush=True)
-            ret = os.popen(f"ray start --head --port {args.ray_master_port}").read()
+            ret = os.popen(f"ray start --head --port {args.ray_master_port} --dashboard-port {args.ray_dashboard_port}").read()
         else:
             print("\033[32mSlaver\033[0m", flush=True)
             ret = os.popen(
@@ -123,7 +123,7 @@ def build_task(task_cls, config=None, device_name=None):
             if device_name == "npu":
                 options["resources"] = {"NPU": 1}
 
-            task = task_cls.options(**options).remote(info, config)
+            task = task_cls.options(**options).remote(info, config, device_name=device_name)
             tasks.append(task)
     return tasks
 
@@ -156,20 +156,20 @@ class BasrRay:
 @ray.remote
 class TestComm(BasrRay):
     tensor_size = (100, 100)
-    def __init__(self, rank_zero_info, config=None, device_name=None):
+    def __init__(self, rank_zero_info, config=None, device_name=None, *kwargs):
         super().__init__(rank_zero_info, config)
         if device_name is None:
             self.device_name = "cpu"
         else:
             self.device_name = device_name
-
+        print(f"Device={self.device_name}")
 
     def init_process_group(self):
         backend = "cpu:gloo"
         if self.device_name == "npu":
             backend = backend + f",{get_device_name()}:{get_nccl_backend()}"
 
-        print(f"开始建链",flush=True)
+        print(f"开始建链", flush=True)
         dist.init_process_group(
             backend=backend,
             rank=self.rank,
@@ -214,15 +214,28 @@ class TestComm(BasrRay):
         tensor = torch.ones(self.tensor_size, dtype=torch.float32) * self.rank
         pass
 
+
+class RayTest():
+
+    def __init__(self):
+        pass
+        device = args.device
+
+        self.list_task = build_task(TestComm, device_name=device)
+
+    def test_comm(self):
+        pool_exec(self.list_task, "print_rank")
+        pool_exec(self.list_task, "init_process_group")
+        pool_exec(self.list_task, "test_allreduce")
+        pool_exec(self.list_task, "test_allgather")
+        pass
+
+    def test_host_memory(self):
+        tmp_tensor = torch.zeros([1024,1024,1024], dtype=torch.float32)
+        pass
+
 if __name__ == "__main__":
     ray_init()
-    device = args.device
+    ray_test = RayTest()
+    ray_test.test_comm()
 
-    cls = partial(TestComm, device_name=device)
-    list_task = build_task(TestComm, device_name=device)
-
-    pool_exec(list_task, "print_rank")
-    pool_exec(list_task, "init_process_group")
-    pool_exec(list_task, "test_allreduce")
-    pool_exec(list_task, "test_allgather")
-    pass

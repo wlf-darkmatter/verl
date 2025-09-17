@@ -57,13 +57,13 @@ val_top_p=0.7
 use_dynamic_bsz=True
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 2))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
-offload=True
+offload=False
 gen_tp=4
 gen_dp=16
 gen_world_size=$((NNODES*8))
-train_tp=1
+train_tp=2
 train_ep=16
-train_pp=16
+train_pp=8
 enable_filter_group=True
 
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
