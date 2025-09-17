@@ -61,9 +61,9 @@ offload=False
 gen_tp=4
 gen_dp=16
 gen_world_size=$((NNODES*8))
-train_tp=8
+train_tp=2
 train_ep=16
-train_pp=2
+train_pp=8
 enable_filter_group=True
 
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
