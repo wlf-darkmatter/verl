@@ -46,7 +46,7 @@ spec:
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "source /etc/profile; export TP_SOCKET_IFNAME=ens45; export GLOO_SOCKET_IFNAME=ens45; CURRENT_IP=$(ifconfig $GLOO_SOCKET_IFNAME | grep -Eo 'inet .*' | awk '{print $2}') env > /data01/huawei-2025/wlf/verl/tmp/${CURRENT_IP}_env.txt ;export  HCCL_SOCKET_IFNAME=ens45; cd /opt/verl; if [[ $RANK == '0' ]];then kwargs=('--is_master') ; fi; python /data01/huawei-2025/wlf/verl/tests/test_comm.py --device npu --ray_master_ip $MASTER_ADDR --nnodes 16 ${kwargs[@]} 2>&1 | tee /data01/huawei-2025/wlf/logs/${CURRENT_IP}_test_comm.log; sleep 7d;"
+                - "source /etc/profile; export TP_SOCKET_IFNAME=ens45; export GLOO_SOCKET_IFNAME=ens45; CURRENT_IP=$(ifconfig $GLOO_SOCKET_IFNAME | grep -Eo 'inet .*' | awk '{print $2}'); env > /data01/huawei-2025/wlf/verl/tmp/${CURRENT_IP}_env.txt ;export  HCCL_SOCKET_IFNAME=ens45; cd /opt/verl; if [[ $RANK == '0' ]];then kwargs=('--is_master') ; fi; python /data01/huawei-2025/wlf/verl/tests/test_comm.py --device npu --ray_master_ip $MASTER_ADDR --nnodes 16 ${kwargs[@]} 2>&1 | tee /data01/huawei-2025/wlf/logs/${CURRENT_IP}_test_comm.log; sleep 7d;"
 
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #
@@ -131,7 +131,7 @@ spec:
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "source /etc/profile; export TP_SOCKET_IFNAME=ens45; export GLOO_SOCKET_IFNAME=ens45; CURRENT_IP=$(ifconfig $GLOO_SOCKET_IFNAME | grep -Eo 'inet .*' | awk '{print $2}') env > /data01/huawei-2025/wlf/verl/tmp/${CURRENT_IP}_env.txt ;export  HCCL_SOCKET_IFNAME=ens45; cd /opt/verl; if [[ $RANK == '0' ]];then kwargs=('--is_master') ; fi; python /data01/huawei-2025/wlf/verl/tests/test_comm.py --device npu --ray_master_ip $MASTER_ADDR --nnodes 16 ${kwargs[@]} 2>&1 | tee /data01/huawei-2025/wlf/logs/${CURRENT_IP}_test_comm.log; sleep 7d;"
+                - "source /etc/profile; export TP_SOCKET_IFNAME=ens45; export GLOO_SOCKET_IFNAME=ens45; CURRENT_IP=$(ifconfig $GLOO_SOCKET_IFNAME | grep -Eo 'inet .*' | awk '{print $2}'); env > /data01/huawei-2025/wlf/verl/tmp/${CURRENT_IP}_env.txt ;export  HCCL_SOCKET_IFNAME=ens45; cd /opt/verl; if [[ $RANK == '0' ]];then kwargs=('--is_master') ; fi; python /data01/huawei-2025/wlf/verl/tests/test_comm.py --device npu --ray_master_ip $MASTER_ADDR --nnodes 16 ${kwargs[@]} 2>&1 | tee /data01/huawei-2025/wlf/logs/${CURRENT_IP}_test_comm.log; sleep 7d;"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #
                 - containerPort: 60350        # determined by user

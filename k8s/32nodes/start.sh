@@ -1,12 +1,22 @@
 export HCCL_SOCKET_IFNAME=ens45 # modify according to actual situation
 export TP_SOCKET_IFNAME=ens45   # modify according to actual situation
 export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
-export HYDRA_FULL_ERROR=1 
+export HYDRA_FULL_ERROR=1
+CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
+
+cp -f /home/verl_mindx/hw_run_dapo_deepseek_671b_megatron.sh /opt/verl/
+cp -f /home/verl_mindx/start.sh /opt/verl/
+cp /data01/huawei-2025/zy/mc2_env.yaml /opt/verl/verl/trainer/
+cp -f /data01/huawei-2025/zy/0911/rollout.py /opt/verl/verl/workers/config/rollout.py
+cp -f /data01/huawei-2025/zy/0911/rollout.yaml /opt/verl/verl/trainer/config/rollout/rollout.yaml
+
+bash /data01/huawei-2025/wlf/verl/k8s/script/watch_stats.sh > /data01/huawei-2025/wlf/watch/rank${RANK}_${CURRENT_IP}.log &
+
 
 source /usr/local/Ascend/driver/bin/setenv.bash;
 source /usr/local/Ascend/ascend-toolkit/set_env.sh;
 source /usr/local/Ascend/nnal/atb/set_env.sh;
-source /usr/local/Ascend/nnal/asdsip/set_env.sh; 
+source /usr/local/Ascend/nnal/asdsip/set_env.sh;
 source /opt/pyvenv/bin/activate;
 source /etc/profile;
 LIB_PATH=/opt/python3.10/lib/
@@ -26,7 +36,7 @@ export NNODES=32         # example is 4 Nodes
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
 export ASCEND_PROCESS_LOG_PATH=/opt/verl/logs/$MINDX_TASK_ID/plog # modify according to actual situation
 
- 
+
 ray stop --force
 rm -rf /tmp
 
@@ -37,7 +47,6 @@ cnt=0
 if [ "$RANK" = "0" ]; then
   # head start
   echo "This is head node"
-  CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
   echo "CURRENT_IP=$CURRENT_IP"
 
   ray start --head --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats

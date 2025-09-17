@@ -44,7 +44,10 @@ spec:
             - name: ascend # do not modify
               image: harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
               imagePullPolicy: IfNotPresent
-              command: ["/bin/bash", "-c", "cd /opt/verl;cp -f /home/verl_mindx/hw_run_dapo_deepseek_671b_megatron.sh /opt/verl/;cp -f /home/verl_mindx/start.sh /opt/verl/;cp /data01/huawei-2025/zy/mc2_env.yaml /opt/verl/verl/trainer/;cp -f /data01/huawei-2025/zy/0911/rollout.py /opt/verl/verl/workers/config/rollout.py;cp -f /data01/huawei-2025/zy/0911/rollout.yaml /opt/verl/verl/trainer/config/rollout/rollout.yaml;bash start.sh 2>&1 | tee /data01/huawei-2025/zy/logs/$(hostname)_32h.log; sleep 7d"]
+              command: ["/bin/bash", "-c"]
+
+              args:
+                - "cd /opt/verl ;GLOO_SOCKET_IFNAME=ens45 ;CURRENT_IP=$(ifconfig $GLOO_SOCKET_IFNAME | grep -Eo 'inet .*' | awk '{print $2}'); bash start.sh 2>&1 | tee /data01/huawei-2025/wlf/logs/$(CURRENT_IP)_32h.log; sleep 7d"
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify
@@ -125,7 +128,9 @@ spec:
             - name: ascend # do not modify
               image: harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
               imagePullPolicy: IfNotPresent
-              command: ["/bin/bash", "-c", "cd /opt/verl;cp -f /home/verl_mindx/hw_run_dapo_deepseek_671b_megatron.sh /opt/verl/;cp -f /home/verl_mindx/start.sh /opt/verl/;cp /data01/huawei-2025/zy/mc2_env.yaml /opt/verl/verl/trainer/;cp -f /data01/huawei-2025/zy/0911/rollout.py /opt/verl/verl/workers/config/rollout.py;cp -f /data01/huawei-2025/zy/0911/rollout.yaml /opt/verl/verl/trainer/config/rollout/rollout.yaml;bash start.sh 2>&1 | tee /data01/huawei-2025/zy/logs/$(hostname)_32h.log;sleep 7d"]
+              command: ["/bin/bash", "-c"]
+              args:
+                - "cd /opt/verl ;GLOO_SOCKET_IFNAME=ens45 ;CURRENT_IP=$(ifconfig $GLOO_SOCKET_IFNAME | grep -Eo 'inet .*' | awk '{print $2}'); bash start.sh 2>&1 | tee /data01/huawei-2025/wlf/logs/$(CURRENT_IP)_32h.log; sleep 7d"
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify

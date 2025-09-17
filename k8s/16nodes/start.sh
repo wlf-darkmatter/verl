@@ -1,12 +1,18 @@
 export HCCL_SOCKET_IFNAME=ens45 # modify according to actual situation
 export TP_SOCKET_IFNAME=ens45   # modify according to actual situation
 export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
-export HYDRA_FULL_ERROR=1 
+export HYDRA_FULL_ERROR=1
+
+cp -f /home/verl_mindx/hw_run_dapo_deepseek_671b_megatron.sh /opt/verl/
+cp -f /home/verl_mindx/start.sh /opt/verl/
+cp /data01/huawei-2025/zy/mc2_env.yaml /opt/verl/verl/trainer/
+cp -f /data01/huawei-2025/zy/0911/rollout.py /opt/verl/verl/workers/config/rollout.py
+cp -f /data01/huawei-2025/zy/0911/rollout.yaml /opt/verl/verl/trainer/config/rollout/rollout.yaml
 
 source /usr/local/Ascend/driver/bin/setenv.bash;
 source /usr/local/Ascend/ascend-toolkit/set_env.sh;
 source /usr/local/Ascend/nnal/atb/set_env.sh;
-source /usr/local/Ascend/nnal/asdsip/set_env.sh; 
+source /usr/local/Ascend/nnal/asdsip/set_env.sh;
 source /opt/pyvenv/bin/activate;
 source /etc/profile;
 LIB_PATH=/opt/python3.10/lib/
@@ -26,7 +32,7 @@ export NNODES=16         # example is 4 Nodes
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
 export ASCEND_PROCESS_LOG_PATH=/opt/verl/logs/$MINDX_TASK_ID/plog # modify according to actual situation
 
- 
+
 ray stop --force
 rm -rf /tmp
 
