@@ -49,7 +49,7 @@ def ray_init():
         curr_addr, _ = get_availale_curr_addr_port()
         print(f"curr_addr = {curr_addr}", flush=True)
 
-        if args.is_master: # or curr_addr == args.ray_master_ip
+        if args.is_master or curr_addr == args.ray_master_ip:
             pass
             print("\033[32mMaster\033[0m", flush=True)
             ret = os.popen(f"ray start --head --port {args.ray_master_port}").read()

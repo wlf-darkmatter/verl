@@ -68,6 +68,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--ray_master_ip", type=str, default=None)
 parser.add_argument("--ray_master_port", type=int, default=6379)
 parser.add_argument("--ray_dashboard_port", type=int, default=8265)
+parser.add_argument("--is_master", action="store_true", help="直接设置当前机器为 master")
 
 parser.add_argument("-dp", type=int, default=1)
 parser.add_argument("-tp", type=int, default=1)
@@ -644,7 +645,7 @@ def ray_init():
         curr_addr, _ = get_availale_curr_addr_port()
         print(curr_addr, flush=True)
 
-        if curr_addr == args.ray_master_ip:
+        if args.is_master or curr_addr == args.ray_master_ip:
             pass
             print("\033[32mMaster\033[0m", flush=True)
             ret = os.popen(f"ray start --head --port {args.ray_master_port}").read()
