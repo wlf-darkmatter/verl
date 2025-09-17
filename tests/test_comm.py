@@ -123,7 +123,7 @@ def build_task(task_cls, config=None, device_name=None):
             if device_name == "npu":
                 options["resources"] = {"NPU": 1}
 
-            task = task_cls.options(**options).remote(info, config)
+            task = task_cls.options(**options).remote(info, config, device_name=device_name)
             tasks.append(task)
     return tasks
 
@@ -156,7 +156,7 @@ class BasrRay:
 @ray.remote
 class TestComm(BasrRay):
     tensor_size = (100, 100)
-    def __init__(self, rank_zero_info, config=None, device_name=None):
+    def __init__(self, rank_zero_info, config=None, device_name=None, *kwargs):
         super().__init__(rank_zero_info, config)
         if device_name is None:
             self.device_name = "cpu"
@@ -213,36 +213,35 @@ class TestComm(BasrRay):
     def test_alltoall(self):
         tensor = torch.ones(self.tensor_size, dtype=torch.float32) * self.rank
         pass
-    
+
 
 
 def test_host_memory():
     #* 创建一个较大的张量
     tmp_tensor = torch.zeros([1024,1024,1024], dtype=torch.float32)
     pass
-    
+
 
 class RayTest():
 
     def __init__(self):
         pass
-
-    def main_test():
         device = args.device
 
-        cls = partial(TestComm, device_name=device)
-        list_task = build_task(TestComm, device_name=device)
+        self.list_task = build_task(TestComm, device_name=device)
 
-        pool_exec(list_task, "print_rank")
-        pool_exec(list_task, "init_process_group")
-        pool_exec(list_task, "test_allreduce")
-        pool_exec(list_task, "test_allgather")
+    def test_comm(self):
+        pool_exec(self.list_task, "print_rank")
+        pool_exec(self.list_task, "init_process_group")
+        pool_exec(self.list_task, "test_allreduce")
+        pool_exec(self.list_task, "test_allgather")
         pass
 
+    def test_host_memory(self):
+        pass
 
-    
 if __name__ == "__main__":
     ray_init()
     ray_test = RayTest()
-    ray_test.main_test()
+    ray_test.test_comm()
 
