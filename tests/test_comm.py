@@ -52,7 +52,7 @@ def ray_init():
         if args.is_master or curr_addr == args.ray_master_ip:
             pass
             print("\033[32mMaster\033[0m", flush=True)
-            ret = os.popen(f"ray start --head --port {args.ray_master_port}").read()
+            ret = os.popen(f"ray start --head --port {args.ray_master_port} --dashboard-port {args.ray_dashboard_port}").read()
         else:
             print("\033[32mSlaver\033[0m", flush=True)
             ret = os.popen(
@@ -215,13 +215,6 @@ class TestComm(BasrRay):
         pass
 
 
-
-def test_host_memory():
-    #* 创建一个较大的张量
-    tmp_tensor = torch.zeros([1024,1024,1024], dtype=torch.float32)
-    pass
-
-
 class RayTest():
 
     def __init__(self):
@@ -238,6 +231,7 @@ class RayTest():
         pass
 
     def test_host_memory(self):
+        tmp_tensor = torch.zeros([1024,1024,1024], dtype=torch.float32)
         pass
 
 if __name__ == "__main__":

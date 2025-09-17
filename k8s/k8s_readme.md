@@ -1,6 +1,6 @@
 # 通用部分
 
-kubectl get pods -n rein-learing
+watch kubectl get pods -n rein-learing
 
 tail -f /tmp/ray/session_latest/logs/job-driver
 
@@ -38,4 +38,6 @@ kubectl delete -f verl/k8s/test/acjob_test_sleep.yaml -n rein-learing
 kubectl logs deepseek-sleep-master-0 -n rein-learing -f
 kubectl logs deepseek-sleep-worker-0 -n rein-learing -f
 
+kubectl exec -it deepseek-sleep-master-0 bash -n rein-learing
+kubectl exec -it deepseek-sleep-worker-0 bash -n rein-learing
 
