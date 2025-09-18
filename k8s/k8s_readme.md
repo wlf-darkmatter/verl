@@ -45,8 +45,6 @@ kubectl logs deepseek-sleep-worker-0 -n rein-learing -f
 kubectl exec -it deepseek-sleep-master-0 bash -n rein-learing
 kubectl exec -it deepseek-sleep-worker-0 bash -n rein-learing
 
-sed -i 's@enable_prefix_caching=.*@enable_prefix_caching=False,@g' /opt/mindspeed-rl/verl_npu/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
-
 
 # 其他测试
 
@@ -55,11 +53,9 @@ sed -i 's@enable_prefix_caching=.*@enable_prefix_caching=False,@g' /opt/mindspee
 ```bash
 export ServerPort=6666
 export DashboardPort=8888
-
-ray start --head --port ${ServerPort} --dashboard-port ${ServerPort}
-
-ray start --address=${MASTER_ADDR}:6666
-
+export HCCL_SOCKET_IFNAME=ens45
+export TP_SOCKET_IFNAME=ens45
+export GLOO_SOCKET_IFNAME=ens45
 
 if [ "$RANK" = "0" ]; then
   kwargs=(--is_master --ray_dashboard_port ${DashboardPort})
@@ -67,7 +63,7 @@ else
   kwargs=()
 fi
 
-cd /home/new_verl
-python k8s/test_comm.py --nnodes=2 --ray_master_ip=${MASTER_ADDR} --ray_master_port=${ServerPort} --device=npu ${kwargs[@]}
+
+cd /home/new_verl; python k8s/test_comm.py --ray_init --nnodes=2 --ray_master_ip=${MASTER_ADDR} --ray_master_port=${ServerPort} --device=npu ${kwargs[@]}
 
 ```

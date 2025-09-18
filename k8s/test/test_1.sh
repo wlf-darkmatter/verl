@@ -42,6 +42,7 @@ fi
 ray stop --force
 
 python k8s/test_comm.py \
+    --ray_init \
     --nnodes=${NNODES} \
     --ray_master_ip=${MASTER_ADDR} \
     --ray_master_port=${ServerPort} \
