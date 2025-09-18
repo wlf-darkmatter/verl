@@ -6,8 +6,6 @@ set -xeuo pipefail
 # remove the `quantization_config` in the `config.json`
 # set `num_nextn_predict_layers=0` to disable MTP, which is not currently supported
 #huggingface-cli download deepseek-ai/DeepSeek-V3-0324 configuration_deepseek.py config.json
-sed -i 's@enable_prefix_caching=.*@enable_prefix_caching=False,@g' /opt/mindspeed-rl/verl_npu/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
-sed -i 's@enable_chunked_prefill=.*@enable_chunked_prefill=False,@g' /opt/mindspeed-rl/verl_npu/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
 
 project_name='DAPO'
 exp_name='DAPO-DeepSeek-671b-megatron'
@@ -60,6 +58,7 @@ use_dynamic_bsz=False
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 2))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
 offload=True
+gen_dp=2
 gen_tp=4
 train_tp=8
 train_ep=1
