@@ -52,6 +52,8 @@ from vllm.distributed import parallel_state as vllm_ps
 from vllm.lora.request import LoRARequest
 from vllm.model_executor.sampling_metadata import SamplingMetadata
 from vllm.worker.worker_base import WorkerWrapperBase
+import vllm.envs as envs
+import torch.distributed as dist
 
 from verl import DataProto
 from verl.third_party.vllm import VLLM_SLEEP_LEVEL
