@@ -40,8 +40,10 @@ NNODES=32
 # 1. download the dist_ckpt format model from https://huggingface.co/BearBiscuit05/dpsk-v3-671B-BF16-dist_ckpt/tree/main
 # change the MODEL_PATH and MCORE_MODEL_PATH to your own path
 # Paths
-MODEL_PATH="/data01/nlp/dpsk-v3-671B-BF16-dist_ckpt"
-MCORE_MODEL_PATH="/data01/huawei-2025/xczhao/weights/dsv3_fp16_mcore_4"
+MODEL_PATH="/data01/huawei-2025/zsz/deepseek3/DeepSeek_V3_hf_fp16"
+#MODEL_PATH="/data01/nlp/dpsk-v3-671B-BF16-dist_ckpt"
+#MCORE_MODEL_PATH="/data01/huawei-2025/xczhao/weights/dsv3_fp16_mcore_4"
+MCORE_MODEL_PATH="/data01/huawei-2025/zy/Deepseek-V3-HF-Four-layer/"
 RAY_DATA_HOME="/opt"
 CKPTS_DIR=${CKPTS_DIR:-"${RAY_DATA_HOME}/ckpts/${project_name}/${exp_name}"}
 TRAIN_FILE="/data01/huawei-2025/xczhao/rl_data/dapo-math/dapo-math-17k.parquet"
