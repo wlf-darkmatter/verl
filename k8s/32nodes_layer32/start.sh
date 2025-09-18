@@ -2,10 +2,9 @@ export HCCL_SOCKET_IFNAME=ens45 # modify according to actual situation
 export TP_SOCKET_IFNAME=ens45   # modify according to actual situation
 export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
 export HYDRA_FULL_ERROR=1
-export RAY_DEDUP_LOGS=0
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
-cp -f /data01/huawei-2025/wlf/verl/k8s/32nodes/hw_run_dapo_deepseek_671b_megatron.sh /opt/verl/
+cp -f /data01/huawei-2025/wlf/verl/k8s/32nodes_layer32/hw_run_dapo_deepseek_671b_megatron.sh /opt/verl/
 
 cp /data01/huawei-2025/zy/mc2_env.yaml /opt/verl/verl/trainer/
 cp -f /data01/huawei-2025/zy/0911/rollout.py /opt/verl/verl/workers/config/rollout.py

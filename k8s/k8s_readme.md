@@ -41,3 +41,7 @@ kubectl logs deepseek-sleep-worker-0 -n rein-learing -f
 kubectl exec -it deepseek-sleep-master-0 bash -n rein-learing
 kubectl exec -it deepseek-sleep-worker-0 bash -n rein-learing
 
+
+
+sed -i 's@enable_prefix_caching=.*@enable_prefix_caching=False,@g' /opt/mindspeed-rl/verl_npu/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
+
