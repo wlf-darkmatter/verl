@@ -23,9 +23,9 @@ clip_ratio_low=0.2
 clip_ratio_high=0.28
 
 max_prompt_length=$((1024 * 2))
-max_response_length=$((1024 * 8))
+max_response_length=$((32))
 enable_overlong_buffer=False
-overlong_buffer_len=$((1024 * 4))
+overlong_buffer_len=$((32))
 overlong_penalty_factor=0.1
 
 loss_agg_mode="token-mean"
@@ -35,13 +35,13 @@ n_resp_per_prompt=16
 train_prompt_mini_bsz=32  # mini_bsz * n >= micro_bsz * pp * dp
 
 #NNODES=${NNODES:-1}
-NNODES=32
+NNODES=2
 
 # 1. download the dist_ckpt format model from https://huggingface.co/BearBiscuit05/dpsk-v3-671B-BF16-dist_ckpt/tree/main
 # change the MODEL_PATH and MCORE_MODEL_PATH to your own path
 # Paths
-MODEL_PATH="/data01/nlp/dpsk-v3-671B-BF16-dist_ckpt"
-MCORE_MODEL_PATH="/data01/nlp/dpsk-v3-671B-BF16-dist_ckpt"
+MODEL_PATH="/data01/huawei-2025/zsz/deepseek3/DeepSeek_V3_hf_fp16"
+MCORE_MODEL_PATH="/data01/huawei-2025/zy/Deepseek-V3-HF-3-2-layer/"
 RAY_DATA_HOME="/opt"
 CKPTS_DIR=${CKPTS_DIR:-"${RAY_DATA_HOME}/ckpts/${project_name}/${exp_name}"}
 TRAIN_FILE="/data01/huawei-2025/xczhao/rl_data/dapo-math/dapo-math-17k.parquet"
@@ -56,17 +56,15 @@ top_k=-1 # 0 for HF rollout, -1 for vLLM rollout
 val_top_p=0.7
 
 # Performance Related Parameter
-use_dynamic_bsz=True
+use_dynamic_bsz=False
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 2))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
 offload=True
-gen_tp=8
-gen_dp=8
-gen_world_size=$((NNODES*8))
-train_tp=4
-train_ep=8
-train_pp=8
-enable_filter_group=True
+gen_tp=4
+train_tp=8
+train_ep=1
+train_pp=1
+enable_filter_group=False
 
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 ray job submit --runtime-env="${RUNTIME_ENV}" \

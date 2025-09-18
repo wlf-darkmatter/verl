@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek671-2-verl-moe-reduce  #sp-64-train-3b-moe-msrun #需要修改
+  name: deepseek671-2-verl-moe-2node  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -47,7 +47,7 @@ spec:
               command: ["/bin/bash", "-c"]
 
               args:
-                - "cd /opt/verl ;GLOO_SOCKET_IFNAME=ens45 ;CURRENT_IP=$(ifconfig $GLOO_SOCKET_IFNAME | grep -Eo 'inet .*' | awk '{print $2}'); bash /home/new_verl/k8s/32nodes_reduce/start.sh 2>&1 | tee /data01/huawei-2025/wlf/logs/${CURRENT_IP}_32h.log; sleep 7d"
+                - "cd /opt/verl ;GLOO_SOCKET_IFNAME=ens45 ;CURRENT_IP=$(ifconfig $GLOO_SOCKET_IFNAME | grep -Eo 'inet .*' | awk '{print $2}'); bash /home/new_verl/k8s/2node/start.sh 2>&1 | tee /data01/huawei-2025/wlf/logs/${CURRENT_IP}_32h.log; sleep 7d"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
@@ -110,7 +110,7 @@ spec:
                       - key: job-name
                         operator: In
                         values:
-                          -  deepseek671-2-verl-moe-reduce  #train-32x7b-256-moe-o0   #train-64x28b-256-moe-o1 #需要修改, 必须与metadata.name一致
+                          -  deepseek671-2-verl-moe-2node  #train-32x7b-256-moe-o0   #train-64x28b-256-moe-o1 #需要修改, 必须与metadata.name一致
                       - key: replica-type
                         operator: In
                         values:
@@ -136,7 +136,7 @@ spec:
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "cd /opt/verl ;GLOO_SOCKET_IFNAME=ens45 ;CURRENT_IP=$(ifconfig $GLOO_SOCKET_IFNAME | grep -Eo 'inet .*' | awk '{print $2}'); bash /home/new_verl/k8s/32nodes_reduce/start.sh 2>&1 | tee /data01/huawei-2025/wlf/logs/${CURRENT_IP}_32h.log; sleep 7d"
+                - "cd /opt/verl ;GLOO_SOCKET_IFNAME=ens45 ;CURRENT_IP=$(ifconfig $GLOO_SOCKET_IFNAME | grep -Eo 'inet .*' | awk '{print $2}'); bash /home/new_verl/k8s/2node/start.sh 2>&1 | tee /data01/huawei-2025/wlf/logs/${CURRENT_IP}_32h.log; sleep 7d"
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify
