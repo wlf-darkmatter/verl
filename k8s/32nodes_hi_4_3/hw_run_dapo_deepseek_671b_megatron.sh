@@ -6,8 +6,8 @@ set -xeuo pipefail
 # remove the `quantization_config` in the `config.json`
 # set `num_nextn_predict_layers=0` to disable MTP, which is not currently supported
 #huggingface-cli download deepseek-ai/DeepSeek-V3-0324 configuration_deepseek.py config.json
-sed -i 's@enable_prefix_caching=.*@enable_prefix_caching=False,@g' /opt/mindspeed-rl/verl_npu/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
-sed -i 's@enable_chunked_prefill=.*@enable_chunked_prefill=False,@g' /opt/mindspeed-rl/verl_npu/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
+#sed -i 's@enable_prefix_caching=.*@enable_prefix_caching=False,@g' /opt/mindspeed-rl/verl_npu/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
+#sed -i 's@enable_chunked_prefill=.*@enable_chunked_prefill=False,@g' /opt/mindspeed-rl/verl_npu/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
 
 project_name='DAPO'
 exp_name='DAPO-DeepSeek-671b-megatron'
@@ -41,7 +41,7 @@ NNODES=32
 # change the MODEL_PATH and MCORE_MODEL_PATH to your own path
 # Paths
 MODEL_PATH="/data01/nlp/dpsk-v3-671B-BF16-dist_ckpt"
-MCORE_MODEL_PATH="/data01/huawei-2025/xczhao/weights/dsv3_fp16_mcore_full_new"
+MCORE_MODEL_PATH="/data01/huawei-2025/xczhao/weights/dsv3_fp16_mcore_4"
 RAY_DATA_HOME="/opt"
 CKPTS_DIR=${CKPTS_DIR:-"${RAY_DATA_HOME}/ckpts/${project_name}/${exp_name}"}
 TRAIN_FILE="/data01/huawei-2025/xczhao/rl_data/dapo-math/dapo-math-17k.parquet"
@@ -90,7 +90,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.clip_ratio_low=${clip_ratio_low} \
     actor_rollout_ref.actor.clip_ratio_high=${clip_ratio_high} \
     actor_rollout_ref.actor.clip_ratio_c=10.0 \
-    actor_rollout_ref.rollout.skip_rollout=Fale \
+    actor_rollout_ref.rollout.skip_rollout=True \
     actor_rollout_ref.rollout.skip_dump_dir="/data01/huawei-2025/zy/rollout_dump" \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
