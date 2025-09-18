@@ -1,0 +1,14 @@
+working_dir: ./
+excludes: ["/.git/"]
+env_vars:
+
+  HCCL_EXEC_TIMEOUT: "7200"
+  HCCL_CONNECT_TIMEOUT: "7200"
+  VLLM_USE_V1: "1"
+  VLLM_VERSION: "0.9.1"
+  HCCL_IF_BASE_PORT: "23999"
+  VLLM_ASCEND_ENABLE_MOE_ALL2ALL_SEQ: "1"
+  HCCL_ASYNC_ERROR_HANDLING: "0"
+  P2P_HCCL_BUFFSIZE: "20"
+  PYTORCH_NPU_ALLOC_CONF: "max_split_size_mb:2048"
+  # LD_PRELOAD: "/usr/local/lib/libjemalloc.so.2"
