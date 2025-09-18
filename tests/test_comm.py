@@ -202,7 +202,6 @@ class TestComm(BasrRay):
 
 
     def test_allgather(self):
-        pass
         tensor = torch.ones(self.tensor_size, dtype=torch.float32) * self.rank
 
         gather_list = [torch.zeros_like(tensor) for _ in range(self.world_size)]
@@ -218,13 +217,15 @@ class TestComm(BasrRay):
     def test_alltoall(self):
         tensor = torch.ones(self.tensor_size, dtype=torch.float32) * self.rank
         pass
-
+    
+    def get_tensor(self, data):
+        pass
 
 class RayTest():
 
     def __init__(self):
-
         self.list_task = build_task(TestComm, device_name=args.device)
+
     def test_comm(self):
         pool_exec(self.list_task, "print_rank")
         pool_exec(self.list_task, "init_process_group")
@@ -233,11 +234,26 @@ class RayTest():
         pass
 
     def test_host_memory(self):
-        tmp_tensor = torch.zeros([1024,1024,1024], dtype=torch.float32)
-        pass
+
+        import torch
+        import torch_npu
+        tmp_tensor = torch.zeros([64, 1024,1024,1024], dtype=torch.float16) #* 下发 1 T
+        print(f"test_host_memory data size: {tmp_tensor.element_size() * tmp_tensor.numel()/1024**3:.2f} GB")
+                        
+        chunck_tmp = tmp_tensor.chunk(len(self.list_task))
+        
+        task_runnint_list = []
+        for i, task_i in enumerate(self.list_task):
+            tmp = chunck_tmp[i]
+            task_runnint_list.append(task_i.get_tensor.remote(tmp))
+            print(f"transfer {tmp.element_size() * tmp.numel()/1024**3:.2f} GB to rank: {i}")
+        list_output = ray.get(task_runnint_list)
+
+        print(f"test_host_memory Done")
 
 if __name__ == "__main__":
     ray_init()
     ray_test = RayTest()
+    ray_test.test_host_memory()
     ray_test.test_comm()
 
