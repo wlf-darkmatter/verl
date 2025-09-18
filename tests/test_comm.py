@@ -91,9 +91,10 @@ def build_task(task_cls, config=None, device_name=None):
     for pg_idx, pg in enumerate(sort_placement_group_by_node_ip(pgs)):
         for local_rank in range(local_world_size):
             rank += 1
-
+            print(f"Building rank: {rank}")
             if rank == 0:
                 master_addr, master_port = get_availale_curr_addr_port()
+                print(f"Get master_addr from ray is {master_addr}")
                 info = {
                     "MASTER_ADDR": master_addr,
                     "MASTER_PORT": str(master_port),
@@ -142,6 +143,7 @@ class BasrRay:
         self.rank_zero_info = rank_zero_info
         self.world_size = int(os.environ.get("WORLD_SIZE", 1))
         self.rank = int(os.environ["RANK"])
+        self.local_rank = int(os.environ["LOCAL_RANK"])
 
     def ray_exec(self, func_name, *args, **kwargs):
         return getattr(self, func_name)(*args, **kwargs)
@@ -165,7 +167,9 @@ class TestComm(BasrRay):
         print(f"Device={self.device_name}")
 
     def init_process_group(self):
+        torch.npu.set_device(self.local_rank)
         backend = "cpu:gloo"
+
         if self.device_name == "npu":
             backend = backend + f",{get_device_name()}:{get_nccl_backend()}"
 
@@ -176,12 +180,13 @@ class TestComm(BasrRay):
             world_size=self.world_size,
             timeout=datetime.timedelta(seconds=300), #* 默认给一个 5min 的超时时间
         )
-        print(f"\033[32m建链完成\033[0m",flush=True)
+        print(f"建链完成", flush=True)
         return dist.get_rank(), dist.get_world_size()
 
     def test_allreduce(self):
 
         # 创建测试张量
+        dist.barrier()
         tensor = torch.ones(self.tensor_size, dtype=torch.float32) * self.rank
         tensor = tensor.to(self.device_name)
 
@@ -218,11 +223,8 @@ class TestComm(BasrRay):
 class RayTest():
 
     def __init__(self):
-        pass
-        device = args.device
 
-        self.list_task = build_task(TestComm, device_name=device)
-
+        self.list_task = build_task(TestComm, device_name=args.device)
     def test_comm(self):
         pool_exec(self.list_task, "print_rank")
         pool_exec(self.list_task, "init_process_group")

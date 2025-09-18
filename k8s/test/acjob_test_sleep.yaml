@@ -12,7 +12,7 @@ spec:
   schedulerName: volcano    #需要修改 work when enableGangScheduling is true
   runPolicy:
     schedulingPolicy:
-      minAvailable: 32    #需要修改， work when enableGangScheduling is true
+      minAvailable: 2    #需要修改， work when enableGangScheduling is true
       queue: default
   successPolicy: AllWorkers
   replicaSpecs:
@@ -88,7 +88,7 @@ spec:
               hostPath:
                  path: /data01
     Worker:
-      replicas: 31  #Master can only be 1
+      replicas: 1  #Master can only be 1
       restartPolicy: Never
       template:
         metadata:
