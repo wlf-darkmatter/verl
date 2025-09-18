@@ -32,20 +32,17 @@ train_prompt_bsz=256 # must be > n_gpus. need to fix
 n_resp_per_prompt=16
 train_prompt_mini_bsz=32  # mini_bsz * n >= micro_bsz * pp * dp
 
-#NNODES=${NNODES:-1}
 NNODES=2
 
 # 1. download the dist_ckpt format model from https://huggingface.co/BearBiscuit05/dpsk-v3-671B-BF16-dist_ckpt/tree/main
 # change the MODEL_PATH and MCORE_MODEL_PATH to your own path
 # Paths
-MODEL_PATH="/data01/huawei-2025/zsz/deepseek3/DeepSeek_V3_hf_fp16"
+MODEL_PATH="/data01/nlp/dpsk-v3-671B-BF16-dist_ckpt_cut"
 MCORE_MODEL_PATH="/data01/huawei-2025/zy/Deepseek-V3-HF-3-2-layer/"
 RAY_DATA_HOME="/opt"
 CKPTS_DIR=${CKPTS_DIR:-"${RAY_DATA_HOME}/ckpts/${project_name}/${exp_name}"}
 TRAIN_FILE="/data01/huawei-2025/xczhao/rl_data/dapo-math/dapo-math-17k.parquet"
 TEST_FILE="/data01/huawei-2025/xczhao/rl_data/dapo-math/dapo-math-17k.parquet"
-
-#TEST_FILE="['$aime24_test_path']"
 
 # Algorithm
 temperature=1.0

@@ -46,7 +46,7 @@ spec:
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "source /etc/profile; bash /home/new_verl/k8s/test/test_1.sh 2>&1 | tee /data01/huawei-2025/wlf/logs/test1.log ; sleep 7d;"
+                - "bash /home/new_verl/k8s/test/test_1.sh ; sleep 7d;"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #
                 - containerPort: 60350        # determined by user
@@ -88,7 +88,7 @@ spec:
               hostPath:
                  path: /data01
     Worker:
-      replicas: 1  #Master can only be 1
+      replicas: 47  #Master can only be 1
       restartPolicy: Never
       template:
         metadata:
@@ -130,7 +130,7 @@ spec:
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "source /etc/profile; bash /home/new_verl/k8s/test/test_1.sh ; sleep 7d;"
+                - "bash /home/new_verl/k8s/test/test_1.sh ; sleep 7d;"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #
                 - containerPort: 60350        # determined by user

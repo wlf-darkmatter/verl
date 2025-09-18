@@ -17,8 +17,15 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--nnodes", type=int, default=1)
 parser.add_argument("--device", type=str, default=None)
 parser.add_argument("--n_gpus_per_node", type=int, default=8)
-parser.add_argument("--is_master", action="store_true", help="直接设置当前机器为 master")
-parser.add_argument("--ray_master_ip", type=str, default=None, help="会自动判断 gloo 网卡的 ip 是否和指定的这个 ip 一致，一致则认为是 master")
+parser.add_argument(
+    "--is_master", action="store_true", help="直接设置当前机器为 master"
+)
+parser.add_argument(
+    "--ray_master_ip",
+    type=str,
+    default=None,
+    help="会自动判断 gloo 网卡的 ip 是否和指定的这个 ip 一致，一致则认为是 master",
+)
 parser.add_argument("--ray_master_port", type=int, default=6379)
 parser.add_argument("--ray_dashboard_port", type=int, default=8265)
 args = parser.parse_args()
@@ -39,7 +46,10 @@ def ray_init():
     os.environ["VLLM_LOGGING_LEVEL"] = "WARN"
     os.environ["VLLM_ALLOW_RUNTIME_LORA_UPDATING"] = "true"
     os.environ["RAY_EXPERIMENTAL_NOSET_ASCEND_RT_VISIBLE_DEVICES"] = "1"
-    print(f"建链规模: NNODES={args.nnodes}, WORLD_SISE={args.nnodes*args.n_gpus_per_node}", flush=True)
+    print(
+        f"建链规模: NNODES={args.nnodes}, WORLD_SISE={args.nnodes*args.n_gpus_per_node}",
+        flush=True,
+    )
     if args.nnodes > 1:
         if args.ray_master_ip is None:
             raise RuntimeError(
@@ -52,7 +62,9 @@ def ray_init():
         if args.is_master or curr_addr == args.ray_master_ip:
             pass
             print("\033[32mMaster\033[0m", flush=True)
-            ret = os.popen(f"ray start --head --port {args.ray_master_port} --dashboard-port {args.ray_dashboard_port}").read()
+            ret = os.popen(
+                f"ray start --head --port {args.ray_master_port} --dashboard-port {args.ray_dashboard_port}"
+            ).read()
         else:
             print("\033[32mSlaver\033[0m", flush=True)
             ret = os.popen(
@@ -124,7 +136,9 @@ def build_task(task_cls, config=None, device_name=None):
             if device_name == "npu":
                 options["resources"] = {"NPU": 1}
 
-            task = task_cls.options(**options).remote(info, config, device_name=device_name)
+            task = task_cls.options(**options).remote(
+                info, config, device_name=device_name
+            )
             tasks.append(task)
     return tasks
 
@@ -158,6 +172,7 @@ class BasrRay:
 @ray.remote
 class TestComm(BasrRay):
     tensor_size = (100, 100)
+
     def __init__(self, rank_zero_info, config=None, device_name=None, *kwargs):
         super().__init__(rank_zero_info, config)
         if device_name is None:
@@ -178,7 +193,7 @@ class TestComm(BasrRay):
             backend=backend,
             rank=self.rank,
             world_size=self.world_size,
-            timeout=datetime.timedelta(seconds=300), #* 默认给一个 5min 的超时时间
+            timeout=datetime.timedelta(seconds=300),  # * 默认给一个 5min 的超时时间
         )
         print(f"建链完成", flush=True)
         return dist.get_rank(), dist.get_world_size()
@@ -200,7 +215,6 @@ class TestComm(BasrRay):
         dist.barrier()
         print(f"\033[32mAllReduce Done\033[0m")
 
-
     def test_allgather(self):
         tensor = torch.ones(self.tensor_size, dtype=torch.float32) * self.rank
 
@@ -208,7 +222,7 @@ class TestComm(BasrRay):
 
         dist.all_gather(gather_list, tensor)
 
-        if self.rank==0:
+        if self.rank == 0:
             gathered_data = torch.cat(gather_list)
             print([i[0][0] for i in gathered_data.chunk(self.world_size)])
         print(f"\033[32mAllGather Done\033[0m", flush=True)
@@ -217,11 +231,12 @@ class TestComm(BasrRay):
     def test_alltoall(self):
         tensor = torch.ones(self.tensor_size, dtype=torch.float32) * self.rank
         pass
-    
+
     def get_tensor(self, data):
         pass
 
-class RayTest():
+
+class RayTest:
 
     def __init__(self):
         self.list_task = build_task(TestComm, device_name=args.device)
@@ -237,23 +252,30 @@ class RayTest():
 
         import torch
         import torch_npu
-        tmp_tensor = torch.zeros([64, 1024,1024,1024], dtype=torch.float16) #* 下发 1 T
-        print(f"test_host_memory data size: {tmp_tensor.element_size() * tmp_tensor.numel()/1024**3:.2f} GB")
-                        
+
+        tmp_tensor = torch.zeros(
+            [64, 1024, 1024, 1024], dtype=torch.float16
+        )  # * 下发 1 T
+        print(
+            f"test_host_memory data size: {tmp_tensor.element_size() * tmp_tensor.numel()/1024**3:.2f} GB"
+        )
+
         chunck_tmp = tmp_tensor.chunk(len(self.list_task))
-        
+
         task_runnint_list = []
         for i, task_i in enumerate(self.list_task):
             tmp = chunck_tmp[i]
             task_runnint_list.append(task_i.get_tensor.remote(tmp))
-            print(f"transfer {tmp.element_size() * tmp.numel()/1024**3:.2f} GB to rank: {i}")
+            print(
+                f"transfer {tmp.element_size() * tmp.numel()/1024**3:.2f} GB to rank: {i}"
+            )
         list_output = ray.get(task_runnint_list)
 
         print(f"test_host_memory Done")
 
+
 if __name__ == "__main__":
     ray_init()
     ray_test = RayTest()
-    ray_test.test_host_memory()
+    # ray_test.test_host_memory()
     ray_test.test_comm()
-
