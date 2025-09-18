@@ -47,7 +47,7 @@ spec:
               command: ["/bin/bash", "-c"]
 
               args:
-                - "cd /opt/;rm -rf verl/ ;rm -rf mindspeed-rl/ ;cp -rf /home/new_verl/ /opt/verl ;GLOO_SOCKET_IFNAME=ens45 ;CURRENT_IP=$(ifconfig $GLOO_SOCKET_IFNAME | grep -Eo 'inet .*' | awk '{print $2}'); bash /home/new_verl/k8s/new_2nodes/start.sh 2>&1 | tee /data01/huawei-2025/wlf/logs/${CURRENT_IP}_32h.log; sleep 7d"
+                - "cd /opt/verl ;GLOO_SOCKET_IFNAME=ens45 ;CURRENT_IP=$(ifconfig $GLOO_SOCKET_IFNAME | grep -Eo 'inet .*' | awk '{print $2}'); bash /home/new_verl/k8s/new_2nodes/start.sh 2>&1 | tee /data01/huawei-2025/wlf/logs/${CURRENT_IP}_32h.log; sleep 7d"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
@@ -136,7 +136,7 @@ spec:
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "cd /opt/;rm -rf verl/ ;rm -rf mindspeed-rl/ ;cp -rf /home/new_verl/ /opt/verl ;GLOO_SOCKET_IFNAME=ens45 ;CURRENT_IP=$(ifconfig $GLOO_SOCKET_IFNAME | grep -Eo 'inet .*' | awk '{print $2}'); bash /home/new_verl/k8s/new_2nodes/start.sh 2>&1 | tee /data01/huawei-2025/wlf/logs/${CURRENT_IP}_32h.log; sleep 7d"
+                - "cd /opt/verl ;GLOO_SOCKET_IFNAME=ens45 ;CURRENT_IP=$(ifconfig $GLOO_SOCKET_IFNAME | grep -Eo 'inet .*' | awk '{print $2}'); bash /home/new_verl/k8s/new_2nodes/start.sh 2>&1 | tee /data01/huawei-2025/wlf/logs/${CURRENT_IP}_32h.log; sleep 7d"
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify
