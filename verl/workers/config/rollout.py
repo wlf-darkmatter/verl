@@ -158,6 +158,9 @@ class RolloutConfig(BaseConfig):
     profiler: ProfilerConfig = field(default_factory=ProfilerConfig)
 
     enable_chunked_prefill: bool = True
+
+    enable_prefix_caching: bool = True
+
     load_format: str = "dummy_dtensor"
 
     layered_summon: bool = False
