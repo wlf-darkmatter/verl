@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek671-2-verl-moe-new_2nodes  #sp-64-train-3b-moe-msrun #需要修改
+  name: deepseek671-2-verl-moe-new-2nodes  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -110,7 +110,7 @@ spec:
                       - key: job-name
                         operator: In
                         values:
-                          -  deepseek671-2-verl-moe-new_2nodes  #train-32x7b-256-moe-o0   #train-64x28b-256-moe-o1 #需要修改, 必须与metadata.name一致
+                          -  deepseek671-2-verl-moe-new-2nodes  #train-32x7b-256-moe-o0   #train-64x28b-256-moe-o1 #需要修改, 必须与metadata.name一致
                       - key: replica-type
                         operator: In
                         values:
