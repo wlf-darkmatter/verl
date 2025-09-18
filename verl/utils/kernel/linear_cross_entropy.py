@@ -34,7 +34,7 @@ import typing
 import torch
 import torch.distributed as dist
 
-from . import kernels
+# from . import kernels
 
 
 class LinearCrossEntropy(torch.autograd.Function):
