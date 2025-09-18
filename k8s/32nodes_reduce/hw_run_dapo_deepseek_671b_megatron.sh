@@ -6,6 +6,8 @@ set -xeuo pipefail
 # remove the `quantization_config` in the `config.json`
 # set `num_nextn_predict_layers=0` to disable MTP, which is not currently supported
 #huggingface-cli download deepseek-ai/DeepSeek-V3-0324 configuration_deepseek.py config.json
+sed -i 's@enable_prefix_caching=.*@enable_prefix_caching=False,@g' /opt/mindspeed-rl/verl_npu/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
+sed -i 's@enable_chunked_prefill=.*@enable_chunked_prefill=False,@g' /opt/mindspeed-rl/verl_npu/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
 
 project_name='DAPO'
 exp_name='DAPO-DeepSeek-671b-megatron'
@@ -58,10 +60,10 @@ use_dynamic_bsz=True
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 2))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
 offload=True
-gen_tp=4
-gen_dp=16
+gen_tp=8
+gen_dp=8
 gen_world_size=$((NNODES*8))
-train_tp=8
+train_tp=4
 train_ep=8
 train_pp=8
 enable_filter_group=True
@@ -110,13 +112,16 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +actor_rollout_ref.actor.megatron.override_transformer_config.use_flash_attn=True \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_method=uniform \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_granularity=full \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.pipeline_num_transformer_layers=[[6],[8],[8],[8],[8],[8],[8],[7]] \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=4 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_first_pipeline_stage=6 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_pipeline_stage=7 \
     actor_rollout_ref.actor.load_weight=False \
     actor_rollout_ref.ref.load_weight=False \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.optim.clip_grad=1.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.8 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.9 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=${gen_tp} \
     actor_rollout_ref.rollout.dp_model_parallel_size=${gen_dp} \
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
