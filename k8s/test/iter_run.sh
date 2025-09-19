@@ -20,6 +20,8 @@ server_prefix_name=deepseek-sleep-
 #     kubectl get pods -o wide -n rein-learing | grep "deepseek-sleep-0-master-0" |awk '{print $6}'
 # done
 list_success=()
+list_fail=()
+
 if [[ $1 == "log" ]];then
     rm -rf ${path_logs}/*
 fi
@@ -27,7 +29,7 @@ fi
 for i in $(seq 0 $((n_group-1))); do
     rm -f ${yaml_prefix_name}${i}.yaml
     cp ${yaml_init} ${yaml_prefix_name}${i}.yaml
-    echo $i
+    echo Target-$i
     sed -i "s/name: deepseek-sleep.*/name: ${server_prefix_name}${i}/g" ${yaml_prefix_name}${i}.yaml
     sed -i "s/- deepseek-sleep.*/- ${server_prefix_name}${i}/g" ${yaml_prefix_name}${i}.yaml
 
@@ -45,9 +47,12 @@ for i in $(seq 0 $((n_group-1))); do
     if [[ $1 == "log" ]];then
         kubectl logs ${server_prefix_name}${i}-master-0 -n rein-learing > ${path_logs}/log_${i}.log
         num_ok=$(cat ${path_logs}/log_${i}.log | grep -c 建链完成)
-        echo $num_ok
-        if [[ $num_ok -lt 0 ]];then
+        if [[ $num_ok -gt 0 ]];then
+            echo -e "\033[32mOK\033[0m"
             list_success+=($i)
+        else
+            echo -e "\033[31mFAIL\033[0m"
+            list_fail+=($i)
         fi
 
     fi
@@ -55,5 +60,35 @@ for i in $(seq 0 $((n_group-1))); do
 done
 
 
-echo ${list_success[@]}
+if [[ $1 == "log" ]];then
+    #! 统计结果
+    echo ${list_success[@]}
+    ip_list=()
+    for i in ${list_success[@]}; do
+        # 获取IP
+        ip_list+=($ip)
+        for j in $(seq 0 $((n_worker-1))); do
+            ip=$(kubectl get pods -o wide -n rein-learing | grep ${server_prefix_name}${i}-worker-${j} |awk '{print $6}')
+            ip_list+=($ip)
+        done
+
+    done
+    echo "【OK IP list】"
+    echo ${ip_list[@]}
+
+    ip_list=()
+    for i in ${list_fail[@]}; do
+        # 获取IP
+        ip_list+=($ip)
+        for j in $(seq 0 $((n_worker-1))); do
+            ip=$(kubectl get pods -o wide -n rein-learing | grep ${server_prefix_name}${i}-worker-${j} |awk '{print $6}')
+            ip_list+=($ip)
+        done
+
+    done
+
+    echo "【Failed IP list】"
+    echo ${ip_list[@]}
+
+fi
 
