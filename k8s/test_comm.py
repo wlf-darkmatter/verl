@@ -7,11 +7,20 @@ from functools import partial
 import ray
 import numpy as np
 import torch
+import torch_npu
 import torch.distributed as dist
 from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
 from verl.single_controller.ray import RayResourcePool
 from verl.single_controller.ray.base import sort_placement_group_by_node_ip
 from verl.utils.device import get_device_name, get_nccl_backend
+
+
+os.environ["TOKENIZERS_PARALLELISM"] = "true"
+os.environ["NCCL_DEBUG"] = "WARN"
+os.environ["VLLM_LOGGING_LEVEL"] = "WARN"
+os.environ["VLLM_ALLOW_RUNTIME_LORA_UPDATING"] = "true"
+os.environ["RAY_EXPERIMENTAL_NOSET_ASCEND_RT_VISIBLE_DEVICES"] = "1"
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--nnodes", type=int, default=1)
@@ -28,6 +37,7 @@ parser.add_argument(
 )
 parser.add_argument("--ray_master_port", type=int, default=6379)
 parser.add_argument("--ray_dashboard_port", type=int, default=8265)
+parser.add_argument("--ray_init", action="store_true")
 args = parser.parse_args()
 
 
@@ -41,16 +51,12 @@ def get_availale_curr_addr_port():
 
 
 def ray_init():
-    os.environ["TOKENIZERS_PARALLELISM"] = "true"
-    os.environ["NCCL_DEBUG"] = "WARN"
-    os.environ["VLLM_LOGGING_LEVEL"] = "WARN"
-    os.environ["VLLM_ALLOW_RUNTIME_LORA_UPDATING"] = "true"
-    os.environ["RAY_EXPERIMENTAL_NOSET_ASCEND_RT_VISIBLE_DEVICES"] = "1"
     print(
         f"建链规模: NNODES={args.nnodes}, WORLD_SISE={args.nnodes*args.n_gpus_per_node}",
         flush=True,
     )
-    if args.nnodes > 1:
+
+    if args.nnodes > 1 and args.ray_init:
         if args.ray_master_ip is None:
             raise RuntimeError(
                 f"`--ray_master_ip` should be set if nnodes({args.nnodes}) > 1."
@@ -82,6 +88,7 @@ def build_task(task_cls, config=None, device_name=None):
         use_gpu = False
     else:
         use_gpu = True
+    print(f"\033[32mStart build task\033[0m", flush=True)
 
     n_gpus_per_node = int(args.n_gpus_per_node)
     nnodes = int(args.nnodes)
@@ -90,9 +97,14 @@ def build_task(task_cls, config=None, device_name=None):
         max_colocate_count=1,
         use_gpu=use_gpu,
     )
+    #* 检查当前ray的资源数是否满足
+
 
     strategy = "PACK"
     pgs = resource_pool.get_placement_groups(strategy=strategy, device_name=device_name)
+    print(f"\033[32mget_placement_groups done\033[0m", flush=True)
+
+
     world_size = resource_pool.world_size
     local_world_size = resource_pool.store[0]
 
@@ -103,16 +115,16 @@ def build_task(task_cls, config=None, device_name=None):
     for pg_idx, pg in enumerate(sort_placement_group_by_node_ip(pgs)):
         for local_rank in range(local_world_size):
             rank += 1
-            print(f"Building rank: {rank}")
+            print(f"Building rank({rank}), local_rank({local_rank})", flush=True)
             if rank == 0:
                 master_addr, master_port = get_availale_curr_addr_port()
-                print(f"Get master_addr from ray is {master_addr}")
+                print(f"Get master_addr from ray is {master_addr}", flush=True)
                 info = {
                     "MASTER_ADDR": master_addr,
                     "MASTER_PORT": str(master_port),
                 }
 
-            actor_name = f"vllm-{rank}"
+            actor_name = f"comm-{rank}"
             env_vars = {
                 "WORLD_SIZE": str(world_size),
                 "RANK": str(rank),
@@ -140,10 +152,12 @@ def build_task(task_cls, config=None, device_name=None):
                 info, config, device_name=device_name
             )
             tasks.append(task)
+
     return tasks
 
 
 def pool_exec(list_task, func_name, *args, **kwargs):
+    print(f"Run {func_name}")
     task_runnint_list = []
     for i, task_i in enumerate(list_task):
         task_runnint_list.append(task_i.ray_exec.remote(func_name, *args, **kwargs))
@@ -179,31 +193,36 @@ class TestComm(BasrRay):
             self.device_name = "cpu"
         else:
             self.device_name = device_name
-        print(f"Device={self.device_name}")
+        print(f"Device={self.device_name}", flush=True)
 
     def init_process_group(self):
+        print(f"\033[32m开始建链\033[0m", flush=True)
+        # backend = "cpu:gloo"
+
+        # if self.device_name == "npu":
+        #     backend = backend + f",{get_device_name()}:{get_nccl_backend()}"
+        backend =  f"{get_device_name()}:{get_nccl_backend()}"
+
+        print(f"\033[33mbackend={backend}\033[0m", flush=True)
+        if not torch.distributed.is_initialized():
+            dist.init_process_group(get_nccl_backend())
+
+            # dist.init_process_group(
+            #     backend=backend,
+            #     rank=self.rank,
+            #     world_size=self.world_size,
+            #     timeout=datetime.timedelta(seconds=900),  # * 默认给一个 5min 的超时时间
+            # )
+
         torch.npu.set_device(self.local_rank)
-        backend = "cpu:gloo"
-
-        if self.device_name == "npu":
-            backend = backend + f",{get_device_name()}:{get_nccl_backend()}"
-
-        print(f"开始建链", flush=True)
-        dist.init_process_group(
-            backend=backend,
-            rank=self.rank,
-            world_size=self.world_size,
-            timeout=datetime.timedelta(seconds=300),  # * 默认给一个 5min 的超时时间
-        )
-        print(f"建链完成", flush=True)
+        print(f"\033[32m建链完成\033[0m", flush=True)
         return dist.get_rank(), dist.get_world_size()
 
     def test_allreduce(self):
 
         # 创建测试张量
         dist.barrier()
-        tensor = torch.ones(self.tensor_size, dtype=torch.float32) * self.rank
-        tensor = tensor.to(self.device_name)
+        tensor = torch.ones(self.tensor_size, dtype=torch.float32, device=self.device_name) * self.rank
 
         ground_truth = np.sum(np.arange(self.world_size))
         print(f"Testing AllReduce with tensor size: {self.tensor_size}", flush=True)
@@ -213,12 +232,12 @@ class TestComm(BasrRay):
         assert tensor[0][0] == ground_truth
         # 同步所有进程
         dist.barrier()
-        print(f"\033[32mAllReduce Done\033[0m")
+        print(f"\033[32mAllReduce Done\033[0m", flush=True)
 
     def test_allgather(self):
-        tensor = torch.ones(self.tensor_size, dtype=torch.float32) * self.rank
+        tensor = torch.ones(self.tensor_size, dtype=torch.float32, device=self.device_name) * self.rank
 
-        gather_list = [torch.zeros_like(tensor) for _ in range(self.world_size)]
+        gather_list = [torch.zeros_like(tensor, device=self.device_name) for _ in range(self.world_size)]
 
         dist.all_gather(gather_list, tensor)
 
@@ -229,7 +248,7 @@ class TestComm(BasrRay):
         dist.barrier()
 
     def test_alltoall(self):
-        tensor = torch.ones(self.tensor_size, dtype=torch.float32) * self.rank
+        tensor = torch.ones(self.tensor_size, dtype=torch.float32, device=self.device_name) * self.rank
         pass
 
     def get_tensor(self, data):
@@ -246,12 +265,9 @@ class RayTest:
         pool_exec(self.list_task, "init_process_group")
         pool_exec(self.list_task, "test_allreduce")
         pool_exec(self.list_task, "test_allgather")
-        pass
 
     def test_host_memory(self):
 
-        import torch
-        import torch_npu
 
         tmp_tensor = torch.zeros(
             [64, 1024, 1024, 1024], dtype=torch.float16
@@ -275,6 +291,7 @@ class RayTest:
 
 
 if __name__ == "__main__":
+    print(f"Start Test Comm", flush=True)
     ray_init()
     ray_test = RayTest()
     # ray_test.test_host_memory()

@@ -323,6 +323,7 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
                         load_megatron_gptmodel_weights(
                             self.config, self.hf_config, actor_module, params_dtype=self.dtype, is_value_model=False
                         )
+            print("模型权重加载完毕", flush=True)
 
             if self.rank == 0:
                 print_model_size(actor_module[0])

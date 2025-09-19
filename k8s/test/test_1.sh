@@ -36,13 +36,17 @@ if [ "$RANK" = "0" ]; then
   kwargs=(--is_master --ray_dashboard_port ${DashboardPort})
 else
   kwargs=()
+  sleep 30
 fi
 
 ray stop --force
 
-python tests/test_comm.py \
+python k8s/test_comm.py \
+    --ray_init \
     --nnodes=${NNODES} \
     --ray_master_ip=${MASTER_ADDR} \
     --ray_master_port=${ServerPort} \
     --device=npu \
     ${kwargs[@]}
+
+
