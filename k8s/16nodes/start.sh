@@ -2,12 +2,19 @@ export HCCL_SOCKET_IFNAME=ens45 # modify according to actual situation
 export TP_SOCKET_IFNAME=ens45   # modify according to actual situation
 export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
 export HYDRA_FULL_ERROR=1
+export RAY_DEDUP_LOGS=0
+# export HCCL_EXEC_TIMEOUT=3600
+export ASCEND_GLOBAL_LOG_LEVEL=3
+CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
-cp -f /home/verl_mindx/hw_run_dapo_deepseek_671b_megatron.sh /opt/verl/
-cp -f /home/verl_mindx/start.sh /opt/verl/
+cp -f /data01/huawei-2025/wlf/verl/k8s/16nodes/hw_run_dapo_deepseek_671b_megatron.sh /opt/verl/
+
 cp /data01/huawei-2025/zy/mc2_env.yaml /opt/verl/verl/trainer/
 cp -f /data01/huawei-2025/zy/0911/rollout.py /opt/verl/verl/workers/config/rollout.py
 cp -f /data01/huawei-2025/zy/0911/rollout.yaml /opt/verl/verl/trainer/config/rollout/rollout.yaml
+
+bash /data01/huawei-2025/wlf/verl/k8s/script/watch_stats.sh > /data01/huawei-2025/wlf/watch/rank${RANK}_${CURRENT_IP}.log &
+
 
 source /usr/local/Ascend/driver/bin/setenv.bash;
 source /usr/local/Ascend/ascend-toolkit/set_env.sh;
@@ -23,8 +30,8 @@ unset LOCAL_WORLD_SIZE
 unset WORLD_SIZE
 unset LOCAL_RANK
 
-export ASCEND_GLOBAL_LOG_LEVEL=1
-export ASCEND_LAUNCH_BLOCKING=1
+#export ASCEND_GLOBAL_LOG_LEVEL=1
+# export ASCEND_LAUNCH_BLOCKING=1
 
 export NPU_PER_NODE=8  # A2 NPU Number
 export NNODES=16         # example is 4 Nodes
@@ -43,7 +50,6 @@ cnt=0
 if [ "$RANK" = "0" ]; then
   # head start
   echo "This is head node"
-  CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
   echo "CURRENT_IP=$CURRENT_IP"
 
   ray start --head --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
@@ -56,7 +62,6 @@ if [ "$RANK" = "0" ]; then
     # judge npu_count_int bigger than NNODES*NPU_PER_NODE
     if [ "$npu_count_int" -ge "$((NNODES*NPU_PER_NODE))" ]; then
       echo "Ray cluster is ready with $npu_count_int npu (from $npu_count NPU resources), starting Python script."
-      ray status
       bash hw_run_dapo_deepseek_671b_megatron.sh
       break
     fi
