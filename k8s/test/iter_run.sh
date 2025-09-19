@@ -1,16 +1,19 @@
 cd $(dirname $0)
 
 nnode=2
+yaml_prefix_name=acjob_test_tmp_
+server_prefix_name=deepseek-sleep-
+group_size=48
 
 n_worker=$((nnode-1))
-n_group=$((48/nnode))
+n_group=$((group_size/nnode))
 
 path_logs=/data01/huawei-2025/wlf/test_comm_logs
 mkdir -p $path_logs
 
-yaml_prefix_name=acjob_test_tmp_
 yaml_init=acjob_test_sleep.yaml
-server_prefix_name=deepseek-sleep-
+
+
 # server_prefix_name=deepseek-sleep-new-
 
 # #* check ip
@@ -22,7 +25,7 @@ server_prefix_name=deepseek-sleep-
 list_success=()
 list_fail=()
 
-if [[ $1 == "log" ]];then
+if [[ $1 == "check" ]];then
     rm -rf ${path_logs}/*
 fi
 
@@ -32,9 +35,9 @@ for i in $(seq 0 $((n_group-1))); do
     echo Target-$i
     sed -i "s/name: deepseek-sleep.*/name: ${server_prefix_name}${i}/g" ${yaml_prefix_name}${i}.yaml
     sed -i "s/- deepseek-sleep.*/- ${server_prefix_name}${i}/g" ${yaml_prefix_name}${i}.yaml
+    sed -i "s/minAvailable.*/minAvailable: ${nnode}/g" ${yaml_prefix_name}${i}.yaml
 
     if [[ $1 == "start" ]];then
-        sed -i "s/minAvailable.*/minAvailable: ${nnode}/g" ${yaml_prefix_name}${i}.yaml
         kubectl apply -f ${yaml_prefix_name}${i}.yaml -n rein-learing
 
     fi
@@ -44,7 +47,7 @@ for i in $(seq 0 $((n_group-1))); do
         rm -f ${yaml_prefix_name}${i}.yaml
     fi
 
-    if [[ $1 == "log" ]];then
+    if [[ $1 == "check" ]];then
         kubectl logs ${server_prefix_name}${i}-master-0 -n rein-learing > ${path_logs}/log_${i}.log
         num_ok=$(cat ${path_logs}/log_${i}.log | grep -c 建链完成)
         if [[ $num_ok -gt 0 ]];then
@@ -60,12 +63,19 @@ for i in $(seq 0 $((n_group-1))); do
 done
 
 
-if [[ $1 == "log" ]];then
-    #! 统计结果
+
+if [[ $1 == "check" ]];then
+    echo "【Success Pods】"
     echo ${list_success[@]}
+
+    echo "【Failed Pods】"
+    echo ${list_fail[@]}
+
+    #! 统计结果
     ip_list=()
     for i in ${list_success[@]}; do
         # 获取IP
+        ip=$(kubectl get pods -o wide -n rein-learing | grep ${server_prefix_name}${i}-master-0 |awk '{print $6}')
         ip_list+=($ip)
         for j in $(seq 0 $((n_worker-1))); do
             ip=$(kubectl get pods -o wide -n rein-learing | grep ${server_prefix_name}${i}-worker-${j} |awk '{print $6}')
@@ -76,9 +86,14 @@ if [[ $1 == "log" ]];then
     echo "【OK IP list】"
     echo ${ip_list[@]}
 
+
+    #!
+
+
     ip_list=()
     for i in ${list_fail[@]}; do
         # 获取IP
+        ip=$(kubectl get pods -o wide -n rein-learing | grep ${server_prefix_name}${i}-master-0 |awk '{print $6}')
         ip_list+=($ip)
         for j in $(seq 0 $((n_worker-1))); do
             ip=$(kubectl get pods -o wide -n rein-learing | grep ${server_prefix_name}${i}-worker-${j} |awk '{print $6}')
@@ -92,3 +107,13 @@ if [[ $1 == "log" ]];then
 
 fi
 
+
+#* 手动停止
+
+if [[ $2 == "release_fail" ]];then
+    for i in ${list_fail[@]}; do
+        kubectl delete -f ${yaml_prefix_name}${i}.yaml -n rein-learing
+        rm -f ${yaml_prefix_name}${i}.yaml
+    done
+
+fi
