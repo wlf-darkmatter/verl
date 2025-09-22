@@ -42,7 +42,7 @@ spec:
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
+              image: harbor.ai-bj.cn/library/verl:verl_0912  ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
 
@@ -65,6 +65,8 @@ spec:
                   memory: "800Gi"
 
               volumeMounts:
+                - name: npu-smi
+                  mountPath: /usr/local/bin/npu-smi
                 - name: ascend-driver
                   mountPath: /usr/local/Ascend/driver
                 - name: dshm
@@ -80,6 +82,9 @@ spec:
               emptyDir:
                 medium: Memory
                 sizeLimit: 500Gi
+            - name: npu-smi
+              hostPath:
+                path: /usr/local/bin/npu-smi
             - name: ascend-driver
               hostPath:
                 path: /usr/local/Ascend/driver                     # Configure the NPU driver and mount it to Docker.
@@ -88,11 +93,10 @@ spec:
                 path: /etc/localtime                               # Configure the Docker time.
             - name: start-path
               hostPath:
-                 path: /data01/huawei-2025/wlf/verl/
+                path: /data01/huawei-2025/wlf/verl/
             - name: data-path
               hostPath:
-                 path: /data01
-
+                path: /data01
     Worker:
       replicas: 31  #Master can only be 1
       restartPolicy: Never
@@ -132,7 +136,7 @@ spec:
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
+              image: harbor.ai-bj.cn/library/verl:verl_0912  ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
@@ -152,6 +156,8 @@ spec:
                   huawei.com/Ascend910: 8  #需要的NPU芯片个数为8
                   memory: "800Gi"
               volumeMounts:
+                - name: npu-smi
+                  mountPath: /usr/local/bin/npu-smi
                 - name: ascend-driver
                   mountPath: /usr/local/Ascend/driver
                 - name: dshm
@@ -167,6 +173,9 @@ spec:
               emptyDir:
                 medium: Memory
                 sizeLimit: 500Gi
+            - name: npu-smi
+              hostPath:
+                path: /usr/local/bin/npu-smi
             - name: ascend-driver
               hostPath:
                 path: /usr/local/Ascend/driver                     # Configure the NPU driver and mount it to Docker.
@@ -175,7 +184,7 @@ spec:
                 path: /etc/localtime                               # Configure the Docker time.
             - name: start-path
               hostPath:
-                 path: /data01/huawei-2025/wlf/verl/
+                path: /data01/huawei-2025/wlf/verl/
             - name: data-path
               hostPath:
-                 path: /data01
+                path: /data01

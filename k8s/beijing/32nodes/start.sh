@@ -9,9 +9,9 @@ CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){
 
 cp -f /data01/huawei-2025/wlf/verl/k8s/beijing/32nodes/hw_run_dapo_deepseek_671b_megatron.sh /opt/verl/
 
-cp /data01/liyingyan/zy/mc2_env.yaml /opt/verl/verl/trainer/
-cp -f /data01/liyingyan/zy/0911/rollout.py /opt/verl/verl/workers/config/rollout.py
-cp -f /data01/liyingyan/zy/0911/rollout.yaml /opt/verl/verl/trainer/config/rollout/rollout.yaml
+cp /data01/huawei-2025/zy/mc2_env.yaml /opt/verl/verl/trainer/
+cp -f /data01/huawei-2025/zy/0911/rollout.py /opt/verl/verl/workers/config/rollout.py
+cp -f /data01/huawei-2025/zy/0911/rollout.yaml /opt/verl/verl/trainer/config/rollout/rollout.yaml
 
 bash /data01/huawei-2025/wlf/verl/k8s/script/watch_stats.sh > /data01/huawei-2025/wlf/watch/rank${RANK}_${CURRENT_IP}.log &
 
