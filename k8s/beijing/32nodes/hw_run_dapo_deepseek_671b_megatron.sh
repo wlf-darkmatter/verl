@@ -67,6 +67,7 @@ train_pp=8
 enable_filter_group=False
 
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
+cd /opt/verl
 ray job submit --runtime-env="${RUNTIME_ENV}" \
     -- python3 -m verl.trainer.main_ppo \
     --config-path=config \
@@ -88,8 +89,8 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.clip_ratio_low=${clip_ratio_low} \
     actor_rollout_ref.actor.clip_ratio_high=${clip_ratio_high} \
     actor_rollout_ref.actor.clip_ratio_c=10.0 \
-    actor_rollout_ref.rollout.skip_rollout=True \
-    actor_rollout_ref.rollout.skip_dump_dir="/data01/huawei-2025/zy/rollout_dump" \
+    actor_rollout_ref.rollout.skip.rollout=True \
+    actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/zy/rollout_dump" \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \

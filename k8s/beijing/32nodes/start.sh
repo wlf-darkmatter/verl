@@ -2,29 +2,23 @@ export HCCL_SOCKET_IFNAME=ens45 # modify according to actual situation
 export TP_SOCKET_IFNAME=ens45   # modify according to actual situation
 export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
 export HYDRA_FULL_ERROR=1
-export RAY_DEDUP_LOGS=0
+export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
 export ASCEND_GLOBAL_LOG_LEVEL=3
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
-cp -f /data01/huawei-2025/wlf/verl/k8s/beijing/32nodes/hw_run_dapo_deepseek_671b_megatron.sh /opt/verl/
-
-cp /data01/huawei-2025/zy/mc2_env.yaml /opt/verl/verl/trainer/
-cp -f /data01/huawei-2025/zy/0911/rollout.py /opt/verl/verl/workers/config/rollout.py
-cp -f /data01/huawei-2025/zy/0911/rollout.yaml /opt/verl/verl/trainer/config/rollout/rollout.yaml
-
+mkdir -p /data01/huawei-2025/wlf/watch
 bash /data01/huawei-2025/wlf/verl/k8s/script/watch_stats.sh > /data01/huawei-2025/wlf/watch/rank${RANK}_${CURRENT_IP}.log &
 
-
-source /usr/local/Ascend/driver/bin/setenv.bash;
 source /usr/local/Ascend/ascend-toolkit/set_env.sh;
 source /usr/local/Ascend/nnal/atb/set_env.sh;
-source /usr/local/Ascend/nnal/asdsip/set_env.sh;
 source /opt/pyvenv/bin/activate;
-source /etc/profile;
+
+rm -rf /opt/verl
+cp -r /data01/huawei-2025/wlf/verl /opt/verl
+
 LIB_PATH=/opt/python3.10/lib/
 export LD_LIBRARY_PATH=$LIB_PATH:$LD_LIBRARY_PATH
-#export LD_PRELOAD="/usr/local/lib/python3.10/dist-packages/sklearn/utils/../../scikit_learn.libs/libgomp-947d5fa1.so.1.0.0";
 
 unset LOCAL_WORLD_SIZE
 unset WORLD_SIZE
@@ -39,9 +33,11 @@ export NNODES=32         # example is 4 Nodes
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
 export ASCEND_PROCESS_LOG_PATH=/opt/verl/logs/$MINDX_TASK_ID/plog # modify according to actual situation
 
-
 ray stop --force
-rm -rf /tmp
+rm -rf /tmp/ray
+rm -rf /opt/verl
+cp -r /home/new_verl /opt/verl
+
 
 export ServerPort=6666     # modify according to actual situation
 export DashboardPort=8888  # modify according to actual situation

@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 set -xeuo pipefail
-#  +actor_rollout_ref.actor.megatron.override_transformer_config.pipeline_num_transformer_layers=[[6],[8],[8],[8],[8],[8],[8],[7]] \
+
 # 0. download the config
 # only need to download the configuration_deepseek.py and config.json
 # remove the `quantization_config` in the `config.json`
 # set `num_nextn_predict_layers=0` to disable MTP, which is not currently supported
 #huggingface-cli download deepseek-ai/DeepSeek-V3-0324 configuration_deepseek.py config.json
-sed -i 's@enable_prefix_caching=.*@enable_prefix_caching=False,@g' /opt/mindspeed-rl/verl_npu/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
-sed -i 's@enable_chunked_prefill=.*@enable_chunked_prefill=False,@g' /opt/mindspeed-rl/verl_npu/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
 
 project_name='DAPO'
 exp_name='DAPO-DeepSeek-671b-megatron'
@@ -41,7 +39,7 @@ NNODES=32
 # change the MODEL_PATH and MCORE_MODEL_PATH to your own path
 # Paths
 MODEL_PATH="/data01/nlp/dpsk-v3-671B-BF16-dist_ckpt"
-MCORE_MODEL_PATH="/data01/huawei-2025/xczhao/weights/dsv3_fp16_mcore_32"
+MCORE_MODEL_PATH="/data01/huawei-2025/xczhao/weights/dsv3_fp16_mcore_full_new"
 RAY_DATA_HOME="/opt"
 CKPTS_DIR=${CKPTS_DIR:-"${RAY_DATA_HOME}/ckpts/${project_name}/${exp_name}"}
 TRAIN_FILE="/data01/huawei-2025/xczhao/rl_data/dapo-math/dapo-math-17k.parquet"
@@ -62,11 +60,11 @@ infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
 offload=True
 gen_tp=4
 gen_dp=16
-gen_world_size=$((NNODES*8))
-train_tp=8
-train_ep=8
-train_pp=1
-enable_filter_group=True
+# gen_world_size=$((NNODES*8))
+train_tp=2
+train_ep=16
+train_pp=8
+enable_filter_group=False
 
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 ray job submit --runtime-env="${RUNTIME_ENV}" \
@@ -90,8 +88,8 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.clip_ratio_low=${clip_ratio_low} \
     actor_rollout_ref.actor.clip_ratio_high=${clip_ratio_high} \
     actor_rollout_ref.actor.clip_ratio_c=10.0 \
-    actor_rollout_ref.rollout.skip_rollout=True \
-    actor_rollout_ref.rollout.skip_dump_dir="/data01/huawei-2025/zy/rollout_dump" \
+    actor_rollout_ref.rollout.skip.rollout=True \
+    actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/zy/rollout_dump" \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
@@ -112,13 +110,14 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +actor_rollout_ref.actor.megatron.override_transformer_config.use_flash_attn=True \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_method=uniform \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_granularity=full \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.pipeline_num_transformer_layers=[[6],[8],[8],[8],[8],[8],[8],[7]] \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=4 \
-    actor_rollout_ref.actor.load_weight=True \
-    actor_rollout_ref.ref.load_weight=True \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_first_pipeline_stage=6 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_pipeline_stage=7 \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.optim.clip_grad=1.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.9 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.7 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=${gen_tp} \
     actor_rollout_ref.rollout.dp_model_parallel_size=${gen_dp} \
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
@@ -145,6 +144,8 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +reward_model.reward_kwargs.overlong_buffer_cfg.log=False \
     +reward_model.reward_kwargs.max_resp_len=${max_response_length} \
     trainer.logger='["console"]' \
+    actor_rollout_ref.actor.load_weight=True \
+    actor_rollout_ref.ref.load_weight=True \
     trainer.project_name="${project_name}" \
     trainer.experiment_name="${exp_name}" \
     trainer.n_gpus_per_node=8 \

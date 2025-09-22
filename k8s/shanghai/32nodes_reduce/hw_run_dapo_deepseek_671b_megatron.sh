@@ -6,6 +6,8 @@ set -xeuo pipefail
 # remove the `quantization_config` in the `config.json`
 # set `num_nextn_predict_layers=0` to disable MTP, which is not currently supported
 #huggingface-cli download deepseek-ai/DeepSeek-V3-0324 configuration_deepseek.py config.json
+sed -i 's@enable_prefix_caching=.*@enable_prefix_caching=False,@g' /opt/mindspeed-rl/verl_npu/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
+sed -i 's@enable_chunked_prefill=.*@enable_chunked_prefill=False,@g' /opt/mindspeed-rl/verl_npu/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
 
 project_name='DAPO'
 exp_name='DAPO-DeepSeek-671b-megatron'
@@ -21,9 +23,9 @@ clip_ratio_low=0.2
 clip_ratio_high=0.28
 
 max_prompt_length=$((1024 * 2))
-max_response_length=$((32))
+max_response_length=$((1024 * 8))
 enable_overlong_buffer=False
-overlong_buffer_len=$((32))
+overlong_buffer_len=$((1024 * 4))
 overlong_penalty_factor=0.1
 
 loss_agg_mode="token-mean"
@@ -32,17 +34,20 @@ train_prompt_bsz=256 # must be > n_gpus. need to fix
 n_resp_per_prompt=16
 train_prompt_mini_bsz=32  # mini_bsz * n >= micro_bsz * pp * dp
 
-NNODES=2
+#NNODES=${NNODES:-1}
+NNODES=32
 
 # 1. download the dist_ckpt format model from https://huggingface.co/BearBiscuit05/dpsk-v3-671B-BF16-dist_ckpt/tree/main
 # change the MODEL_PATH and MCORE_MODEL_PATH to your own path
 # Paths
-MODEL_PATH="/data01/nlp/dpsk-v3-671B-BF16-dist_ckpt_cut"
-MCORE_MODEL_PATH="/data01/huawei-2025/zy/Deepseek-V3-HF-3-2-layer/"
+MODEL_PATH="/data01/nlp/dpsk-v3-671B-BF16-dist_ckpt"
+MCORE_MODEL_PATH="/data01/huawei-2025/xczhao/weights/dsv3_fp16_mcore_full_new"
 RAY_DATA_HOME="/opt"
 CKPTS_DIR=${CKPTS_DIR:-"${RAY_DATA_HOME}/ckpts/${project_name}/${exp_name}"}
 TRAIN_FILE="/data01/huawei-2025/xczhao/rl_data/dapo-math/dapo-math-17k.parquet"
 TEST_FILE="/data01/huawei-2025/xczhao/rl_data/dapo-math/dapo-math-17k.parquet"
+
+#TEST_FILE="['$aime24_test_path']"
 
 # Algorithm
 temperature=1.0
@@ -51,16 +56,17 @@ top_k=-1 # 0 for HF rollout, -1 for vLLM rollout
 val_top_p=0.7
 
 # Performance Related Parameter
-use_dynamic_bsz=False
+use_dynamic_bsz=True
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 2))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
 offload=True
-gen_dp=2
 gen_tp=4
-train_tp=8
-train_ep=1
-train_pp=1
-enable_filter_group=False
+gen_dp=16
+gen_world_size=$((NNODES*8))
+train_tp=4
+train_ep=8
+train_pp=8
+enable_filter_group=True
 
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 ray job submit --runtime-env="${RUNTIME_ENV}" \
@@ -84,8 +90,8 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.clip_ratio_low=${clip_ratio_low} \
     actor_rollout_ref.actor.clip_ratio_high=${clip_ratio_high} \
     actor_rollout_ref.actor.clip_ratio_c=10.0 \
-    actor_rollout_ref.rollout.skip_rollout=True \
-    actor_rollout_ref.rollout.skip_dump_dir="/data01/huawei-2025/zy/rollout_dump" \
+    actor_rollout_ref.rollout.skip.rollout=Fale \
+    actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/zy/rollout_dump" \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
@@ -101,14 +107,17 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.megatron.tensor_model_parallel_size=${train_tp} \
     actor_rollout_ref.actor.megatron.expert_model_parallel_size=${train_ep} \
     actor_rollout_ref.actor.megatron.dist_checkpointing_path=${MCORE_MODEL_PATH} \
-    actor_rollout_ref.actor.megatron.use_dist_checkpointing=True \
+    actor_rollout_ref.actor.megatron.use_dist_checkpointing=Ture \
     +actor_rollout_ref.ref.megatron.override_transformer_config.use_flash_attn=True \
     +actor_rollout_ref.actor.megatron.override_transformer_config.use_flash_attn=True \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_method=uniform \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_granularity=full \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.pipeline_num_transformer_layers=[[6],[8],[8],[8],[8],[8],[8],[7]] \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=4 \
-    actor_rollout_ref.actor.load_weight=True \
-    actor_rollout_ref.ref.load_weight=True \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_first_pipeline_stage=6 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_pipeline_stage=7 \
+    actor_rollout_ref.actor.load_weight=False \
+    actor_rollout_ref.ref.load_weight=False \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.optim.clip_grad=1.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
