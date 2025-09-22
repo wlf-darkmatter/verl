@@ -267,7 +267,6 @@ skip:
 
 # Whether to skip tokenizer initialization for rollout engine
 # When enabled (True), the rollout assume token in token out for generation
-skip_tokenizer_init: True
 
 # profile the rollout model in `generate_sequence`
 profiler:

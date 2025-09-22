@@ -207,7 +207,6 @@ actor_rollout_ref:
       dump_step: 1
       post_dump_action: repeat
       compress: false
-    skip_tokenizer_init: true
     profiler:
       _target_: verl.utils.profiler.ProfilerConfig
       tool: ${oc.select:global_profiler.tool,null}
