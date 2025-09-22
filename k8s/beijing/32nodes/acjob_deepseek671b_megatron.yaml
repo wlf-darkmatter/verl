@@ -13,7 +13,7 @@ spec:
   runPolicy:
     schedulingPolicy:
       minAvailable: 32    #需要修改， work when enableGangScheduling is true
-      queue: default
+      queue: project-6-root
   successPolicy: AllWorkers
   replicaSpecs:
     Master:
@@ -30,10 +30,10 @@ spec:
               requiredDuringSchedulingIgnoredDuringExecution:
                 nodeSelectorTerms:
                 - matchExpressions:
-                  - key: zone
+                  - key: volcano.sh/nodegroup-name
                     operator: In
                     values:
-                    - nlp48
+                    - rl
           terminationGracePeriodSeconds: 60
           automountServiceAccountToken: false
           hostNetwork: true
@@ -120,10 +120,10 @@ spec:
               requiredDuringSchedulingIgnoredDuringExecution:
                 nodeSelectorTerms:
                 - matchExpressions:
-                  - key: zone
+                  - key: volcano.sh/nodegroup-name
                     operator: In
                     values:
-                    - nlp48
+                    - rl
           terminationGracePeriodSeconds: 60
           automountServiceAccountToken: false
           hostNetwork: true

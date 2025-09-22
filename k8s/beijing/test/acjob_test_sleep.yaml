@@ -13,7 +13,7 @@ spec:
   runPolicy:
     schedulingPolicy:
       minAvailable: 8    #需要修改， work when enableGangScheduling is true
-      queue: default
+      queue: project-6-root
   successPolicy: AllWorkers
   replicaSpecs:
     Master:
