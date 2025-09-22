@@ -21,9 +21,9 @@ clip_ratio_low=0.2
 clip_ratio_high=0.28
 
 max_prompt_length=$((1024 * 2))
-max_response_length=$((1024 * 1))
+max_response_length=$((1024 * 8))
 enable_overlong_buffer=False
-overlong_buffer_len=$((1024 * 1))
+overlong_buffer_len=$((1024 * 5))
 overlong_penalty_factor=0.1
 
 loss_agg_mode="token-mean"
@@ -33,7 +33,7 @@ n_resp_per_prompt=16
 train_prompt_mini_bsz=32  # mini_bsz * n >= micro_bsz * pp * dp
 
 #NNODES=${NNODES:-1}
-NNODES=32
+NNODES=64
 
 # 1. download the dist_ckpt format model from https://huggingface.co/BearBiscuit05/dpsk-v3-671B-BF16-dist_ckpt/tree/main
 # change the MODEL_PATH and MCORE_MODEL_PATH to your own path
@@ -59,9 +59,10 @@ actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 2))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
 offload=True
 gen_tp=8
-gen_dp=32
+gen_dp=32 #! 无法大于等于 64. assert self.num_local_experts > 0, "Expected at least one expert"
+
 # gen_world_size=$((NNODES*8))
-train_tp=2
+train_tp=4
 train_ep=16
 train_pp=8
 enable_filter_group=False
@@ -119,10 +120,10 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.optim.clip_grad=1.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.8 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.7 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=${gen_tp} \
     actor_rollout_ref.rollout.dp_model_parallel_size=${gen_dp} \
-    actor_rollout_ref.rollout.enable_chunked_prefill=False \
+    actor_rollout_ref.rollout.enable_chunked_prefill=True \
     actor_rollout_ref.rollout.max_num_batched_tokens=$((max_prompt_length + max_response_length)) \
     actor_rollout_ref.rollout.temperature=${temperature} \
     actor_rollout_ref.rollout.top_p=${top_p} \
