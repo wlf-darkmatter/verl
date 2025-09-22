@@ -96,7 +96,7 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.megatron.optimizer_offload=${offload} \
     actor_rollout_ref.actor.megatron.grad_offload=${offload} \
     algorithm.filter_groups.enable=${enable_filter_group} \
-    actor_rollout_ref.rollout.skip.rollout=True \
+    actor_rollout_ref.rollout.skip.enable=True \
     actor_rollout_ref.rollout.skip.dump_dir="/opt/verl/rollout_dump" \
     actor_rollout_ref.actor.megatron.pipeline_model_parallel_size=${train_pp} \
     actor_rollout_ref.actor.megatron.tensor_model_parallel_size=${train_tp} \

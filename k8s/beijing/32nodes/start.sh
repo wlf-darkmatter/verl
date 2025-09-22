@@ -37,7 +37,7 @@ ray stop --force
 rm -rf /tmp/ray
 rm -rf /opt/verl
 cp -r /home/new_verl /opt/verl
-
+cd $(dirname $0)
 
 export ServerPort=6666     # modify according to actual situation
 export DashboardPort=8888  # modify according to actual situation

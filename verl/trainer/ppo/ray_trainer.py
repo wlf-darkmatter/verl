@@ -936,7 +936,7 @@ class RayPPOTrainer:
             if self.config.trainer.get("val_only", False):
                 return
 
-        if self.config.actor_rollout_ref.rollout.get("skip.rollout", False):
+        if self.config.actor_rollout_ref.rollout.get("skip.enable", False):
             rollout_skip = RolloutSkip(self.config, self.actor_rollout_wg)
             rollout_skip.wrap_generate_sequences()
 

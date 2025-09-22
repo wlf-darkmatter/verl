@@ -244,7 +244,7 @@ skip:
   # If no cached data is found or loading fails, new rollouts will be generated and automatically saved.
   # This feature is useful for debugging or when you want to reuse computation results across multiple runs.
   enable: False
-  # Specifies the filesystem path where rollout data should be cached when skip.rollout is enabled.
+  # Specifies the filesystem path where rollout data should be cached when skip.enable is enabled.
   # Note: Giving path under /tmp/ray/session* is not recommended as these are temporary Ray cluster directories.
   dump_dir: /tmp/rollout_dump
 
