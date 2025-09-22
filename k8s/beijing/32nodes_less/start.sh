@@ -1,7 +1,7 @@
 export HCCL_SOCKET_IFNAME=ens45 # modify according to actual situation
 export TP_SOCKET_IFNAME=ens45   # modify according to actual situation
 export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
-export HYDRA_FULL_ERROR=1
+# export HYDRA_FULL_ERROR=1
 export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
 export ASCEND_GLOBAL_LOG_LEVEL=3
@@ -18,7 +18,7 @@ LIB_PATH=/opt/python3.10/lib/
 export LD_LIBRARY_PATH=$LIB_PATH:$LD_LIBRARY_PATH
 
 unset LOCAL_WORLD_SIZE
-unset WORLD_SIZE
+# unset WORLD_SIZE
 unset LOCAL_RANK
 
 #export ASCEND_GLOBAL_LOG_LEVEL=1

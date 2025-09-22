@@ -33,6 +33,7 @@ import os
 import pickle
 import socket
 from contextlib import contextmanager
+from copy import deepcopy
 from types import MethodType
 from typing import Any
 
@@ -40,11 +41,12 @@ import numpy as np
 import ray
 import torch
 import torch.distributed
+import torch.distributed as dist
+import vllm.envs as envs
 import zmq
 import zmq.asyncio
 from filelock import FileLock
 from omegaconf import DictConfig, ListConfig, OmegaConf
-from copy import deepcopy
 from tensordict import TensorDict
 from vllm import LLM, SamplingParams
 from vllm.config import CompilationConfig, CompilationLevel
@@ -52,14 +54,13 @@ from vllm.distributed import parallel_state as vllm_ps
 from vllm.lora.request import LoRARequest
 from vllm.model_executor.sampling_metadata import SamplingMetadata
 from vllm.worker.worker_base import WorkerWrapperBase
-import vllm.envs as envs
-import torch.distributed as dist
 
 from verl import DataProto
 from verl.third_party.vllm import VLLM_SLEEP_LEVEL
 from verl.utils.profiler import GPUMemoryLogger
 from verl.utils.ray_utils import ray_noset_visible_devices
-from verl.utils.torch_functional import get_response_mask, pad_2d_list_to_length
+from verl.utils.torch_functional import (get_response_mask,
+                                         pad_2d_list_to_length)
 from verl.workers.config import RolloutConfig
 from verl.workers.rollout.base import BaseRollout
 
@@ -122,8 +123,8 @@ def _get_current_node_ip() -> str:
 
 def _init_dp_envs(config):
     rank = torch.distributed.get_rank()
-    world_size = int(config.get("rollout_world_size", 1))
-    # world_size = int(os.getenv("WORLD_SIZE", "-1"))
+    # world_size = int(config.get("rollout_world_size", 1))
+    world_size = int(os.getenv("WORLD_SIZE", "-1"))
     tp_size = int(config.get("tensor_model_parallel_size", 1))
     dp_size = int(config.get("dp_model_parallel_size", 1))
 
@@ -222,11 +223,7 @@ class vLLMRollout(BaseRollout):
         lora_kwargs = kwargs.pop("lora_kwargs", {})
         self.lora_kwargs = lora_kwargs
         # copy it to avoid secretly modifying the engine config
-        engine_kwargs = (
-            {}
-            if "engine_kwargs" not in config or "vllm" not in config.engine_kwargs
-            else OmegaConf.to_container(deepcopy(config.engine_kwargs.vllm))
-        )
+        engine_kwargs = config.get("engine_kwargs", {}).get("vllm", {}) or {}
         # For each vLLM engine parameter,
         # - `None` means not setting it, so we pop it, and leave it to vLLM default value
         #    (which can vary across different vLLM versions);
