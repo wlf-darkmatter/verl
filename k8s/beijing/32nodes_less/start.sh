@@ -7,21 +7,16 @@ export RAY_DEDUP_LOGS=0
 export ASCEND_GLOBAL_LOG_LEVEL=3
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
-cp -f /data01/huawei-2025/wlf/verl/k8s/beijing/32nodes_less/hw_run_dapo_deepseek_671b_megatron.sh /opt/verl/
+cp -f $(dirname $0)/hw_run_dapo_deepseek_671b_megatron.sh /opt/verl/
 
-cp /data01/huawei-2025/zy/mc2_env.yaml /opt/verl/verl/trainer/
-cp -f /data01/huawei-2025/zy/0911/rollout.py /opt/verl/verl/workers/config/rollout.py
-cp -f /data01/huawei-2025/zy/0911/rollout.yaml /opt/verl/verl/trainer/config/rollout/rollout.yaml
-
+mkdir -p /data01/huawei-2025/wlf/watch
 bash /data01/huawei-2025/wlf/verl/k8s/script/watch_stats.sh > /data01/huawei-2025/wlf/watch/rank${RANK}_${CURRENT_IP}.log &
 
-
-source /usr/local/Ascend/driver/bin/setenv.bash;
 source /usr/local/Ascend/ascend-toolkit/set_env.sh;
 source /usr/local/Ascend/nnal/atb/set_env.sh;
-source /usr/local/Ascend/nnal/asdsip/set_env.sh;
-source /opt/pyvenv/bin/activate;
+
 source /etc/profile;
+
 LIB_PATH=/opt/python3.10/lib/
 export LD_LIBRARY_PATH=$LIB_PATH:$LD_LIBRARY_PATH
 #export LD_PRELOAD="/usr/local/lib/python3.10/dist-packages/sklearn/utils/../../scikit_learn.libs/libgomp-947d5fa1.so.1.0.0";
