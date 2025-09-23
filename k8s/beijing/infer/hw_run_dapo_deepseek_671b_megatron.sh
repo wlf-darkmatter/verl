@@ -42,7 +42,7 @@ NNODES=8
 gen_tp=8
 gen_dp=8
 
-MODEL_PATH="/data01/nlp/dpsk-v3-671B-BF16-dist_ckpt"
+MODEL_PATH="/data01/huawei-2025/weight/dpsk-v3-671B-BF16-dist_ckpt"
 
 TRAIN_FILE="/data01/huawei-2025/xczhao/rl_data/dapo-math/dapo-math-17k.parquet"
 
