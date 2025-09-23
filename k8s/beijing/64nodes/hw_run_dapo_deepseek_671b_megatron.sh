@@ -70,7 +70,7 @@ enable_filter_group=False
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 cd /opt/verl
 ray job submit --runtime-env="${RUNTIME_ENV}" \
-    -- python3 -m verl.trainer.main_ppo \
+    -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
     --config-name='ppo_megatron_trainer.yaml' \
     actor_rollout_ref.rollout.skip.enable=True \
