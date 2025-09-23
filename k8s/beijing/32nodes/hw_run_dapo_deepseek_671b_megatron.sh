@@ -71,7 +71,7 @@ cd /opt/verl
 ray job submit --runtime-env="${RUNTIME_ENV}" \
     -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
-    --config-name='ppo_megatron_trainer.yaml' \
+    --config-name="dapo_megatron_trainer" \
     actor_rollout_ref.rollout.skip.enable=True \
     actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/zy/rollout_dump" \
     actor_rollout_ref.rollout.skip.dump_step=500 \
