@@ -62,13 +62,21 @@ from verl.utils.device import get_device_name, get_nccl_backend
 # os.environ["ENABLE_MOE_ALLTOALLV"] = "1"
 
 os.environ["VLLM_USE_V1"] = "1"
-
+os.environ["RAY_EXPERIMENTAL_NOSET_ASCEND_RT_VISIBLE_DEVICES"] = "1"
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--ray_master_ip", type=str, default=None)
+parser.add_argument(
+    "--ray_master_ip",
+    type=str,
+    default=None,
+    help="会自动判断 gloo 网卡的 ip 是否和指定的这个 ip 一致，一致则认为是 master",
+)
 parser.add_argument("--ray_master_port", type=int, default=6379)
 parser.add_argument("--ray_dashboard_port", type=int, default=8265)
-parser.add_argument("--is_master", action="store_true", help="直接设置当前机器为 master")
+parser.add_argument("--ray_init", action="store_true", help="是否需要脚本自己启动ray")
+parser.add_argument(
+    "--is_master", action="store_true", help="直接设置当前机器为 master"
+)
 
 parser.add_argument("-dp", type=int, default=1)
 parser.add_argument("-tp", type=int, default=1)
@@ -177,6 +185,7 @@ def get_cluster_info():
     return ip_list
 
 
+@ray.remote
 def get_availale_curr_addr_port():
     host_ip_by_sdk = ray._private.services.get_node_ip_address()
     with socket.socket() as sock:
@@ -438,7 +447,8 @@ class VllmRay:
     def _prepare_data(self):
         from torchdata.stateful_dataloader import StatefulDataLoader
 
-        from verl.utils.dataset.rl_dataset import collate_fn as default_collate_fn
+        from verl.utils.dataset.rl_dataset import \
+            collate_fn as default_collate_fn
 
         if args.dataset_path.endswith("parquet"):
             data = load_dataset("parquet", data_files=args.dataset_path)["train"]
@@ -471,7 +481,7 @@ class VllmRay:
             kwargs["ignore_eos"] = True
 
         self.sampling_params = SamplingParams(**kwargs)
-        self.sampling_params.detokenize = False
+        self.sampling_params.detokenize = True
 
         from verl.utils import hf_tokenizer
         from verl.utils.dataset.rl_dataset import RLHFDataset
@@ -503,7 +513,8 @@ class VllmRay:
 
     def _build_vllm_ray(self):
         config = self.config
-        from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
+        from ray.util.scheduling_strategies import \
+            PlacementGroupSchedulingStrategy
 
         n_gpus_per_node = int(config.n_gpus_per_node)
         nnodes = int(config.nnodes)
@@ -523,7 +534,14 @@ class VllmRay:
                 rank += 1
 
                 if rank == 0:
-                    master_addr, master_port = get_availale_curr_addr_port()
+                    master_addr, master_port = ray.get(
+                        get_availale_curr_addr_port.options(
+                            scheduling_strategy=PlacementGroupSchedulingStrategy(
+                                placement_group=pg, placement_group_bundle_index=0
+                            ),
+                        ).remote()
+                    )
+                    print(f"Get master_addr from ray is {master_addr}", flush=True)
                     info = {
                         "MASTER_ADDR": master_addr,
                         "MASTER_PORT": str(master_port),
@@ -638,12 +656,12 @@ def ray_init():
     if args.ray_debug:
         os.environ["RAY_DEBUG_POST_MORTEM"] = "1"
 
-    if args.nnodes > 1:
+    if args.nnodes > 1 and args.ray_init:
         if args.ray_master_ip is None:
             raise RuntimeError(f"`--ray_master_ip` should be set if nnodes({args.nnodes}) > 1.")
 
-        curr_addr, _ = get_availale_curr_addr_port()
-        print(curr_addr, flush=True)
+        curr_addr = ray._private.services.get_node_ip_address()
+        print(f"{curr_addr=}", flush=True)
 
         if args.is_master or curr_addr == args.ray_master_ip:
             pass
@@ -673,20 +691,20 @@ class Test:
             list_output = self.Vllm.generate_sequences(_preencode_prompts)
 
             # todo tokenizer
-            # try:
-            #     _output = list_output[0].batch["response"][0].outputs[0]
-            #     response_text = _output.text
-            #     print("===>Output===>", flush=True)
-            #     if len(response_text) <= 620:
-            #         print(response_text, flush=True)
-            #     else:
-            #         print(response_text[:300], flush=True)
-            #         print("\n...\n...\n")
-            #         print(response_text[-300:], flush=True)
-            #     print(f"<===END, 生成结束原因: {_output.finish_reason}", flush=True)
+            try:
+                _output = list_output[0].batch["response"][0].outputs[0]
+                response_text = _output.text
+                print("===>Output===>", flush=True)
+                if len(response_text) <= 620:
+                    print(response_text, flush=True)
+                else:
+                    print(response_text[:300], flush=True)
+                    print("\n...\n...\n")
+                    print(response_text[-300:], flush=True)
+                print(f"<===END, 生成结束原因: {_output.finish_reason}", flush=True)
 
-            # except Exception as e:
-            #     print(f"Print generation failed! \nreason is {e.__repr__()}")
+            except Exception as e:
+                print(f"Print generation failed! \nreason is {e.__repr__()}")
 
             # * 打印 综合 TPS
             print(f"=== Step {step_i} ===", flush=True)
