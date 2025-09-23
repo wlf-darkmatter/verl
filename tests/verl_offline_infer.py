@@ -74,6 +74,9 @@ parser.add_argument(
 parser.add_argument("--ray_master_port", type=int, default=6379)
 parser.add_argument("--ray_dashboard_port", type=int, default=8265)
 parser.add_argument("--ray_init", action="store_true", help="是否需要脚本自己启动ray")
+parser.add_argument(
+    "--is_master", action="store_true", help="直接设置当前机器为 master"
+)
 
 parser.add_argument("-dp", type=int, default=1)
 parser.add_argument("-tp", type=int, default=1)
@@ -660,7 +663,7 @@ def ray_init():
         curr_addr = ray._private.services.get_node_ip_address()
         print(f"{curr_addr=}", flush=True)
 
-        if curr_addr == args.ray_master_ip:
+        if args.is_master or curr_addr == args.ray_master_ip:
             pass
             print("\033[32mMaster\033[0m", flush=True)
             ret = os.popen(f"ray start --head --port {args.ray_master_port}").read()
