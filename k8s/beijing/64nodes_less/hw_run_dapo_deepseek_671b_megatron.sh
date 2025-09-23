@@ -162,6 +162,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.default_local_dir="${CKPTS_DIR}" \
     trainer.resume_mode=auto \
     trainer.log_val_generations=10 \
+    actor_rollout_ref.rollout.free_cache_engine=True \
     trainer.device="npu" $@   2>&1 | tee /tmp/ray.output
 
 ray_name=$(cat /tmp/ray.output | grep "submitted successfully" | awk -F "'" '{print $2}')
