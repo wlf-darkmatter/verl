@@ -46,7 +46,7 @@ if [[ "$RANK" = "0" ]]; then
 
   kwargs=(--is_master --ray_dashboard_port $DashboardPort )
 else
-  kwargs=(--ray_master_ip $MASTER_IP )
+  kwargs=( )
 fi
 
 #! ------------------------------------------------------------
@@ -61,6 +61,7 @@ gen_dp=8
 
 python3 tests/verl_offline_infer.py \
     ${kwargs[@]} \
+    --ray_master_ip $MASTER_ADDR \
     --ray_master_port $ServerPort \
     -tp $gen_tp \
     -dp $gen_dp \
