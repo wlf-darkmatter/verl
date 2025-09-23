@@ -3,7 +3,7 @@ import os
 import socket
 import datetime
 from functools import partial
-
+import time
 import ray
 import numpy as np
 import torch
@@ -197,15 +197,16 @@ class TestComm(BasrRay):
 
     def init_process_group(self):
         print(f"\033[32m开始建链\033[0m", flush=True)
-        # backend = "cpu:gloo"
+        time.sleep(5)
+        
 
-        # if self.device_name == "npu":
-        #     backend = backend + f",{get_device_name()}:{get_nccl_backend()}"
-        backend =  f"{get_device_name()}:{get_nccl_backend()}"
+        backend = "cpu:gloo"
+        if self.device_name == "npu":
+            backend = f"{get_device_name()}:{get_nccl_backend()}"
 
         print(f"\033[33mbackend={backend}\033[0m", flush=True)
         if not torch.distributed.is_initialized():
-            dist.init_process_group(get_nccl_backend())
+            dist.init_process_group(backend)
 
             # dist.init_process_group(
             #     backend=backend,
