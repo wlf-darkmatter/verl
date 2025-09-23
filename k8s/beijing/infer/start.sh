@@ -61,6 +61,7 @@ gen_dp=8
 
 python3 tests/verl_offline_infer.py \
     ${kwargs[@]} \
+    --ray_init \
     --ray_master_ip $MASTER_ADDR \
     --ray_master_port $ServerPort \
     -tp $gen_tp \
