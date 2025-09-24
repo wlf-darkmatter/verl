@@ -7,8 +7,16 @@ export RAY_DEDUP_LOGS=1
 export ASCEND_GLOBAL_LOG_LEVEL=3
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
-mkdir -p /data01/huawei-2025/wlf/watch
-bash /data01/huawei-2025/wlf/verl/k8s/script/watch_stats.sh > /data01/huawei-2025/wlf/watch/rank${RANK}_${CURRENT_IP}.log &
+#######################################
+#! 规避模型加载时 权重读取错误的问题
+rm -f /opt/vllm/vllm/model_executor/model_loader/base_loader.py
+cp -f /home/new_verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/model_loader/base_loader.py
+
+rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+cp -f /home/new_verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+#######################################
+
+mkdir -p /data01/huawei-2025/wlf/watchbash /data01/huawei-2025/wlf/verl/k8s/script/watch_stats.sh > /data01/huawei-2025/wlf/watch/rank${RANK}_${CURRENT_IP}.log &
 
 source /usr/local/Ascend/ascend-toolkit/set_env.sh;
 source /usr/local/Ascend/nnal/atb/set_env.sh;
