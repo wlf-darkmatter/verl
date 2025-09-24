@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -xeuo pipefail
+
 #  +actor_rollout_ref.actor.megatron.override_transformer_config.pipeline_num_transformer_layers=[[6],[8],[8],[8],[8],[8],[8],[7]] \
 # 0. download the config
 # only need to download the configuration_deepseek.py and config.json

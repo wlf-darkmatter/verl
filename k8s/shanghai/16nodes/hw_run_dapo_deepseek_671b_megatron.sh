@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -xeuo pipefail
 
+
 export HYDRA_FULL_ERROR=1
 
 # 0. download the config

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -xeuo pipefail
 
+
 # 0. download the config
 # only need to download the configuration_deepseek.py and config.json
 # remove the `quantization_config` in the `config.json`
