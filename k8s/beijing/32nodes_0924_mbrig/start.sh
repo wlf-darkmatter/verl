@@ -29,6 +29,7 @@ export NNODES=32         # example is 4 Nodes
 
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
 export ASCEND_PROCESS_LOG_PATH=/opt/verl/logs/$MINDX_TASK_ID/plog # modify according to actual situation
+# pip install /data01/huawei-2025/wlf/verl/k8s/mbridge-0.13.0-py3-none-any.whl
 
 ray stop --force
 rm -rf /tmp/ray
@@ -38,6 +39,12 @@ cd $(dirname $0)
 
 export ServerPort=6666     # modify according to actual situation
 export DashboardPort=8888  # modify according to actual situation
+
+rm -f /opt/vllm/vllm/model_executor/model_loader/base_loader.py
+cp -f /home/new_verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/model_loader/base_loader.py
+
+rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+cp -f /home/new_verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 
 cnt=0
 if [ "$RANK" = "0" ]; then
