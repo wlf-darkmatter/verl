@@ -59,6 +59,14 @@ train_prompt_bsz=16
 gen_tp=8
 gen_dp=8
 
+
+rm -f /opt/vllm/vllm/model_executor/model_loader/base_loader.py
+cp -f /home/new_verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/model_loader/base_loader.py
+
+rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+cp -f /home/new_verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+
+
 python3 tests/verl_offline_infer.py \
     ${kwargs[@]} \
     --ray_init \
