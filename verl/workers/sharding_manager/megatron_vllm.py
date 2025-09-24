@@ -46,7 +46,7 @@ logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
 """
 Megatron Hybrid Engine:
 - During training, only the current pp stage holds the parameters
-- Before inference, broadcast the parameters of the current pp rank 
+- Before inference, broadcast the parameters of the current pp rank
    to all other pp ranks (all pp ranks holds all the parameters)
 - Bind the parameters to the inference engine
 - Do inference in tp. pp is treated as additional dp
@@ -156,23 +156,25 @@ class MegatronVLLMShardingManager(BaseShardingManager):
                     self.inference_engine.wake_up(tags=["weights"])
                 else:
                     self.inference_engine.wake_up()
-            if self.bridge is not None:
-                per_tensor_param = self.bridge.export_weights(self.actor_module)
-            else:
-                per_tensor_param = per_tensor_generator(
-                    self.actor_module,
-                    self.model_config,
-                    self.weight_converter,
-                    self.transformer_config,
-                    self.layer_name_mapping,
-                )
-            model = self.model_runner.model
-            from verl.utils.vllm.patch import patch_vllm_moe_model_weight_loader
+                    
+            if os.environ.get("VERL_DEBUG_NOSHARDING", None):
+                if self.bridge is not None:
+                    per_tensor_param = self.bridge.export_weights(self.actor_module)
+                else:
+                    per_tensor_param = per_tensor_generator(
+                        self.actor_module,
+                        self.model_config,
+                        self.weight_converter,
+                        self.transformer_config,
+                        self.layer_name_mapping,
+                    )
+                model = self.model_runner.model
+                from verl.utils.vllm.patch import patch_vllm_moe_model_weight_loader
 
-            patch_vllm_moe_model_weight_loader(model)
-            loaded_params = model.load_weights(per_tensor_param)
-            info = f"vLLM load weights, loaded_params: {len(loaded_params)}"
-            logger.info(info)
+                patch_vllm_moe_model_weight_loader(model)
+                loaded_params = model.load_weights(per_tensor_param)
+                info = f"vLLM load weights, loaded_params: {len(loaded_params)}"
+                logger.info(info)
 
             if self.offload_param:
                 offload_megatron_model_to_cpu(self.actor_module)
