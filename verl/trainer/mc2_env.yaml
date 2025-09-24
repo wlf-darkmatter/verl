@@ -10,5 +10,5 @@ env_vars:
   VLLM_ASCEND_ENABLE_MOE_ALL2ALL_SEQ: "1"
   HCCL_ASYNC_ERROR_HANDLING: "0"
   P2P_HCCL_BUFFSIZE: "20"
-  PYTORCH_NPU_ALLOC_CONF: "max_split_size_mb:2048"
+  # PYTORCH_NPU_ALLOC_CONF: "max_split_size_mb:2048"
   # LD_PRELOAD: "/usr/local/lib/libjemalloc.so.2"
