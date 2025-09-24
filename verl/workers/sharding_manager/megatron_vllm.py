@@ -157,8 +157,9 @@ class MegatronVLLMShardingManager(BaseShardingManager):
                 else:
                     self.inference_engine.wake_up()
 
-            if not os.environ.get("VERL_DEBUG_NOSHARDING", None):
+            if os.environ.get("VERL_DEBUG_NOSHARDING", "0") == "1" :
                 print(f"\033[33mVERL_DEBUG_NOSHARDING! Skipping sharding manager\033[0m", flush=True)
+            else:
                 if self.bridge is not None:
                     per_tensor_param = self.bridge.export_weights(self.actor_module)
                 else:
