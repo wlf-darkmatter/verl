@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 set -xeuo pipefail
+#* 规避模型加载时 权重读取错误的问题
+rm -f /opt/vllm/vllm/model_executor/model_loader/base_loader.py
+cp -f /home/new_verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/model_loader/base_loader.py
+
+rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+cp -f /home/new_verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+
 
 export HYDRA_FULL_ERROR=1
 
