@@ -5,6 +5,7 @@ export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
 export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
 export ASCEND_GLOBAL_LOG_LEVEL=3
+export VERL_DEBUG_NOSHARDING="1"
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
 #######################################
@@ -37,23 +38,19 @@ export NNODES=32         # example is 4 Nodes
 
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
 export ASCEND_PROCESS_LOG_PATH=/opt/verl/logs/$MINDX_TASK_ID/plog # modify according to actual situation
-# pip install /data01/huawei-2025/wlf/verl/k8s/mbridge-0.13.0-py3-none-any.whl
 
 ray stop --force
 rm -rf /tmp/ray
 rm -rf /opt/verl
 cp -r /home/new_verl /opt/verl
+#######################################
+#sleep设置为1
+cp -f /data01/huawei-2025/zy/verl/verl/third_party/vllm/__init_back_.py /opt/verl/verl/third_party/vllm/__init__.py
+#######################################
 cd $(dirname $0)
 
 export ServerPort=6666     # modify according to actual situation
 export DashboardPort=8888  # modify according to actual situation
-
-###权重加载修改
-rm -f /opt/vllm/vllm/model_executor/model_loader/base_loader.py
-cp -f /home/new_verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/model_loader/base_loader.py
-
-rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
-cp -f /home/new_verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 
 cnt=0
 if [ "$RANK" = "0" ]; then
