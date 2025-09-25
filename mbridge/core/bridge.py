@@ -329,6 +329,10 @@ class Bridge(ABC):
             self._weight_name_mapping_mcore_local_to_global(model, consider_ep=False)
             for model in models
         ]
+        # print(f'--------------start---------------------')
+        # print(f"weights_names_all_pp:{weights_names_all_pp}")
+        # print(f'local_to_global_maps:{local_to_global_maps}')
+        # print(f'--------------end-----------------------')
         for iter_pp_rank, iter_vpp_rank, iter_name in weights_names_all_pp:
             local_to_global_map = local_to_global_maps[iter_vpp_rank]
             if iter_pp_rank == self.mpu.pp_rank:
@@ -484,7 +488,10 @@ class Bridge(ABC):
                 )
             else:
                 ret[param_name] = param_name
-
+        # print(f'--------------------------------------')
+        # print(f'all_param_names:{all_param_names}')
+        # print(f'ret:{ret}')
+        # print(f'--------------------------------------')
         # ep
         if self.mpu.ep_size > 1 and consider_ep:
             num_experts = self.config.num_moe_experts

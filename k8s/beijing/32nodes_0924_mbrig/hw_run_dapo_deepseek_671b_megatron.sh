@@ -2,7 +2,6 @@
 set -xeuo pipefail
 
 
-
 # 0. download the config
 # only need to download the configuration_deepseek.py and config.json
 # remove the `quantization_config` in the `config.json`
@@ -23,9 +22,9 @@ clip_ratio_low=0.2
 clip_ratio_high=0.28
 
 max_prompt_length=$((1024 * 2))
-max_response_length=$((1024 * 1))
+max_response_length=$((1024 * 8))
 enable_overlong_buffer=False
-overlong_buffer_len=$((1024 * 1))
+overlong_buffer_len=$((1024 * 8))
 overlong_penalty_factor=0.1
 
 loss_agg_mode="token-mean"
@@ -41,7 +40,7 @@ NNODES=32
 # change the MODEL_PATH and MCORE_MODEL_PATH to your own path
 # Paths
 MODEL_PATH="/data01/huawei-2025/weight/dpsk-v3-671B-BF16-dist_ckpt"
-MCORE_MODEL_PATH="/data01/huawei-2025/weight/dsv3_fp16_mcore_full_new"
+MCORE_MODEL_PATH="/data01/huawei-2025/weight/mcore_null"
 RAY_DATA_HOME="/opt"
 CKPTS_DIR=${CKPTS_DIR:-"${RAY_DATA_HOME}/ckpts/${project_name}/${exp_name}"}
 TRAIN_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k.parquet"
@@ -61,7 +60,8 @@ actor_ppo_max_token_len=$(((max_prompt_length + max_response_length)))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length)))
 offload=True
 gen_tp=8
-gen_dp=8
+gen_dp=8 #! 无法大于 64. assert self.num_local_experts > 0, "Expected at least one expert"
+
 # gen_world_size=$((NNODES*8))
 train_tp=4
 train_ep=32
@@ -75,7 +75,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
     --config-name='dapo_megatron_trainer' \
-    actor_rollout_ref.rollout.skip.enable=True \
+    actor_rollout_ref.rollout.skip.enable=False \
     actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/zy/rollout_dump" \
     actor_rollout_ref.rollout.skip.dump_step=500 \
     data.train_files="${TRAIN_FILE}" \
@@ -110,24 +110,24 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.megatron.tensor_model_parallel_size=${train_tp} \
     actor_rollout_ref.actor.megatron.expert_model_parallel_size=${train_ep} \
     actor_rollout_ref.actor.megatron.dist_checkpointing_path=${MCORE_MODEL_PATH} \
-    actor_rollout_ref.actor.megatron.use_dist_checkpointing=Ture \
+    actor_rollout_ref.actor.megatron.use_dist_checkpointing=False \
     +actor_rollout_ref.ref.megatron.override_transformer_config.use_flash_attn=True \
-    actor_rollout_ref.actor.megatron.expert_tensor_parallel_size=$ETP \
-    actor_rollout_ref.ref.megatron.expert_tensor_parallel_size=$ETP \
     +actor_rollout_ref.actor.megatron.override_transformer_config.use_flash_attn=True \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_method=uniform \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_granularity=full \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.pipeline_num_transformer_layers=[[7],[8],[8],[8],[8],[8],[8],[6]] \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.pipeline_num_transformer_layers=[[6],[8],[8],[8],[8],[8],[8],[7]] \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=1 \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_first_pipeline_stage=7 \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_pipeline_stage=6 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_first_pipeline_stage=6 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_pipeline_stage=7 \
+    actor_rollout_ref.actor.megatron.expert_tensor_parallel_size=$ETP \
+    actor_rollout_ref.ref.megatron.expert_tensor_parallel_size=$ETP \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.optim.clip_grad=1.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.8 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.7 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=${gen_tp} \
     actor_rollout_ref.rollout.dp_model_parallel_size=${gen_dp} \
-    actor_rollout_ref.rollout.enable_chunked_prefill=False \
+    actor_rollout_ref.rollout.enable_chunked_prefill=True \
     actor_rollout_ref.rollout.max_num_batched_tokens=$((max_prompt_length + max_response_length)) \
     actor_rollout_ref.rollout.temperature=${temperature} \
     actor_rollout_ref.rollout.top_p=${top_p} \
@@ -144,9 +144,10 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.ref.megatron.expert_model_parallel_size=${train_ep} \
     actor_rollout_ref.ref.megatron.param_offload=${offload} \
     actor_rollout_ref.ref.megatron.dist_checkpointing_path=${MCORE_MODEL_PATH} \
-    actor_rollout_ref.ref.megatron.use_dist_checkpointing=True \
+    actor_rollout_ref.ref.megatron.use_dist_checkpointing=False \
     actor_rollout_ref.actor.megatron.use_mbridge=True \
     actor_rollout_ref.rollout.load_format=safetensors \
+    actor_rollout_ref.actor.use_torch_compile=False \
     reward_model.reward_manager=dapo \
     +reward_model.reward_kwargs.overlong_buffer_cfg.enable=${enable_overlong_buffer} \
     +reward_model.reward_kwargs.overlong_buffer_cfg.len=${overlong_buffer_len} \

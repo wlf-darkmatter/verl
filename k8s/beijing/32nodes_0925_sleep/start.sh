@@ -16,8 +16,7 @@ rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 cp -f /home/new_verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 #######################################
 
-mkdir -p /data01/huawei-2025/wlf/watch
-bash /data01/huawei-2025/wlf/verl/k8s/script/watch_stats.sh > /data01/huawei-2025/wlf/watch/rank${RANK}_${CURRENT_IP}.log &
+mkdir -p /data01/huawei-2025/wlf/watchbash /home/new_verl/k8s/script/watch_stats.sh > /data01/huawei-2025/wlf/watch/rank${RANK}_${CURRENT_IP}.log &
 
 source /usr/local/Ascend/ascend-toolkit/set_env.sh;
 source /usr/local/Ascend/nnal/atb/set_env.sh;
@@ -38,23 +37,18 @@ export NNODES=32         # example is 4 Nodes
 
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
 export ASCEND_PROCESS_LOG_PATH=/opt/verl/logs/$MINDX_TASK_ID/plog # modify according to actual situation
-# pip install /data01/huawei-2025/wlf/verl/k8s/mbridge-0.13.0-py3-none-any.whl
 
 ray stop --force
 rm -rf /tmp/ray
 rm -rf /opt/verl
 cp -r /home/new_verl /opt/verl
+#######################################
+cp -f /data01/huawei-2025/zy/verl/verl/third_party/vllm/__init_back_.py /opt/verl/verl/third_party/vllm/__init__.py
+#######################################
 cd $(dirname $0)
 
 export ServerPort=6666     # modify according to actual situation
 export DashboardPort=8888  # modify according to actual situation
-
-###权重加载修改
-rm -f /opt/vllm/vllm/model_executor/model_loader/base_loader.py
-cp -f /home/new_verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/model_loader/base_loader.py
-
-rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
-cp -f /home/new_verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 
 cnt=0
 if [ "$RANK" = "0" ]; then
