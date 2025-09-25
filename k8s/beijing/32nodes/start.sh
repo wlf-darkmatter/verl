@@ -132,12 +132,13 @@ while true; do
     exit 0
   fi
 
-  if [[ -n $failed ]]; then
-    echo "Job $ray_name exit with exception"
-    ray stop --force
-#    rm -rf /tmp
-    exit 1
-  fi
+  #! 如果失败了也不要停止
+#   if [[ -n $failed ]]; then
+#     echo "Job $ray_name exit with exception"
+#     ray stop --force
+# #    rm -rf /tmp
+#     exit 1
+#   fi
 
   sleep 10
 done
