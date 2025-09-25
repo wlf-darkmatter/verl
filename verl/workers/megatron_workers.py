@@ -630,6 +630,7 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
     @DistProfiler.annotate(color="red")
     def generate_sequences(self, prompts: DataProto):
         assert self._is_rollout
+        torch.npu.synchronize()
         prompts = prompts.to(get_device_name())
         meta_info = {
             "eos_token_id": self.generation_config.eos_token_id

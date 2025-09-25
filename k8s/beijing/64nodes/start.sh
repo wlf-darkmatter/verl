@@ -4,7 +4,7 @@ export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
 # export HYDRA_FULL_ERROR=1
 export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
-
+export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
 export VLLM_SLEEP_LEVEL=1
 export VERL_DEBUG_NOSHARDING=0
 
@@ -132,12 +132,12 @@ while true; do
     exit 0
   fi
 
-  if [[ -n $failed ]]; then
-    echo "Job $ray_name exit with exception"
-    ray stop --force
-#    rm -rf /tmp
-    exit 1
-  fi
+#   if [[ -n $failed ]]; then
+#     echo "Job $ray_name exit with exception"
+#     ray stop --force
+# #    rm -rf /tmp
+#     exit 1
+#   fi
 
   sleep 10
 done

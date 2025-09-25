@@ -209,7 +209,8 @@ class MegatronVLLMShardingManager(BaseShardingManager):
             self.inference_engine.sleep(level=VLLM_SLEEP_LEVEL)
         for model in self.actor_module:
             model.train()
-
+            
+        torch.npu.synchronize()
         aggressive_empty_cache(force_sync=True)
 
         set_expandable_segments(True)
