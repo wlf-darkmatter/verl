@@ -788,8 +788,8 @@ class DeepseekV2ForCausalLM(nn.Module, SupportsPP):
                     weight_loader = param.weight_loader
                     weight_loader(param, loaded_weight, shard_id)
                 except:
-                    print(f"Failed to load {name}")
-                    
+                    print(f"Warning: Vllm failed to load {name}", flush=True)
+
                 break
             else:
                 for mapping in expert_params_mapping:
@@ -810,7 +810,7 @@ class DeepseekV2ForCausalLM(nn.Module, SupportsPP):
                                     shard_id=shard_id,
                                     expert_id=expert_id)
                     except:
-                        print(f"Failed to load {name}")
+                        print(f"Warning: Vllm failed to load {name}", flush=True)
 
                     break
                 else:
@@ -832,7 +832,7 @@ class DeepseekV2ForCausalLM(nn.Module, SupportsPP):
                                                 default_weight_loader)
                         weight_loader(param, loaded_weight)
                     except:
-                        print(f"Failed to load {name}")
+                        print(f"Warning: Vllm failed to load {name}", flush=True)
 
             loaded_params.add(name)
         return loaded_params
