@@ -163,7 +163,6 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.test_freq=-1 \
     trainer.save_freq=-1 \
     trainer.total_epochs=10 \
-    trainer.total_training_steps=10 \
     trainer.default_local_dir="${CKPTS_DIR}" \
     trainer.resume_mode=auto \
     trainer.log_val_generations=10 \
