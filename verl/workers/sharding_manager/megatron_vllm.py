@@ -156,7 +156,12 @@ class MegatronVLLMShardingManager(BaseShardingManager):
                     self.inference_engine.wake_up(tags=["weights"])
                 else:
                     self.inference_engine.wake_up()
-
+            if os.environ.get('SAVE_RANK0_MODEL',"0") == "1" :
+                model = self.model_runner.model
+                if torch.distributed.get_rank()==0:
+                    print(f'==========={dir(model)}=============================')
+                    torch.save(model.state_dict(),'/data01/huawei-2025/wlf/verl/k8s/beijing/32nodes_0925_sleep/data_weight/model_nosharding_rank0.pt')
+                    print(f'========下载完毕================')
             if os.environ.get("VERL_DEBUG_NOSHARDING", "0") == "1" :
                 print(f"\033[33mVERL_DEBUG_NOSHARDING! Skipping sharding manager\033[0m", flush=True)
             else:
@@ -177,6 +182,11 @@ class MegatronVLLMShardingManager(BaseShardingManager):
                 loaded_params = model.load_weights(per_tensor_param)
                 info = f"vLLM load weights, loaded_params: {len(loaded_params)}"
                 logger.info(info)
+            if os.environ.get('SAVE_RANK0_MODEL',"0") == "1" :
+                if torch.distributed.get_rank()==0:
+                    print(f'==========={dir(model)}=============================')
+                    torch.save(model.state_dict(),'/data01/huawei-2025/wlf/verl/k8s/beijing/32nodes_0925_sleep/data_weight/model_aftersharding_rank0.pt')
+                    print(f'========下载完毕================')
 
             if self.offload_param:
                 offload_megatron_model_to_cpu(self.actor_module)
