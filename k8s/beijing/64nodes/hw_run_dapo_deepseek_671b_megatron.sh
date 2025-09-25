@@ -57,14 +57,14 @@ val_top_p=0.7
 
 # Performance Related Parameter
 use_dynamic_bsz=True
-actor_ppo_max_token_len=$(((max_prompt_length + max_response_length)))
-infer_ppo_max_token_len=$(((max_prompt_length + max_response_length)))
+actor_ppo_max_token_len=$(((max_prompt_length + max_response_length)/2))
+infer_ppo_max_token_len=$(((max_prompt_length + max_response_length)/2))
 offload=True
 gen_tp=8
 gen_dp=8
 # gen_world_size=$((NNODES*8))
-train_tp=4
-train_ep=32
+train_tp=8
+train_ep=64
 train_pp=8
 enable_filter_group=False
 ETP=1
@@ -77,7 +77,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     --config-name="dapo_megatron_trainer" \
     actor_rollout_ref.rollout.load_format=safetensors \
     actor_rollout_ref.rollout.skip.enable=True \
-    actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/wlf/rollout_dump" \
+    actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/wlf/rollout_dump_tmp" \
     actor_rollout_ref.rollout.skip.dump_step=500 \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
