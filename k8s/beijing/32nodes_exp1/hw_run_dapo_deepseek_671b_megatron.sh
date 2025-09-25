@@ -63,11 +63,13 @@ offload=True
 gen_tp=8
 gen_dp=8
 # gen_world_size=$((NNODES*8))
-train_tp=4
-train_ep=64
+train_tp=8
+train_ep=32
 train_pp=8
 enable_filter_group=False
 ETP=1
+## expert_tensor_parallel_size * expert_model_parallel_size * pipeline_model_parallel_size
+## decoder_world_size % expert_tensor_model_pipeline_parallel_size ==0
 
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 cd /opt/verl
