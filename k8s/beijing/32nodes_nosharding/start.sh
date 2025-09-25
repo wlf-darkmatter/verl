@@ -6,6 +6,10 @@ export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
 export ASCEND_GLOBAL_LOG_LEVEL=3
 export VERL_DEBUG_NOSHARDING="1"
+
+export VERL_ENVIRONMENT_ROLLOUT_DIR=$(dirname $0)/env_rollout
+mkdir -p $VERL_ENVIRONMENT_ROLLOUT_DIR
+
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
 #######################################

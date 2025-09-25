@@ -59,4 +59,7 @@ if os.environ.get("VERL_DEBUG_NOSHARDING", "0") == "1" :
     #* 如果要临时关闭掉 SHARDING，那就不应该 sleep mode 2
     VLLM_SLEEP_LEVEL = 1
 
+if os.environ.get("VLLM_SLEEP_LEVEL", "") != "" :
+    VLLM_SLEEP_LEVEL = int(VLLM_SLEEP_LEVEL)
+
 __all__ = ["LLM", "parallel_state"]

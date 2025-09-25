@@ -146,6 +146,14 @@ def _init_dp_envs(config):
 
     print(f"[VLLM] using TP={tp_size}, DP={dp_size}", flush=True)
 
+    if os.getenv("VERL_ENVIRONMENT_ROLLOUT_DIR", "") != "":
+        rank = torch.distributed.get_rank()
+        print(f"\033[33m[VLLM] Record VERL_ENVIRONMENT_ROLLOUT\033[0m")
+        with open(os.getenv("VERL_ENVIRONMENT_ROLLOUT_DIR") + f"/RANK{rank:03d}.env", 'w') as f:
+            # 写入所有的环境变量
+            for key, value in os.environ.items():
+                f.write(f"{key}={value}\n")
+
 
 
 class vLLMRollout(BaseRollout):
