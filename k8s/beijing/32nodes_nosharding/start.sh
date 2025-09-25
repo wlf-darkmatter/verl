@@ -15,6 +15,12 @@ cp -f /home/new_verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/mode
 
 rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 cp -f /home/new_verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+
+rm -f /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
+cp -f /home/new_verl/k8s/patch/vllm_ascend/ops/fused_moe.py /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
+
+
+
 #######################################
 
 mkdir -p /data01/huawei-2025/wlf/watch
