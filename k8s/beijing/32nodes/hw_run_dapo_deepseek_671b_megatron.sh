@@ -10,7 +10,7 @@ set -xeuo pipefail
 #huggingface-cli download deepseek-ai/DeepSeek-V3-0324 configuration_deepseek.py config.json
 
 project_name='DAPO'
-exp_name='DAPO-DeepSeek-671b-megatron'
+exp_name='DAPO-DeepSeek-671b-megatron-32NNODES'
 
 adv_estimator=grpo
 
