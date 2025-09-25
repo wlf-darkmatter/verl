@@ -8,6 +8,8 @@ export SAVE_RANK0_MODEL=0
 export ASCEND_GLOBAL_LOG_LEVEL=3
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
+unset VERL_DEBUG_NOSHARDING
+
 #######################################
 #! 规避模型加载时 权重读取错误的问题
 rm -f /opt/vllm/vllm/model_executor/model_loader/base_loader.py
