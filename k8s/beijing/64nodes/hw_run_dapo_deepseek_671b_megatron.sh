@@ -25,12 +25,12 @@ clip_ratio_high=0.28
 max_prompt_length=$((1024 * 2))
 max_response_length=$((1024 * 8))
 enable_overlong_buffer=False
-overlong_buffer_len=$((1024 * 5))
+overlong_buffer_len=$((1024 * 4))
 overlong_penalty_factor=0.1
 
 loss_agg_mode="token-mean"
 
-train_prompt_bsz=256 # must be > n_gpus. need to fix
+train_prompt_bsz=128 # must be > n_gpus. need to fix
 n_resp_per_prompt=16
 train_prompt_mini_bsz=32  # mini_bsz * n >= micro_bsz * pp * dp
 
@@ -57,26 +57,27 @@ val_top_p=0.7
 
 # Performance Related Parameter
 use_dynamic_bsz=True
-actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 2))
-infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
+actor_ppo_max_token_len=$(((max_prompt_length + max_response_length)))
+infer_ppo_max_token_len=$(((max_prompt_length + max_response_length)))
 offload=True
 gen_tp=8
-gen_dp=32 #! 无法大于等于 64. assert self.num_local_experts > 0, "Expected at least one expert"
-
+gen_dp=8
 # gen_world_size=$((NNODES*8))
 train_tp=4
-train_ep=16
+train_ep=32
 train_pp=8
 enable_filter_group=False
+ETP=1
 
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 cd /opt/verl
 ray job submit --runtime-env="${RUNTIME_ENV}" \
     -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
-    --config-name='dapo_megatron_trainer' \
+    --config-name="dapo_megatron_trainer" \
+    actor_rollout_ref.rollout.load_format=safetensors \
     actor_rollout_ref.rollout.skip.enable=True \
-    actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/zy/rollout_dump" \
+    actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/wlf/rollout_dump" \
     actor_rollout_ref.rollout.skip.dump_step=500 \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
@@ -112,21 +113,25 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.megatron.dist_checkpointing_path=${MCORE_MODEL_PATH} \
     actor_rollout_ref.actor.megatron.use_dist_checkpointing=Ture \
     +actor_rollout_ref.ref.megatron.override_transformer_config.use_flash_attn=True \
+    actor_rollout_ref.actor.megatron.expert_tensor_parallel_size=$ETP \
+    actor_rollout_ref.ref.megatron.expert_tensor_parallel_size=$ETP \
     +actor_rollout_ref.actor.megatron.override_transformer_config.use_flash_attn=True \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_method=uniform \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_granularity=full \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.pipeline_num_transformer_layers=[[6],[8],[8],[8],[8],[8],[8],[7]] \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=4 \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_first_pipeline_stage=6 \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_pipeline_stage=7 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.pipeline_num_transformer_layers=[[7],[8],[8],[8],[8],[8],[8],[6]] \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=1 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_first_pipeline_stage=7 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_pipeline_stage=6 \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.optim.clip_grad=1.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.7 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.80 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=${gen_tp} \
     actor_rollout_ref.rollout.dp_model_parallel_size=${gen_dp} \
-    actor_rollout_ref.rollout.enable_chunked_prefill=True \
+    actor_rollout_ref.rollout.enable_chunked_prefill=False \
+    actor_rollout_ref.rollout.enable_prefix_caching=False \
     actor_rollout_ref.rollout.max_num_batched_tokens=$((max_prompt_length + max_response_length)) \
+    actor_rollout_ref.rollout.max_num_seqs=$((32)) \
     actor_rollout_ref.rollout.temperature=${temperature} \
     actor_rollout_ref.rollout.top_p=${top_p} \
     actor_rollout_ref.rollout.top_k=${top_k} \
