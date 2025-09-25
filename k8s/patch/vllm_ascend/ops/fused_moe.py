@@ -322,6 +322,13 @@ def apply_mlp(
     """
 
     w1 = w1.transpose(1, 2)
+    print(f">>>>>>>>>>>>>> apply_mlp-1: {torch_npu.npu.memory_reserved() / 1024**3:.2f} GB", flush=True)
+    print(f">>>>>>>>>>>>>> apply_mlp-1: {hidden_states.shape=} ", flush=True)
+    print(f">>>>>>>>>>>>>> apply_mlp-1: {w1.shape=} ", flush=True)
+    print(f">>>>>>>>>>>>>> apply_mlp-1: {w2.shape=} ", flush=True)
+    print(f">>>>>>>>>>>>>> apply_mlp-1: {group_list=} ", flush=True)
+
+
     hidden_states = torch_npu.npu_grouped_matmul(
         x=[hidden_states],
         weight=[w1],
@@ -331,7 +338,10 @@ def apply_mlp(
         group_list=group_list,
     )
 
+    # torch.npu.empty_cache() #! 这里加了清缓存操作
     hidden_states = torch.cat(hidden_states, dim=0)
+    # torch.npu.empty_cache() #! 这里加了清缓存操作
+
     hidden_states = torch_npu.npu_swiglu(hidden_states)
 
     w2 = w2.transpose(1, 2)
@@ -344,7 +354,9 @@ def apply_mlp(
         group_list=group_list,
     )
 
+    # torch.npu.empty_cache() #! 这里加了清缓存操作
     hidden_states = torch.cat(hidden_states, dim=0)
+    # torch.npu.empty_cache() #! 这里加了清缓存操作
     return hidden_states
 
 
