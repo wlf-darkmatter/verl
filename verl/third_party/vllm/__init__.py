@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 from importlib.metadata import PackageNotFoundError, version
-
 from packaging import version as vs
 
 from verl.utils.import_utils import is_sglang_available
@@ -54,5 +54,12 @@ else:
             f"vllm version {package_version} not supported and SGLang also not Found. Currently supported "
             f"vllm versions are 0.7.0+"
         )
+
+if os.environ.get("VERL_DEBUG_NOSHARDING", "0") == "1" :
+    #* 如果要临时关闭掉 SHARDING，那就不应该 sleep mode 2
+    VLLM_SLEEP_LEVEL = 1
+
+if os.environ.get("VLLM_SLEEP_LEVEL", "") != "" :
+    VLLM_SLEEP_LEVEL = int(VLLM_SLEEP_LEVEL)
 
 __all__ = ["LLM", "parallel_state"]
