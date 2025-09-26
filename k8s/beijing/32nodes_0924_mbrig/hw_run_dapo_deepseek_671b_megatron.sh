@@ -22,9 +22,9 @@ clip_ratio_low=0.2
 clip_ratio_high=0.28
 
 max_prompt_length=$((1024 * 2))
-max_response_length=$((1024 * 8))
+max_response_length=$((1024 * 1))
 enable_overlong_buffer=False
-overlong_buffer_len=$((1024 * 8))
+overlong_buffer_len=$((1024 * 1))
 overlong_penalty_factor=0.1
 
 loss_agg_mode="token-mean"

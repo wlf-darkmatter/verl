@@ -25,7 +25,7 @@ source /opt/pyvenv/bin/activate;
 
 LIB_PATH=/opt/python3.10/lib/
 export LD_LIBRARY_PATH=$LIB_PATH:$LD_LIBRARY_PATH
-
+export VLLM_SLEEP_LEVEL=1
 unset LOCAL_WORLD_SIZE
 # unset WORLD_SIZE
 unset LOCAL_RANK
