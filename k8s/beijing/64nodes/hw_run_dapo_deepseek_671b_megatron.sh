@@ -23,9 +23,9 @@ clip_ratio_low=0.2
 clip_ratio_high=0.28
 
 max_prompt_length=$((1024 * 2))
-max_response_length=$((1024 * 8))
-enable_overlong_buffer=False
-overlong_buffer_len=$((1024 * 4))
+max_response_length=$((1024 * 12))
+enable_overlong_buffer=True
+overlong_buffer_len=$((1024 * 1))
 overlong_penalty_factor=0.1
 
 loss_agg_mode="token-mean"
@@ -43,7 +43,8 @@ NNODES=64
 MODEL_PATH="/data01/huawei-2025/weight/dpsk-v3-671B-BF16-dist_ckpt"
 MCORE_MODEL_PATH="/data01/huawei-2025/weight/dsv3_fp16_mcore_full_new"
 RAY_DATA_HOME="/opt"
-CKPTS_DIR=${CKPTS_DIR:-"${RAY_DATA_HOME}/ckpts/${project_name}/${exp_name}"}
+CKPTS_DIR=/data01/huawei-2025/weight/ckpt-DAPO-DeepSeek-671b-megatron
+
 TRAIN_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k.parquet"
 TEST_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k.parquet"
 
@@ -166,13 +167,13 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.nnodes="${NNODES}" \
     trainer.val_before_train=False \
     trainer.test_freq=-1 \
-    trainer.save_freq=-1 \
+    trainer.save_freq=10 \
     trainer.total_epochs=10 \
-    trainer.default_local_dir="${CKPTS_DIR}" \
+    trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
     trainer.log_val_generations=10 \
     actor_rollout_ref.rollout.free_cache_engine=True \
-    trainer.device="npu" $@   2>&1 | tee /tmp/ray.output
+    trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
 
 ray_name=$(cat /tmp/ray.output | grep "submitted successfully" | awk -F "'" '{print $2}')
 ray_name=${ray_name//\'}
