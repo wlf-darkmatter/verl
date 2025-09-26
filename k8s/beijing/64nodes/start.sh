@@ -33,8 +33,7 @@ source /usr/local/Ascend/ascend-toolkit/set_env.sh;
 source /usr/local/Ascend/nnal/atb/set_env.sh;
 source /opt/pyvenv/bin/activate;
 
-rm -rf /opt/verl
-cp -r /data01/huawei-2025/wlf/verl /opt/verl
+
 
 LIB_PATH=/opt/python3.10/lib/
 export LD_LIBRARY_PATH=$LIB_PATH:$LD_LIBRARY_PATH
