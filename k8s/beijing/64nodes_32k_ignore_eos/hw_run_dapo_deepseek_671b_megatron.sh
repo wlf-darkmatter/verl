@@ -84,7 +84,6 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/wlf/rollout_dump" \
     actor_rollout_ref.rollout.skip.dump_step=500 \
     actor_rollout_ref.rollout.ignore_eos=True \
-    actor_rollout_ref.rollout.max_tokens=${max_response_length} \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
     data.prompt_key=prompt \
