@@ -4,6 +4,10 @@ export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
 # export HYDRA_FULL_ERROR=1
 export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
+export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
+export VLLM_SLEEP_LEVEL=1
+export VERL_DEBUG_NOSHARDING=0
+
 export ASCEND_GLOBAL_LOG_LEVEL=3
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
@@ -14,6 +18,12 @@ cp -f /home/new_verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/mode
 
 rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 cp -f /home/new_verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+
+rm -f /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
+cp -f /home/new_verl/k8s/patch/vllm_ascend/ops/fused_moe.py /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
+
+
+
 #######################################
 
 mkdir -p /data01/huawei-2025/wlf/watch
@@ -23,22 +33,22 @@ source /usr/local/Ascend/ascend-toolkit/set_env.sh;
 source /usr/local/Ascend/nnal/atb/set_env.sh;
 source /opt/pyvenv/bin/activate;
 
+
 LIB_PATH=/opt/python3.10/lib/
 export LD_LIBRARY_PATH=$LIB_PATH:$LD_LIBRARY_PATH
-export VLLM_SLEEP_LEVEL=1
+
 unset LOCAL_WORLD_SIZE
 # unset WORLD_SIZE
 unset LOCAL_RANK
 
-#export ASCEND_GLOBAL_LOG_LEVEL=1
+# export ASCEND_GLOBAL_LOG_LEVEL=1
 # export ASCEND_LAUNCH_BLOCKING=1
 
 export NPU_PER_NODE=8  # A2 NPU Number
-export NNODES=32         # example is 4 Nodes
+export NNODES=64         # example is 4 Nodes
 
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
 export ASCEND_PROCESS_LOG_PATH=/opt/verl/logs/$MINDX_TASK_ID/plog # modify according to actual situation
-# pip install /data01/huawei-2025/wlf/verl/k8s/mbridge-0.13.0-py3-none-any.whl
 
 ray stop --force
 rm -rf /tmp/ray
@@ -48,13 +58,6 @@ cd $(dirname $0)
 
 export ServerPort=6666     # modify according to actual situation
 export DashboardPort=8888  # modify according to actual situation
-
-###权重加载修改
-rm -f /opt/vllm/vllm/model_executor/model_loader/base_loader.py
-cp -f /home/new_verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/model_loader/base_loader.py
-
-rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
-cp -f /home/new_verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 
 cnt=0
 if [ "$RANK" = "0" ]; then
@@ -127,12 +130,12 @@ while true; do
     exit 0
   fi
 
-  if [[ -n $failed ]]; then
-    echo "Job $ray_name exit with exception"
-    ray stop --force
-#    rm -rf /tmp
-    exit 1
-  fi
+#   if [[ -n $failed ]]; then
+#     echo "Job $ray_name exit with exception"
+#     ray stop --force
+# #    rm -rf /tmp
+#     exit 1
+#   fi
 
   sleep 10
 done
