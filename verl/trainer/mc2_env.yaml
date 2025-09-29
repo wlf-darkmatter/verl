@@ -12,4 +12,4 @@ env_vars:
   P2P_HCCL_BUFFSIZE: "20"
   HCCL_BUFFSIZE: "300"
   # PYTORCH_NPU_ALLOC_CONF: "max_split_size_mb:2048"
-  # LD_PRELOAD: "/usr/local/lib/libjemalloc.so.2"
+ 

@@ -9,6 +9,9 @@ export VLLM_SLEEP_LEVEL=1
 export VERL_DEBUG_NOSHARDING=0
 
 export ASCEND_GLOBAL_LOG_LEVEL=3
+
+export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
+
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
 #######################################
