@@ -13,4 +13,4 @@ export HCCL_ASYNC_ERROR_HANDLING="0"
 export P2P_HCCL_BUFFSIZE="20"
 export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
 cd /opt/verl
-torchrun --nproc_per_node 8 --nnodes 4 --node_rank $RANK --master_addr $MASTER_ADDR --master_port $MASTER_PORT /opt/verl/scripts/converter_hf_to_mcore_n_node.py --hf_model_path /data01/huawei-2025/weight/dpsk-v3-671B-BF16-dist_ckpt --output_path /data01/huawei-2025/weight/dsv3_fp16_mcore_full_zy_test --pp_size 4 --ep_size 8
+torchrun --nproc_per_node 8 --nnodes 4 --node_rank $RANK --master_addr $MASTER_ADDR --master_port $MASTER_PORT /opt/verl/scripts/converter_hf_to_mcore_n_node.py --hf_model_path /data01/huawei-2025/weight/dsv3-base-hf --output_path /data01/huawei-2025/weight/dsv3_fp16_mcore_full_base --pp_size 4 --ep_size 8
