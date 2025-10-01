@@ -62,7 +62,7 @@ sp=2
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length)/sp))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length)/sp))
 
-max_num_batched_tokens=$((8*1024))
+max_num_batched_tokens=$((6*1024))
 
 offload=True
 gen_tp=8
@@ -135,7 +135,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
     actor_rollout_ref.rollout.enable_prefix_caching=False \
     actor_rollout_ref.rollout.max_num_batched_tokens=${max_num_batched_tokens} \
-    actor_rollout_ref.rollout.max_num_seqs=$((16)) \
+    actor_rollout_ref.rollout.max_num_seqs=$((32)) \
     actor_rollout_ref.rollout.temperature=${temperature} \
     actor_rollout_ref.rollout.top_p=${top_p} \
     actor_rollout_ref.rollout.top_k=${top_k} \

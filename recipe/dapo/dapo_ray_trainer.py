@@ -248,9 +248,9 @@ class RayDAPOTrainer(RayPPOTrainer):
                                     others += 1
 
                             total = len(uid2vals)
-                            print(f"[INFO] Filter前全错-全0: {all_zero}个，占比: {all_zero / total:.2%}",flush=True)
-                            print(f"[INFO] Filter前全对-全1: {all_one}个，占比: {all_one / total:.2%}",flush=True)
-                            print(f"[INFO] Filter前ACC: {sum(acc_val) / len(acc_val)}, 求和:{sum(acc_val)}， 长度:{len(acc_val)}", flush=True)
+                            print(f"[INFO] Filter前全错-全0: {all_zero}个，占比: {all_zero / total:.2%}", flush=True)
+                            print(f"[INFO] Filter前全对-全1: {all_one}个，占比: {all_one / total:.2%}", flush=True)
+                            print(f"[INFO] Filter前ACC: {sum(acc_val) / len(acc_val)}, 求和:{sum(acc_val)}，长度:{len(acc_val)}", flush=True)
                         except Exception as e:
                             print(f"Print filter failed! \nreason is {e.__repr__()}")
 

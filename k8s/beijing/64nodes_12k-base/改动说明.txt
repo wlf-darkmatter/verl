@@ -1,1 +1,3 @@
 学习率 1e-6 -> 3e-6
+max_num_batched_tokens $((6*1024)) -> $((8*1024))
+actor_rollout_ref.rollout.max_num_seqs $((32)) $((16))

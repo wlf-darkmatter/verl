@@ -23,7 +23,7 @@ clip_ratio_low=0.2
 clip_ratio_high=0.28
 
 max_prompt_length=$((1024 * 2))
-max_response_length=$((1024 * 12))
+max_response_length=$((1024 * 24))
 enable_overlong_buffer=True
 overlong_buffer_len=$((1024 * 1))
 overlong_penalty_factor=0.1
@@ -43,7 +43,7 @@ NNODES=64
 MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf"
 MCORE_MODEL_PATH="/data01/huawei-2025/weight/dsv3_bf16_mcore_full_base"
 RAY_DATA_HOME="/opt"
-CKPTS_DIR=/data01/huawei-2025/weight/ckpt-DAPO-DeepSeek-671b-megatron-base-2k12k
+CKPTS_DIR=/data01/huawei-2025/weight/ckpt-DAPO-DeepSeek-671b-megatron-base-2k24k
 
 TRAIN_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k.parquet"
 TEST_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k.parquet"
@@ -58,11 +58,11 @@ val_top_p=0.7
 
 # Performance Related Parameter
 use_dynamic_bsz=True
-sp=2
+sp=4
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length)/sp))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length)/sp))
 
-max_num_batched_tokens=$((8*1024))
+max_num_batched_tokens=$((6*1024))
 
 offload=True
 gen_tp=8
@@ -135,7 +135,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
     actor_rollout_ref.rollout.enable_prefix_caching=False \
     actor_rollout_ref.rollout.max_num_batched_tokens=${max_num_batched_tokens} \
-    actor_rollout_ref.rollout.max_num_seqs=$((16)) \
+    actor_rollout_ref.rollout.max_num_seqs=$((32)) \
     actor_rollout_ref.rollout.temperature=${temperature} \
     actor_rollout_ref.rollout.top_p=${top_p} \
     actor_rollout_ref.rollout.top_k=${top_k} \

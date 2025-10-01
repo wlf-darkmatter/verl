@@ -3,9 +3,7 @@ export TP_SOCKET_IFNAME=ens45   # modify according to actual situation
 export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
 # export HYDRA_FULL_ERROR=1
 export RAY_DEDUP_LOGS=1
-
-
-
+# export HCCL_EXEC_TIMEOUT=3600
 export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
 export VLLM_SLEEP_LEVEL=1
 export VERL_DEBUG_NOSHARDING=0
@@ -15,12 +13,6 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
 export TASK_QUEUE_ENABLE=2
-#! 注意，1001 加了这 几个超时配置
-export HCCL_EXEC_TIMEOUT=86400
-export HCCL_EVENT_TIMEOUT=86400
-export ACL_DEVICE_SYNC_TIMEOUT=86400
-export HCCL_ASYNC_ERROR_HANDLING=0
-
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
