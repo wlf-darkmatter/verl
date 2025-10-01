@@ -80,7 +80,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
     actor_rollout_ref.rollout.load_format=safetensors \
-    actor_rollout_ref.rollout.skip.enable=False \
+    actor_rollout_ref.rollout.skip.enable=True \
     actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/wlf/rollout_dump" \
     actor_rollout_ref.rollout.skip.dump_step=500 \
     data.train_files="${TRAIN_FILE}" \
@@ -177,4 +177,4 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
 ray_name=$(cat /tmp/ray.output | grep "submitted successfully" | awk -F "'" '{print $2}')
 ray_name=${ray_name//\'}
 echo "ray_name: $ray_name"
-ray job logs $ray_name --follow
+ray job logs $ray_name --follow | tee $(dirname $0)/ray.log
