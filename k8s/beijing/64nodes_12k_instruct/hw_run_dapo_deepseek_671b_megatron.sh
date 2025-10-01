@@ -43,7 +43,7 @@ NNODES=64
 MODEL_PATH="/data01/huawei-2025/weight/dpsk-v3-671B-BF16-dist_ckpt"
 MCORE_MODEL_PATH="/data01/huawei-2025/weight/dsv3_fp16_mcore_full_new"
 RAY_DATA_HOME="/opt"
-CKPTS_DIR=/data01/huawei-2025/weight/ckpt-DAPO-DeepSeek-671b-megatron
+CKPTS_DIR=/data01/huawei-2025/weight/CKPT/ckpt-DAPO-DeepSeek-671b-megatron-2k12k
 
 TRAIN_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k.parquet"
 TEST_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k.parquet"
@@ -177,4 +177,4 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
 ray_name=$(cat /tmp/ray.output | grep "submitted successfully" | awk -F "'" '{print $2}')
 ray_name=${ray_name//\'}
 echo "ray_name: $ray_name"
-ray job logs $ray_name --follow
+ray job logs $ray_name --follow | tee $(dirname $0)/ray.log
