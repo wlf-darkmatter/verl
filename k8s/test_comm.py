@@ -120,7 +120,7 @@ def build_task(task_cls, config=None, device_name=None):
             rank += 1
             print(f"Building rank({rank}), local_rank({local_rank})", flush=True)
             if rank == 0:
-                master_addr, master_port = get_availale_curr_addr_port()
+                master_addr, master_port = ray.get(get_availale_curr_addr_port.remote())
                 print(f"Get master_addr from ray is {master_addr}", flush=True)
                 info = {
                     "MASTER_ADDR": master_addr,
