@@ -13,7 +13,7 @@ from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
 from verl.single_controller.ray import RayResourcePool
 from verl.single_controller.ray.base import sort_placement_group_by_node_ip
 from verl.utils.device import get_device_name, get_nccl_backend
-
+import socket
 
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
 os.environ["NCCL_DEBUG"] = "WARN"
@@ -63,7 +63,9 @@ def ray_init():
                 f"`--ray_master_ip` should be set if nnodes({args.nnodes}) > 1."
             )
 
-        curr_addr, _ = ray.get(get_availale_curr_addr_port.remote())
+        hostname = socket.gethostname()
+        curr_addr = socket.gethostbyname(hostname)
+
         print(f"curr_addr = {curr_addr}", flush=True)
 
         if args.is_master or curr_addr == args.ray_master_ip:
