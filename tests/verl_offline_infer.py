@@ -41,6 +41,7 @@ import socket
 import time
 from datetime import datetime
 from pathlib import Path
+import pickle
 
 import numpy as np
 import ray
@@ -687,15 +688,21 @@ class Test:
     def test_tps(self, num_step=1):
         # * start running
         step_i = 0
+        num_print_control = 620
         for _preencode_prompts in self.Vllm.dataloader:
             list_output = self.Vllm.generate_sequences(_preencode_prompts)
+
+            #* pickle dump list_output
+            pickle.dump(list_output, open(f"/tmp/{step_i}.pkl", "wb"))
+            #todo tmp
+            num_print_control = np.inf
 
             # todo tokenizer
             try:
                 _output = list_output[0].batch["response"][0].outputs[0]
                 response_text = _output.text
                 print("===>Output===>", flush=True)
-                if len(response_text) <= 620:
+                if len(response_text) <= num_print_control:
                     print(response_text, flush=True)
                 else:
                     print(response_text[:300], flush=True)
