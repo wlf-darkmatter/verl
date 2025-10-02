@@ -32,9 +32,10 @@ spec:
           hostNetwork: true
           nodeSelector:                        # modify according to the actual situation
             host-arch: huawei-arm
+            verl: test
           containers:
             - name: ascend # do not modify
-              image: harbor.ai-bj.cn/library/verl:verl_0912  ##image
+              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.5.1-cann_8.2.rc1-py_3.10-aarch64_0827a  ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
 
@@ -98,9 +99,10 @@ spec:
           hostNetwork: true
           nodeSelector:                        # modify according to the actual situation
             host-arch: huawei-arm
+            verl: test
           containers:
             - name: ascend # do not modify
-              image: harbor.ai-bj.cn/library/verl:verl_0912  ##image
+              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.5.1-cann_8.2.rc1-py_3.10-aarch64_0827a  ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
