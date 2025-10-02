@@ -41,6 +41,7 @@ parser.add_argument("--ray_init", action="store_true")
 args = parser.parse_args()
 
 
+@ray.remote
 def get_availale_curr_addr_port():
     host_ip_by_sdk = ray._private.services.get_node_ip_address()
     with socket.socket() as sock:
@@ -62,7 +63,7 @@ def ray_init():
                 f"`--ray_master_ip` should be set if nnodes({args.nnodes}) > 1."
             )
 
-        curr_addr, _ = get_availale_curr_addr_port()
+        curr_addr, _ = ray.get(get_availale_curr_addr_port.remote())
         print(f"curr_addr = {curr_addr}", flush=True)
 
         if args.is_master or curr_addr == args.ray_master_ip:
@@ -198,7 +199,7 @@ class TestComm(BasrRay):
     def init_process_group(self):
         print(f"\033[32m开始建链\033[0m", flush=True)
         time.sleep(5)
-        
+
 
         backend = "cpu:gloo"
         if self.device_name == "npu":
