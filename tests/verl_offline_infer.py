@@ -667,10 +667,10 @@ def ray_init():
         if args.is_master or curr_addr == args.ray_master_ip:
             pass
             print("\033[32mMaster\033[0m", flush=True)
-            ret = os.popen(f"ray start --head --port {args.ray_master_port}").read()
+            ret = os.popen(f"ray start --head --port {args.ray_master_port} --dashboard-port {args.ray_dashboard_port}").read()
         else:
             print("\033[32mSlaver\033[0m", flush=True)
-            ret = os.popen(f"ray start --address={args.ray_master_ip}:{args.ray_master_port}").read()
+            ret = os.popen(f"ray start --address={args.ray_master_ip}:{args.ray_master_port} --dashboard-port {args.ray_dashboard_port}").read()
             exit(0)
         print(ret, flush=True)
 

@@ -1,20 +1,18 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek671-32-verl-moe  #sp-64-train-3b-moe-msrun #需要修改
+  name: deepseek671-16-verl-moe-infer-base  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
     fault-retry-times: "0"
     ring-controller.atlas: ascend-910b
     subHealthyStrategy: "ignore"
-  annotations:
-    sp-block: "32"
 spec:
   schedulerName: volcano    #需要修改 work when enableGangScheduling is true
   runPolicy:
     schedulingPolicy:
-      minAvailable: 2    #需要修改， work when enableGangScheduling is true
+      minAvailable: 16    #需要修改， work when enableGangScheduling is true
       queue: default
   successPolicy: AllWorkers
   replicaSpecs:
@@ -27,12 +25,21 @@ spec:
             ring-controller.atlas: ascend-910b
         spec:
           priorityClassName: system-cluster-critical
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: volcano.sh/nodegroup-name
+                    operator: In
+                    values:
+                    - rl
           terminationGracePeriodSeconds: 60
           automountServiceAccountToken: false
           hostNetwork: true
           nodeSelector:                        # modify according to the actual situation
+            accelerator-type: module-910b-8
             host-arch: huawei-arm
-            verl: test
           containers:
             - name: ascend # do not modify
               image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.5.1-cann_8.2.rc1-py_3.10-aarch64_0827a  ##image
@@ -40,7 +47,7 @@ spec:
               command: ["/bin/bash", "-c"]
 
               args:
-                - "bash /home/new_verl/k8s/beijing/32nodes/start.sh; sleep 7d"
+                - "bash /home/new_verl/k8s/beijing/infer-base/start.sh ;sleep 7d"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
@@ -68,6 +75,8 @@ spec:
                   mountPath: /etc/localtime
                 - name: start-path
                   mountPath: /home/new_verl/
+                - name: data-path
+                  mountPath: /mnt
           volumes:
             - name: dshm
               emptyDir:
@@ -85,8 +94,11 @@ spec:
             - name: start-path
               hostPath:
                 path: /mnt/hpfs_test/wlf/verl
+            - name: data-path
+              hostPath:
+                path: /mnt
     Worker:
-      replicas: 1  #Master can only be 1
+      replicas: 7  #Master can only be 1
       restartPolicy: Never
       template:
         metadata:
@@ -94,19 +106,41 @@ spec:
             ring-controller.atlas: ascend-910b
         spec:
           priorityClassName: system-cluster-critical
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: job-name
+                        operator: In
+                        values:
+                          -  deepseek671-16-verl-moe-infer-base  #train-32x7b-256-moe-o0   #train-64x28b-256-moe-o1 #需要修改, 必须与metadata.name一致
+                      - key: replica-type
+                        operator: In
+                        values:
+                          - worker
+                  topologyKey: kubernetes.io/hostname
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: volcano.sh/nodegroup-name
+                    operator: In
+                    values:
+                    - rl
           terminationGracePeriodSeconds: 60
           automountServiceAccountToken: false
           hostNetwork: true
           nodeSelector:                        # modify according to the actual situation
+            accelerator-type: module-910b-8
             host-arch: huawei-arm
-            verl: test
           containers:
             - name: ascend # do not modify
               image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.5.1-cann_8.2.rc1-py_3.10-aarch64_0827a  ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "bash /home/new_verl/k8s/beijing/32nodes/start.sh; sleep 7d"
+                - "bash /home/new_verl/k8s/beijing/infer-base/start.sh ;sleep 7d"
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify
@@ -132,6 +166,8 @@ spec:
                   mountPath: /etc/localtime
                 - name: start-path
                   mountPath: /home/new_verl/
+                - name: data-path
+                  mountPath: /mnt
           volumes:
             - name: dshm
               emptyDir:
@@ -149,3 +185,6 @@ spec:
             - name: start-path
               hostPath:
                 path: /mnt/hpfs_test/wlf/verl
+            - name: data-path
+              hostPath:
+                path: /mnt
