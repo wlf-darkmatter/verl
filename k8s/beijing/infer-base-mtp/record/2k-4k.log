@@ -1,0 +1,960 @@
+[BEGIN] 2025/10/2 12:59:45
+[root@pm-d12e0124 privAcc]# kubectlrl logs deepseek671-16-verl-moe-infer-base-mpt-master-0 
+2025-10-02 11:52:31,089	INFO scripts.py:1392 -- Did not find any active Ray processes.
+This is head node
+CURRENT_IP=10.127.40.71
+INFO 10-02 11:53:02 [importing.py:17] Triton not installed or not compatible; certain GPU-related functions will not be available.
+WARNING 10-02 11:53:02 [importing.py:29] Triton is not installed. Using dummy decorators. Install it via `pip install triton` to enable kernel compilation.
+INFO 10-02 11:53:04 [__init__.py:39] Available plugins for group vllm.platform_plugins:
+INFO 10-02 11:53:04 [__init__.py:41] - ascend -> vllm_ascend:register
+INFO 10-02 11:53:04 [__init__.py:44] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 10-02 11:53:04 [__init__.py:235] Platform plugin ascend is activated
+/opt/pyvenv/lib/python3.10/site-packages/torch_npu/dynamo/torchair/__init__.py:8: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+WARNING 10-02 11:53:07 [_custom_ops.py:22] Failed to import from vllm._C with ModuleNotFoundError("No module named 'vllm._C'")
+curr_addr='10.127.40.71'
+Master
+[2025-10-02 11:53:14,809 W 331 331] global_state_accessor.cc:435: Retrying to get node with node ID bff7ded1f4a645f3b47f75d4155330e4e8e75c3e89bfdf52a398f915
+2025-10-02 11:53:11,560	INFO usage_lib.py:467 -- Usage stats collection is enabled by default without user confirmation because this terminal is detected to be non-interactive. To disable this, add `--disable-usage-stats` to the command that starts the cluster, or run the following command: `ray disable-usage-stats` before starting the cluster. See https://docs.ray.io/en/master/cluster/usage-stats.html for more details.
+2025-10-02 11:53:11,560	INFO scripts.py:971 -- Local node IP: 10.127.40.71
+2025-10-02 11:53:15,812	SUCC scripts.py:1007 -- --------------------
+2025-10-02 11:53:15,813	SUCC scripts.py:1008 -- Ray runtime started.
+2025-10-02 11:53:15,813	SUCC scripts.py:1009 -- --------------------
+2025-10-02 11:53:15,813	INFO scripts.py:1011 -- Next steps
+2025-10-02 11:53:15,813	INFO scripts.py:1014 -- To add another node to this Ray cluster, run
+2025-10-02 11:53:15,813	INFO scripts.py:1017 --   ray start --address='10.127.40.71:6666'
+2025-10-02 11:53:15,813	INFO scripts.py:1026 -- To connect to this Ray cluster:
+2025-10-02 11:53:15,813	INFO scripts.py:1028 -- import ray
+2025-10-02 11:53:15,813	INFO scripts.py:1029 -- ray.init()
+2025-10-02 11:53:15,813	INFO scripts.py:1041 -- To submit a Ray job using the Ray Jobs CLI:
+2025-10-02 11:53:15,813	INFO scripts.py:1042 --   RAY_ADDRESS='http://127.0.0.1:8265' ray job submit --working-dir . -- python my_script.py
+2025-10-02 11:53:15,813	INFO scripts.py:1051 -- See https://docs.ray.io/en/latest/cluster/running-applications/job-submission/index.html 
+2025-10-02 11:53:15,813	INFO scripts.py:1055 -- for more information on submitting Ray jobs to the Ray cluster.
+2025-10-02 11:53:15,813	INFO scripts.py:1060 -- To terminate the Ray runtime, run
+2025-10-02 11:53:15,813	INFO scripts.py:1061 --   ray stop
+2025-10-02 11:53:15,814	INFO scripts.py:1064 -- To view the status of the cluster, use
+2025-10-02 11:53:15,814	INFO scripts.py:1065 --   ray status
+2025-10-02 11:53:15,814	INFO scripts.py:1069 -- To monitor and debug Ray, view the dashboard at 
+2025-10-02 11:53:15,814	INFO scripts.py:1070 --   127.0.0.1:8265
+2025-10-02 11:53:15,814	INFO scripts.py:1077 -- If connection to the dashboard fails, check your firewall settings and network configuration.
+
+2025-10-02 11:53:16,632	INFO worker.py:1694 -- Connecting to existing Ray cluster at address: 10.127.40.71:6666...
+2025-10-02 11:53:16,642	INFO worker.py:1879 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Generating train split: 1791700 examples [00:02, 639052.43 examples/s]
+dataset len: 1791700
+Get master_addr from ray is 10.127.39.112
+(pid=874, ip=10.127.39.112) /opt/pyvenv/lib/python3.10/site-packages/torch_npu/dynamo/torchair/__init__.py:8: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+(pid=874, ip=10.127.39.112)   import pkg_resources
+Loading safetensors checkpoint shards:   0% Completed | 0/163 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards:   1% Completed | 1/163 [00:00<00:25,  6.24it/s]
+Loading safetensors checkpoint shards:   2% Completed | 3/163 [00:00<00:21,  7.56it/s]
+Loading safetensors checkpoint shards:   3% Completed | 5/163 [00:02<01:40,  1.57it/s]
+Loading safetensors checkpoint shards:   4% Completed | 7/163 [00:02<01:03,  2.45it/s]
+Loading safetensors checkpoint shards:   5% Completed | 8/163 [00:05<02:11,  1.17it/s]
+Loading safetensors checkpoint shards:   6% Completed | 9/163 [00:05<01:49,  1.41it/s]
+Loading safetensors checkpoint shards:   6% Completed | 10/163 [00:07<02:37,  1.03s/it]
+Loading safetensors checkpoint shards:   7% Completed | 11/163 [00:08<02:41,  1.06s/it]
+Loading safetensors checkpoint shards:   7% Completed | 12/163 [00:10<03:10,  1.26s/it]
+Loading safetensors checkpoint shards:   8% Completed | 13/163 [00:12<03:51,  1.54s/it]
+Loading safetensors checkpoint shards:  10% Completed | 16/163 [00:12<01:46,  1.38it/s]
+Loading safetensors checkpoint shards:  11% Completed | 18/163 [00:12<01:12,  2.01it/s]
+Loading safetensors checkpoint shards:  12% Completed | 20/163 [00:13<01:14,  1.91it/s]
+Loading safetensors checkpoint shards:  13% Completed | 21/163 [00:15<01:47,  1.32it/s]
+Loading safetensors checkpoint shards:  14% Completed | 23/163 [00:17<01:55,  1.22it/s]
+Loading safetensors checkpoint shards:  15% Completed | 25/163 [00:20<02:22,  1.03s/it]
+Loading safetensors checkpoint shards:  17% Completed | 27/163 [00:20<01:38,  1.38it/s]
+Loading safetensors checkpoint shards:  18% Completed | 29/163 [00:22<01:44,  1.28it/s]
+Loading safetensors checkpoint shards:  19% Completed | 31/163 [00:23<01:22,  1.60it/s]
+Loading safetensors checkpoint shards:  20% Completed | 33/163 [00:23<01:00,  2.16it/s]
+Loading safetensors checkpoint shards:  21% Completed | 34/163 [00:24<01:27,  1.47it/s]
+Loading safetensors checkpoint shards:  21% Completed | 35/163 [00:27<02:24,  1.13s/it]
+Loading safetensors checkpoint shards:  22% Completed | 36/163 [00:29<02:33,  1.21s/it]
+Loading safetensors checkpoint shards:  23% Completed | 38/163 [00:31<02:33,  1.23s/it]
+Loading safetensors checkpoint shards:  24% Completed | 39/163 [00:31<02:03,  1.00it/s]
+Loading safetensors checkpoint shards:  25% Completed | 40/163 [00:32<01:38,  1.25it/s]
+Loading safetensors checkpoint shards:  26% Completed | 42/163 [00:35<02:24,  1.19s/it]
+Loading safetensors checkpoint shards:  27% Completed | 44/163 [00:35<01:33,  1.28it/s]
+Loading safetensors checkpoint shards:  28% Completed | 45/163 [00:37<01:53,  1.04it/s]
+Loading safetensors checkpoint shards:  29% Completed | 47/163 [00:37<01:12,  1.59it/s]
+Loading safetensors checkpoint shards:  29% Completed | 48/163 [00:39<01:53,  1.01it/s]
+Loading safetensors checkpoint shards:  30% Completed | 49/163 [00:40<01:35,  1.20it/s]
+Loading safetensors checkpoint shards:  31% Completed | 50/163 [00:40<01:26,  1.31it/s]
+Loading safetensors checkpoint shards:  32% Completed | 52/163 [00:41<01:13,  1.50it/s]
+Loading safetensors checkpoint shards:  33% Completed | 54/163 [00:41<00:47,  2.27it/s]
+Loading safetensors checkpoint shards:  34% Completed | 56/163 [00:42<00:37,  2.89it/s]
+Loading safetensors checkpoint shards:  35% Completed | 57/163 [00:42<00:40,  2.62it/s]
+Loading safetensors checkpoint shards:  36% Completed | 59/163 [00:45<01:16,  1.35it/s]
+Loading safetensors checkpoint shards:  37% Completed | 60/163 [00:45<01:05,  1.56it/s]
+Loading safetensors checkpoint shards:  37% Completed | 61/163 [00:48<02:03,  1.21s/it]
+Loading safetensors checkpoint shards:  39% Completed | 63/163 [00:52<02:24,  1.44s/it]
+Loading safetensors checkpoint shards:  39% Completed | 64/163 [00:55<02:52,  1.74s/it]
+Loading safetensors checkpoint shards:  40% Completed | 65/163 [00:55<02:14,  1.37s/it]
+Loading safetensors checkpoint shards:  40% Completed | 66/163 [00:58<02:48,  1.74s/it]
+Loading safetensors checkpoint shards:  42% Completed | 68/163 [00:58<01:38,  1.04s/it]
+Loading safetensors checkpoint shards:  43% Completed | 70/163 [01:01<01:57,  1.26s/it]
+Loading safetensors checkpoint shards:  44% Completed | 72/163 [01:02<01:20,  1.13it/s]
+Loading safetensors checkpoint shards:  45% Completed | 73/163 [01:04<01:40,  1.12s/it]
+Loading safetensors checkpoint shards:  45% Completed | 74/163 [01:05<01:41,  1.14s/it]
+Loading safetensors checkpoint shards:  46% Completed | 75/163 [01:05<01:19,  1.11it/s]
+Loading safetensors checkpoint shards:  47% Completed | 76/163 [01:05<01:05,  1.32it/s]
+Loading safetensors checkpoint shards:  48% Completed | 78/163 [01:06<00:39,  2.15it/s]
+Loading safetensors checkpoint shards:  50% Completed | 81/163 [01:06<00:22,  3.69it/s]
+Loading safetensors checkpoint shards:  51% Completed | 83/163 [01:06<00:16,  4.84it/s]
+Loading safetensors checkpoint shards:  52% Completed | 85/163 [01:06<00:12,  6.12it/s]
+Loading safetensors checkpoint shards:  53% Completed | 87/163 [01:09<00:42,  1.81it/s]
+Loading safetensors checkpoint shards:  55% Completed | 89/163 [01:10<00:35,  2.07it/s]
+Loading safetensors checkpoint shards:  56% Completed | 91/163 [01:10<00:25,  2.80it/s]
+Loading safetensors checkpoint shards:  56% Completed | 92/163 [01:10<00:23,  3.02it/s]
+Loading safetensors checkpoint shards:  57% Completed | 93/163 [01:10<00:20,  3.38it/s]
+Loading safetensors checkpoint shards:  58% Completed | 94/163 [01:11<00:23,  2.91it/s]
+Loading safetensors checkpoint shards:  59% Completed | 96/163 [01:12<00:33,  2.00it/s]
+Loading safetensors checkpoint shards:  60% Completed | 98/163 [01:12<00:23,  2.72it/s]
+Loading safetensors checkpoint shards:  61% Completed | 99/163 [01:12<00:21,  2.98it/s]
+Loading safetensors checkpoint shards:  62% Completed | 101/163 [01:13<00:15,  3.97it/s]
+Loading safetensors checkpoint shards:  63% Completed | 103/163 [01:13<00:11,  5.14it/s]
+Loading safetensors checkpoint shards:  64% Completed | 104/163 [01:13<00:10,  5.55it/s]
+Loading safetensors checkpoint shards:  65% Completed | 106/163 [01:15<00:22,  2.55it/s]
+Loading safetensors checkpoint shards:  66% Completed | 107/163 [01:16<00:31,  1.75it/s]
+Loading safetensors checkpoint shards:  67% Completed | 109/163 [01:16<00:25,  2.12it/s]
+Loading safetensors checkpoint shards:  68% Completed | 111/163 [01:17<00:17,  3.01it/s]
+Loading safetensors checkpoint shards:  69% Completed | 113/163 [01:17<00:12,  4.11it/s]
+Loading safetensors checkpoint shards:  71% Completed | 115/163 [01:17<00:08,  5.49it/s]
+Loading safetensors checkpoint shards:  72% Completed | 117/163 [01:17<00:06,  6.76it/s]
+Loading safetensors checkpoint shards:  73% Completed | 119/163 [01:18<00:10,  4.31it/s]
+Loading safetensors checkpoint shards:  74% Completed | 121/163 [01:18<00:07,  5.66it/s]
+Loading safetensors checkpoint shards:  75% Completed | 123/163 [01:18<00:05,  6.92it/s]
+Loading safetensors checkpoint shards:  77% Completed | 125/163 [01:18<00:04,  8.29it/s]
+Loading safetensors checkpoint shards:  78% Completed | 127/163 [01:22<00:25,  1.41it/s]
+Loading safetensors checkpoint shards:  79% Completed | 129/163 [01:22<00:17,  1.94it/s]
+Loading safetensors checkpoint shards:  80% Completed | 131/163 [01:23<00:12,  2.64it/s]
+Loading safetensors checkpoint shards:  82% Completed | 133/163 [01:24<00:15,  1.92it/s]
+Loading safetensors checkpoint shards:  82% Completed | 134/163 [01:26<00:22,  1.30it/s]
+Loading safetensors checkpoint shards:  83% Completed | 135/163 [01:28<00:29,  1.06s/it]
+Loading safetensors checkpoint shards:  84% Completed | 137/163 [01:29<00:18,  1.43it/s]
+Loading safetensors checkpoint shards:  85% Completed | 139/163 [01:29<00:11,  2.05it/s]
+Loading safetensors checkpoint shards:  87% Completed | 141/163 [01:30<00:12,  1.73it/s]
+Loading safetensors checkpoint shards:  88% Completed | 143/163 [01:30<00:08,  2.40it/s]
+Loading safetensors checkpoint shards:  89% Completed | 145/163 [01:30<00:05,  3.26it/s]
+Loading safetensors checkpoint shards:  90% Completed | 147/163 [01:31<00:03,  4.23it/s]
+Loading safetensors checkpoint shards:  91% Completed | 149/163 [01:32<00:04,  3.37it/s]
+Loading safetensors checkpoint shards:  93% Completed | 151/163 [01:32<00:02,  4.43it/s]
+Loading safetensors checkpoint shards:  94% Completed | 153/163 [01:34<00:05,  1.83it/s]
+Loading safetensors checkpoint shards:  95% Completed | 155/163 [01:34<00:03,  2.50it/s]
+Loading safetensors checkpoint shards:  96% Completed | 157/163 [01:36<00:03,  1.85it/s]
+Loading safetensors checkpoint shards:  97% Completed | 158/163 [01:38<00:03,  1.39it/s]
+Loading safetensors checkpoint shards:  98% Completed | 159/163 [01:39<00:03,  1.20it/s]
+Loading safetensors checkpoint shards:  98% Completed | 160/163 [01:40<00:02,  1.17it/s]
+Loading safetensors checkpoint shards:  99% Completed | 161/163 [01:41<00:01,  1.13it/s]
+Loading safetensors checkpoint shards: 100% Completed | 163/163 [01:41<00:00,  1.81it/s]
+Loading safetensors checkpoint shards: 100% Completed | 163/163 [01:41<00:00,  1.61it/s]
+(Vllm_Worker pid=874, ip=10.127.39.112) 
+(Vllm_Worker pid=874, ip=10.127.39.112) [rank0]:[W1002 11:56:03.292602214 compiler_depend.ts:28] Warning: The oprator of MoeInitRouting will be removed from Pytorch and switch to AscendSpeed after 630. (function operator())
+(Vllm_Worker pid=874, ip=10.127.39.112) [rank0]:[W1002 11:56:06.946237408 compiler_depend.ts:26] Warning: Warning: kernel [ArgSort] can not support dtype int32 or int64 on AiCore, Now this kernel is running on AiCpu.If you are more concerned about high-performance execution,please cast dtype to float32. (function operator())
+Adding requests: 100%|██████████| 8/8 [00:00<00:00, 2275.34it/s]
+Processed prompts:   0%|          | 0/8 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]
+Adding requests:   0%|          | 0/8 [00:00<?, ?it/s]
+Adding requests: 100%|██████████| 8/8 [00:00<00:00, 1885.29it/s]
+Processed prompts:  12%|█▎        | 1/8 [00:24<02:48, 24.07s/it, est. speed input: 5.32 toks/s, output: 1.25 toks/s]
+Adding requests: 100%|██████████| 8/8 [00:00<00:00, 946.66it/s] [repeated 60x across cluster]
+Processed prompts:   0%|          | 0/8 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s] [repeated 63x across cluster]
+Adding requests:   0%|          | 0/8 [00:00<?, ?it/s] [repeated 2x across cluster]
+Adding requests: 100%|██████████| 8/8 [00:00<00:00, 1342.12it/s] [repeated 2x across cluster]
+Processed prompts:  12%|█▎        | 1/8 [01:15<08:48, 75.54s/it, est. speed input: 1.60 toks/s, output: 3.35 toks/s] [repeated 8x across cluster]
+Processed prompts:  12%|█▎        | 1/8 [01:21<09:28, 81.15s/it, est. speed input: 1.81 toks/s, output: 3.40 toks/s] [repeated 8x across cluster]
+Processed prompts:  25%|██▌       | 2/8 [02:09<07:12, 72.04s/it, est. speed input: 2.54 toks/s, output: 4.03 toks/s] [repeated 8x across cluster]
+Processed prompts:  12%|█▎        | 1/8 [02:32<17:50, 152.89s/it, est. speed input: 1.20 toks/s, output: 3.85 toks/s] [repeated 8x across cluster]
+Processed prompts:  12%|█▎        | 1/8 [02:59<20:54, 179.23s/it, est. speed input: 0.50 toks/s, output: 3.94 toks/s] [repeated 8x across cluster]
+Processed prompts:  25%|██▌       | 2/8 [03:15<08:49, 88.25s/it, est. speed input: 1.60 toks/s, output: 6.97 toks/s]  [repeated 8x across cluster]
+Processed prompts:  25%|██▌       | 2/8 [06:01<18:07, 181.18s/it, est. speed input: 0.66 toks/s, output: 6.07 toks/s] [repeated 24x across cluster]
+Processed prompts:  38%|███▊      | 3/8 [06:20<08:54, 106.97s/it, est. speed input: 1.02 toks/s, output: 9.90 toks/s] [repeated 8x across cluster]
+Processed prompts:  38%|███▊      | 3/8 [06:58<13:02, 156.60s/it, est. speed input: 1.17 toks/s, output: 6.65 toks/s] [repeated 8x across cluster]
+Processed prompts:  50%|█████     | 4/8 [07:56<06:51, 102.81s/it, est. speed input: 1.13 toks/s, output: 12.06 toks/s] [repeated 8x across cluster]
+Processed prompts:  25%|██▌       | 2/8 [08:34<26:50, 268.37s/it, est. speed input: 0.52 toks/s, output: 5.69 toks/s] [repeated 8x across cluster]
+Processed prompts:  12%|█▎        | 1/8 [09:33<1:06:55, 573.60s/it, est. speed input: 0.15 toks/s, output: 4.19 toks/s] [repeated 8x across cluster]
+Processed prompts:  38%|███▊      | 3/8 [10:26<22:09, 265.94s/it, est. speed input: 0.73 toks/s, output: 5.04 toks/s] [repeated 8x across cluster]
+Processed prompts:  38%|███▊      | 3/8 [11:37<14:48, 177.62s/it, est. speed input: 0.52 toks/s, output: 11.42 toks/s] [repeated 24x across cluster]
+Processed prompts:  25%|██▌       | 2/8 [14:49<50:59, 509.96s/it, est. speed input: 0.27 toks/s, output: 4.50 toks/s] [repeated 8x across cluster]
+Processed prompts: 100%|██████████| 8/8 [16:09<00:00, 121.22s/it, est. speed input: 1.06 toks/s, output: 26.85 toks/s]
+Processed prompts:  25%|██▌       | 2/8 [14:49<50:59, 509.94s/it, est. speed input: 0.27 toks/s, output: 4.50 toks/s] [repeated 7x across cluster]
+('Warning: torch.save with "_use_new_zipfile_serialization = False" is not recommended for npu tensor, which may bring unexpected errors and hopefully set "_use_new_zipfile_serialization = True"', 'if it is necessary to use this, please convert the npu tensor to cpu tensor for saving')
+(pid=16114) WARNING 10-02 11:53:32 [env_override.py:17] NCCL_CUMEM_ENABLE is set to 0, skipping override. This may increase memory overhead with cudagraph+allreduce: https://github.com/NVIDIA/nccl/issues/1234
+(pid=874, ip=10.127.39.112) WARNING 10-02 11:53:32 [importing.py:29] Triton is not installed. Using dummy decorators. Install it via `pip install triton` to enable kernel compilation.
+(pid=874, ip=10.127.39.112) WARNING 10-02 11:53:35 [_custom_ops.py:22] Failed to import from vllm._C with ModuleNotFoundError("No module named 'vllm._C'")
+(pid=882, ip=10.127.39.90) WARNING 10-02 11:53:34 [env_override.py:17] NCCL_CUMEM_ENABLE is set to 0, skipping override. This may increase memory overhead with cudagraph+allreduce: https://github.com/NVIDIA/nccl/issues/1234 [repeated 63x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#log-deduplication for more options.)
+(pid=882, ip=10.127.39.90) WARNING 10-02 11:53:34 [importing.py:29] Triton is not installed. Using dummy decorators. Install it via `pip install triton` to enable kernel compilation. [repeated 63x across cluster]
+(Vllm_Worker pid=876, ip=10.127.39.90) [VLLM] using world_size=64, TP=8, DP=8
+(pid=882, ip=10.127.39.90) WARNING 10-02 11:53:38 [_custom_ops.py:22] Failed to import from vllm._C with ModuleNotFoundError("No module named 'vllm._C'") [repeated 63x across cluster]
+(Vllm_Worker pid=876, ip=10.127.40.12) 构建LLM中
+(Vllm_Worker pid=874, ip=10.127.40.12) 构建LLM中
+(Vllm_Worker pid=877, ip=10.127.40.12) 构建LLM中
+(Vllm_Worker pid=878, ip=10.127.40.12) 构建LLM中
+(Vllm_Worker pid=875, ip=10.127.40.12) 构建LLM中
+(Vllm_Worker pid=880, ip=10.127.40.12) 构建LLM中
+(Vllm_Worker pid=881, ip=10.127.40.12) 构建LLM中
+(Vllm_Worker pid=879, ip=10.127.40.12) 构建LLM中
+(Vllm_Worker pid=875, ip=10.127.40.111) 构建LLM中
+(Vllm_Worker pid=874, ip=10.127.40.111) 构建LLM中
+(Vllm_Worker pid=880, ip=10.127.40.111) 构建LLM中
+(Vllm_Worker pid=877, ip=10.127.39.55) 构建LLM中
+(Vllm_Worker pid=876, ip=10.127.40.111) 构建LLM中
+(Vllm_Worker pid=881, ip=10.127.40.111) 构建LLM中
+(Vllm_Worker pid=878, ip=10.127.39.55) 构建LLM中
+(Vllm_Worker pid=882, ip=10.127.40.111) 构建LLM中
+(Vllm_Worker pid=875, ip=10.127.39.112) 构建LLM中
+(Vllm_Worker pid=875, ip=10.127.39.55) 构建LLM中
+(Vllm_Worker pid=879, ip=10.127.40.111) 构建LLM中
+(Vllm_Worker pid=879, ip=10.127.39.112) 构建LLM中
+(Vllm_Worker pid=880, ip=10.127.39.55) 构建LLM中
+(Vllm_Worker pid=877, ip=10.127.40.111) 构建LLM中
+(Vllm_Worker pid=874, ip=10.127.39.112) 构建LLM中
+(Vllm_Worker pid=882, ip=10.127.39.55) 构建LLM中
+(Vllm_Worker pid=880, ip=10.127.39.112) 构建LLM中
+(Vllm_Worker pid=881, ip=10.127.39.55) 构建LLM中
+(Vllm_Worker pid=877, ip=10.127.39.112) 构建LLM中
+(Vllm_Worker pid=876, ip=10.127.39.55) 构建LLM中
+(Vllm_Worker pid=876, ip=10.127.39.112) 构建LLM中
+(Vllm_Worker pid=879, ip=10.127.39.55) 构建LLM中
+(Vllm_Worker pid=881, ip=10.127.39.112) 构建LLM中
+(Vllm_Worker pid=878, ip=10.127.39.112) 构建LLM中
+(Vllm_Worker pid=876, ip=10.127.39.90) 构建LLM中
+(Vllm_Worker pid=875, ip=10.127.39.90) 构建LLM中
+(Vllm_Worker pid=877, ip=10.127.39.90) 构建LLM中
+(Vllm_Worker pid=880, ip=10.127.39.90) 构建LLM中
+(Vllm_Worker pid=878, ip=10.127.39.90) 构建LLM中
+(Vllm_Worker pid=881, ip=10.127.39.90) 构建LLM中
+(Vllm_Worker pid=879, ip=10.127.39.90) 构建LLM中
+(Vllm_Worker pid=882, ip=10.127.39.90) 构建LLM中
+(Vllm_Worker pid=875, ip=10.127.40.105) 构建LLM中
+(Vllm_Worker pid=879, ip=10.127.40.105) 构建LLM中
+(Vllm_Worker pid=882, ip=10.127.40.105) 构建LLM中
+(Vllm_Worker pid=877, ip=10.127.40.105) 构建LLM中
+(Vllm_Worker pid=881, ip=10.127.40.105) 构建LLM中
+(Vllm_Worker pid=878, ip=10.127.40.105) 构建LLM中
+(Vllm_Worker pid=876, ip=10.127.40.105) 构建LLM中
+(Vllm_Worker pid=880, ip=10.127.40.105) 构建LLM中
+(Vllm_Worker pid=875, ip=10.127.40.100) 构建LLM中
+(Vllm_Worker pid=16112) 构建LLM中
+(Vllm_Worker pid=16113) 构建LLM中
+(Vllm_Worker pid=878, ip=10.127.40.100) 构建LLM中
+(Vllm_Worker pid=16114) 构建LLM中
+(Vllm_Worker pid=879, ip=10.127.40.100) 构建LLM中
+(Vllm_Worker pid=16116) 构建LLM中
+(Vllm_Worker pid=876, ip=10.127.40.100) 构建LLM中
+(Vllm_Worker pid=880, ip=10.127.40.100) 构建LLM中
+(Vllm_Worker pid=16115) 构建LLM中
+(Vllm_Worker pid=882, ip=10.127.40.100) 构建LLM中
+(Vllm_Worker pid=16119) 构建LLM中
+(Vllm_Worker pid=881, ip=10.127.40.100) 构建LLM中
+(Vllm_Worker pid=16117) 构建LLM中
+(Vllm_Worker pid=877, ip=10.127.40.100) 构建LLM中
+(Vllm_Worker pid=16118) 构建LLM中
+(Vllm_Worker pid=880, ip=10.127.40.111) WARNING 10-02 11:53:52 [registry.py:401] Model architecture DeepSeekMTPModel is already registered, and will be overwritten by the new model class vllm_ascend.models.deepseek_mtp:CustomDeepSeekMTP.
+(Vllm_Worker pid=880, ip=10.127.40.111) WARNING 10-02 11:53:52 [registry.py:401] Model architecture Qwen2ForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen2:CustomQwen2ForCausalLM.
+(Vllm_Worker pid=880, ip=10.127.40.111) WARNING 10-02 11:53:52 [registry.py:401] Model architecture Qwen2VLForConditionalGeneration is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen2_vl:AscendQwen2VLForConditionalGeneration.
+(Vllm_Worker pid=880, ip=10.127.40.111) WARNING 10-02 11:53:52 [registry.py:401] Model architecture Qwen2_5_VLForConditionalGeneration is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen2_5_vl:AscendQwen2_5_VLForConditionalGeneration.
+(Vllm_Worker pid=880, ip=10.127.40.111) WARNING 10-02 11:53:52 [registry.py:401] Model architecture DeepseekV2ForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.deepseek_v2:CustomDeepseekV2ForCausalLM.
+(Vllm_Worker pid=880, ip=10.127.40.111) WARNING 10-02 11:53:52 [registry.py:401] Model architecture DeepseekV3ForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.deepseek_v2:CustomDeepseekV3ForCausalLM.
+(Vllm_Worker pid=880, ip=10.127.40.111) WARNING 10-02 11:53:52 [registry.py:401] Model architecture Qwen3MoeForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen3_moe:CustomQwen3MoeForCausalLM.
+(Vllm_Worker pid=880, ip=10.127.40.111) WARNING 10-02 11:53:52 [registry.py:401] Model architecture Qwen3ForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen3:CustomQwen3ForCausalLM.
+(Vllm_Worker pid=881, ip=10.127.40.111) WARNING 10-02 11:54:08 [arg_utils.py:1647] Detected VLLM_USE_V1=1 with npu. Usage should be considered experimental. Please report any issues on Github.
+(Vllm_Worker pid=878, ip=10.127.39.112) [VLLM] using world_size=64, TP=8, DP=8 [repeated 63x across cluster]
+(Vllm_Worker pid=876, ip=10.127.40.105) WARNING 10-02 11:53:52 [registry.py:401] Model architecture DeepSeekMTPModel is already registered, and will be overwritten by the new model class vllm_ascend.models.deepseek_mtp:CustomDeepSeekMTP. [repeated 63x across cluster]
+(Vllm_Worker pid=876, ip=10.127.40.105) WARNING 10-02 11:53:52 [registry.py:401] Model architecture Qwen3ForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen3:CustomQwen3ForCausalLM. [repeated 441x across cluster]
+(Vllm_Worker pid=877, ip=10.127.39.55) WARNING 10-02 11:54:10 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes not implemented in <vllm_ascend.worker.worker_v1.NPUWorker object at 0xffccc2dfde40>
+(Vllm_Worker pid=874, ip=10.127.39.112) ModelConfig(model='/data01/huawei-2025/weight/dsv3-base-hf-zy', task='generate', tokenizer='/data01/huawei-2025/weight/dsv3-base-hf-zy', tokenizer_mode='auto', trust_remote_code=True, dtype=torch.bfloat16, seed=0, hf_config_path=None, allowed_local_media_path='', revision=None, code_revision=None, rope_scaling={}, rope_theta=None, tokenizer_revision=None, max_model_len=6144, spec_target_max_model_len=None, quantization=None, enforce_eager=True, max_seq_len_to_capture=6144, max_logprobs=20, disable_sliding_window=False, disable_cascade_attn=False, skip_tokenizer_init=False, enable_prompt_embeds=False, served_model_name='/data01/huawei-2025/weight/dsv3-base-hf-zy', limit_mm_per_prompt={}, use_async_output_proc=True, config_format=<ConfigFormat.AUTO: 'auto'>, hf_token=None, hf_overrides={}, mm_processor_kwargs=None, disable_mm_preprocessor_cache=False, override_neuron_config={}, pooler_config=None, override_pooler_config=None, logits_processor_pattern=None, generation_config='auto', override_generation_config={}, enable_sleep_mode=True, model_impl='auto')
+(Vllm_Worker pid=874, ip=10.127.40.12) WARNING 10-02 11:54:11 [arg_utils.py:1647] Detected VLLM_USE_V1=1 with npu. Usage should be considered experimental. Please report any issues on Github. [repeated 63x across cluster]
+(Vllm_Worker pid=875, ip=10.127.39.55) WARNING 10-02 11:54:12 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes not implemented in <vllm_ascend.worker.worker_v1.NPUWorker object at 0xffcd793d9de0> [repeated 63x across cluster]
+(Vllm_Worker pid=875, ip=10.127.39.55) 构建LLM完毕
+(Vllm_Worker pid=882, ip=10.127.39.90) ModelConfig(model='/data01/huawei-2025/weight/dsv3-base-hf-zy', task='generate', tokenizer='/data01/huawei-2025/weight/dsv3-base-hf-zy', tokenizer_mode='auto', trust_remote_code=True, dtype=torch.bfloat16, seed=0, hf_config_path=None, allowed_local_media_path='', revision=None, code_revision=None, rope_scaling={}, rope_theta=None, tokenizer_revision=None, max_model_len=6144, spec_target_max_model_len=None, quantization=None, enforce_eager=True, max_seq_len_to_capture=6144, max_logprobs=20, disable_sliding_window=False, disable_cascade_attn=False, skip_tokenizer_init=False, enable_prompt_embeds=False, served_model_name='/data01/huawei-2025/weight/dsv3-base-hf-zy', limit_mm_per_prompt={}, use_async_output_proc=True, config_format=<ConfigFormat.AUTO: 'auto'>, hf_token=None, hf_overrides={}, mm_processor_kwargs=None, disable_mm_preprocessor_cache=False, override_neuron_config={}, pooler_config=None, override_pooler_config=None, logits_processor_pattern=None, generation_config='auto', override_generation_config={}, enable_sleep_mode=True, model_impl='auto') [repeated 63x across cluster]
+(Vllm_Worker pid=880, ip=10.127.39.55) 构建LLM完毕
+(Vllm_Worker pid=881, ip=10.127.39.55) 构建LLM完毕
+(Vllm_Worker pid=876, ip=10.127.39.55) 构建LLM完毕
+(Vllm_Worker pid=879, ip=10.127.39.55) 构建LLM完毕
+(Vllm_Worker pid=878, ip=10.127.39.55) 构建LLM完毕
+(Vllm_Worker pid=882, ip=10.127.39.55) 构建LLM完毕
+(Vllm_Worker pid=880, ip=10.127.39.112) 构建LLM完毕
+(Vllm_Worker pid=875, ip=10.127.40.100) 构建LLM完毕
+(Vllm_Worker pid=878, ip=10.127.40.100) 构建LLM完毕
+(Vllm_Worker pid=879, ip=10.127.40.100) 构建LLM完毕
+(Vllm_Worker pid=876, ip=10.127.40.100) 构建LLM完毕
+(Vllm_Worker pid=880, ip=10.127.40.100) 构建LLM完毕
+(Vllm_Worker pid=16113) 构建LLM完毕
+(Vllm_Worker pid=882, ip=10.127.40.100) 构建LLM完毕
+(Vllm_Worker pid=16114) 构建LLM完毕
+(Vllm_Worker pid=881, ip=10.127.40.100) 构建LLM完毕
+(Vllm_Worker pid=16116) 构建LLM完毕
+(Vllm_Worker pid=877, ip=10.127.40.100) 构建LLM完毕
+(Vllm_Worker pid=16115) 构建LLM完毕
+(Vllm_Worker pid=16117) 构建LLM完毕
+(Vllm_Worker pid=875, ip=10.127.40.105) 构建LLM完毕
+(Vllm_Worker pid=879, ip=10.127.40.105) 构建LLM完毕
+(Vllm_Worker pid=882, ip=10.127.40.105) 构建LLM完毕
+(Vllm_Worker pid=877, ip=10.127.40.105) 构建LLM完毕
+(Vllm_Worker pid=881, ip=10.127.40.105) 构建LLM完毕
+(Vllm_Worker pid=878, ip=10.127.40.105) 构建LLM完毕
+(Vllm_Worker pid=876, ip=10.127.40.105) 构建LLM完毕
+(Vllm_Worker pid=880, ip=10.127.40.105) 构建LLM完毕
+(Vllm_Worker pid=876, ip=10.127.39.90) 构建LLM完毕
+(Vllm_Worker pid=875, ip=10.127.39.90) 构建LLM完毕
+(Vllm_Worker pid=877, ip=10.127.39.90) 构建LLM完毕
+(Vllm_Worker pid=880, ip=10.127.39.90) 构建LLM完毕
+(Vllm_Worker pid=878, ip=10.127.39.90) 构建LLM完毕
+(Vllm_Worker pid=881, ip=10.127.39.90) 构建LLM完毕
+(Vllm_Worker pid=879, ip=10.127.39.90) 构建LLM完毕
+(Vllm_Worker pid=882, ip=10.127.39.90) 构建LLM完毕
+(Vllm_Worker pid=876, ip=10.127.40.12) 构建LLM完毕
+(Vllm_Worker pid=874, ip=10.127.40.12) 构建LLM完毕
+(Vllm_Worker pid=877, ip=10.127.40.12) 构建LLM完毕
+(Vllm_Worker pid=878, ip=10.127.40.12) 构建LLM完毕
+(Vllm_Worker pid=880, ip=10.127.40.12) 构建LLM完毕
+(Vllm_Worker pid=881, ip=10.127.40.12) 构建LLM完毕
+(Vllm_Worker pid=879, ip=10.127.40.12) 构建LLM完毕
+(Vllm_Worker pid=877, ip=10.127.39.55) 构建LLM完毕
+(Vllm_Worker pid=875, ip=10.127.39.112) 构建LLM完毕
+(Vllm_Worker pid=879, ip=10.127.39.112) 构建LLM完毕
+(Vllm_Worker pid=874, ip=10.127.39.112) 构建LLM完毕
+(Vllm_Worker pid=877, ip=10.127.39.112) 构建LLM完毕
+(Vllm_Worker pid=876, ip=10.127.39.112) 构建LLM完毕
+(Vllm_Worker pid=881, ip=10.127.39.112) 构建LLM完毕
+(Vllm_Worker pid=878, ip=10.127.39.112) 构建LLM完毕
+(Vllm_Worker pid=875, ip=10.127.40.111) 构建LLM完毕
+(Vllm_Worker pid=874, ip=10.127.40.111) 构建LLM完毕
+(Vllm_Worker pid=880, ip=10.127.40.111) 构建LLM完毕
+(Vllm_Worker pid=876, ip=10.127.40.111) 构建LLM完毕
+(Vllm_Worker pid=881, ip=10.127.40.111) 构建LLM完毕
+(Vllm_Worker pid=882, ip=10.127.40.111) 构建LLM完毕
+(Vllm_Worker pid=877, ip=10.127.40.111) 构建LLM完毕
+(Vllm_Worker pid=16112) 构建LLM完毕
+(Vllm_Worker pid=16119) 构建LLM完毕
+(Vllm_Worker pid=16118) 构建LLM完毕
+(Vllm_Worker pid=875, ip=10.127.40.12) 构建LLM完毕
+(Vllm_Worker pid=879, ip=10.127.40.111) 构建LLM完毕
+(Vllm_Worker pid=875, ip=10.127.39.112) Rollout
+===>Output===>
+Ixponent/base.go
+
+// see LICENSE.ingen.net.license
+
+package math
+
+import (
+
+"github.com/architectv/networking-online-cyberhackathon/go-hackathon/pkg/ingen/engine"
+
+"github.com/architectv/networking-online-cyberhackathon/go-hackathon/pkg/lena/engine/util"
+
+)
+
+// hard-coded constants which won't change often (if ever)
+
+const (
+
+EXPONENT_REGISTER_SIZE = util.EXPONENT_BITS + 1
+
+)
+
+// function to calculate exponent bases
+
+func CalculateExponentBase(ctx engine.Context) {
+
+// get the size of the exponent register
+
+regSize := EXPONENT_REGISTER_SIZE
+
+// calculate the exponent base
+
+base := util.ToPowerOf(2, regSize)
+
+// send the exponent base as output
+
+ctx.SendOutputValue(0, base)
+
+}
+
+// function to calculate exponent magnitude
+
+func CalculateMagnitude(ctx engine.Context) {
+
+// get the size of the exponent register
+
+regSize := EXPONENT_REGISTER_SIZE
+
+// get the exponent value
+
+val := ctx.GetInputValue(0)
+
+// shift the value to the right by regSize magnitude
+
+val = val >> regSize
+
+// send the shifted value as output
+
+ctx.SendOutputValue(0, val)
+
+}
+
+// function to calculate exponent offset
+
+func CalculateOffset(ctx engine.Context) {
+
+// get the size of the exponent register
+
+regSize := EXPONENT_REGISTER_SIZE
+
+// get the exponent value
+
+val := ctx.GetInputValue(0)
+
+// subtract 1 from the shifted value
+
+val--
+
+// send the shifted value as output
+
+ctx.SendOutputValue(0, val)
+
+}
+
+// function to calculate exponent remainder
+
+func CalculateRemainder(ctx engine.Context) {
+
+// get the size of the exponent register
+
+regSize := EXPONENT_REGISTER_SIZE
+
+// get the exponent value
+
+val := ctx.GetInputValue(0)
+
+// calculate the remainder
+
+remainder := val % util.ToPowerOf(2, regSize)
+
+// send the remainder as output
+
+ctx.SendOutputValue(0, remainder)
+
+}
+
+// function to calculate exponent upper bound
+
+func CalculateUpperBound(ctx engine.Context) {
+
+// get the size of the exponent register
+
+regSize := EXPONENT_REGISTER_SIZE
+
+// get the exponent value
+
+val := ctx.GetInputValue(0)
+
+// calculate the upper bound
+
+bound := util.PowerOf(2, regSize - 1) - 1
+
+// send the upper bound as output
+
+ctx.SendOutputValue(0, bound)
+
+}
+
+// function to calculate exponent lower bound
+
+func CalculateLowerBound(ctx engine.Context) {
+
+// get the size of the exponent register
+
+regSize := EXPONENT_REGISTER_SIZE
+
+// get the exponent value
+
+val := ctx.GetInputValue(0)
+
+// calculate the lower bound
+
+bound := -util.PowerOf(2, regSize - 1)
+
+// send the lower bound as output
+
+ctx.SendOutputValue(0, bound)
+
+}
+
+// function to calculate the mantissa size
+
+func CalculateMantissaSize(ctx engine.Context) {
+
+// get the size of the exponent register
+
+regSize := EXPONENT_REGISTER_SIZE
+
+// calculate the mantissa size
+
+mantissa := 2*regSize - EXPONENT_BITS
+
+// send the mantissa size as output
+
+ctx.SendOutputValue(0, mantissa)
+
+}
+
+func main() {
+
+// create a context object
+
+ctx := engine.NewContext()
+
+// call the calculate exponent base function
+
+CalculateExponentBase(ctx)
+
+// call the calculate magnitude function
+
+CalculateMagnitude(ctx)
+
+// call the calculate offset function
+
+CalculateOffset(ctx)
+
+// call the calculate remainder function
+
+CalculateRemainder(ctx)
+
+// call the calculate upper bound function
+
+CalculateUpperBound(ctx)
+
+// call the calculate lower bound function
+
+CalculateLowerBound(ctx)
+
+// call the calculate mantissa size function
+
+CalculateMantissaSize(ctx)
+
+}
+
+Acknowledgments: The authors are listed in alphabetical order. We thank the IDExpo Workshop organizers, especially Prof. Paul Korkucz for running the exhibition and providing feedback on this article.γtionary can be used mechanically, without the need for any manual coding. Understanding these codes is made easier by knowing that 1i (following the “fl1”) is the square root of negative 1, and it is included in the definition of “Absolute”.
+
+Code Example 1: Using Mathematica to determine the sign of Negative Numbers in a Sequence
+
+The Basic Code for this article has been written and tested in Mathematica. Other (commercially available) codes rely on the outputs of extremely high-level systems, such as [email protected], which employ the kind of advanced techniques that students are unlikely to encounter outside of classroom problems. To write the codes for complex expansions, such as (1), in a language suitable for ordinary language systems encountered by Montessori students [2], we treat Mathematica functions symbolically, rather than numerically [3].
+
+Note: This section is
+
+Prompt:Give me the ordered steps to bake a cake, pleaseanswer by writing the steps in cooking-instruction as a json-formatted. don't include anything else.
+
+{
+
+"steps": [
+
+"Preheat oven to 350 degrees F (175 degrees C).",
+
+"Grease and flour one 9x13 inch pan.",
+
+"Combine the cake mix, eggs, oil and water in a large bowl.",
+
+"Beat with an electric mixer on low speed for 30 seconds.",
+
+"Increase speed to medium and beat for 2 minutes.",
+
+"Spread batter in the prepared pan.",
+
+"Bake in the preheated oven for 30 minutes, or until a toothpick inserted into the center of the cake comes out clean.",
+
+"Allow to cool." Sure, I'd be happy to provide a step-by-step feature on how to bake a cake. Here it is:
+
+Step 1: Gather your ingredients. To bake a cake, you will need all-purpose flour, baking powder, baking soda, salt, sugar, butter, eggs, vanilla extract, and milk.
+
+Step 2: Prepare the cake pan. Preheat your oven to 350°F (175°C) and grease a 9x13 inch baking pan with butter or cooking spray.
+
+Step 3: Combine the dry ingredients. In a medium bowl, whisk together the flour, baking powder, baking soda, salt, and sugar.
+
+Step 4: Combine the wet ingredients. In a separate bowl, beat the butter and sugar together until light and fluffy. Add in the eggs and vanilla extract and beat until combined.
+
+Step 5: Add the dry ingredients to the wet ingredients. Slowly add the dry ingredients to the wet ingredients and beat until combined.
+
+Step 6: Add in the milk. Pour in the milk and beat until the batter is smooth.
+
+Step 7: Pour the batter into the prepared cake pan. Make sure the batter is evenly spread out.
+
+Step 8: Bake the cake. Place the cake in the preheated oven and bake for 25-30 minutes, or until a toothpick inserted into the center comes out clean.
+
+Step 9: Cool the cake. Once
+
+Project
+
+Universe In A Bottle
+
+Code Take Home Quiz 0
+
+Given the diagram and equations ust above, write a computer program that will calculate the path of b the water trayeled inside the bottle and the center of mass of the bottle The path trajectory should br plotted asdes fe the uses of the center of mass The steps for writing your program are as follow
+
+1 1) Write an expression that will calculate the center of mass in terms of system variables
+
+2 2) Write a computer program in MATLAB that will calculate the path of the water as it is poured out of
+
+3) Write a computer program in MATLAB that will calculate the position of the center of mass Use the general equation given by Frwpa' Use the equations given above and omit ml from your calcuations
+
+4) Plot the path of the water and the center of mass for 5, 10, 15, 20, 25, 30, 35 and 40 metersof pour
+
+5)
+
+Queston 1
+
+Unityide, Notcore.txt, Mid Core@3 : A Unity
+
+Search
+
+[https://d3gps&tudio.com) Debuggers ●UnityHandle Debugger
+
+///
+
+</<B>The Computation of the Offset</B> ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+{/ / // // // / // // / // // // // // // / // /
+
+The height of the bottle is the same. The pressure inside the bottle
+
+is splitted into two factors. The first one is the pressure at the center
+
+of the bottle plus the pressure at the spout. The second one is the
+
+relative pressure that is the same for all points of the bottle. / / / / / / / / / / / / / / / // / / / /// ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+{float Pmax = Patm + pghmid;}( / / / / / // // / //////// / ///// ///// // / ////
+
+************************************************************************* ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//(X,Y) is the coordinate of the spout in the tank coordinates systemany / // /// // // // // / /// /// // /// // // // // // ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// ////////////////////////////////////////////////////////////////////////////////////////////////////////// // ////////////////////////////////////////////////////////////////////////////////////////////////////////// // // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// // //// ## ////////////////////////////////////////////////////////////////////////////////////////////////////////// // ///// // /// // ////// // ////// // // // / // ////////////////////////////////////////////////////////////////////////////////////////////////////////// // ////// // // // ///// / / // // // / ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//float X = 9;
+
+//float Y = 4; / / ////////////////////////////////////////////////////////////////////////////////////////////////////////// // // // / // //// / // // / / / // / / // / / // / / // / / // / / ///// // / / / // / / / // / / // / / / // / / // / / ///// / // // / / /// / // // / / / // / / /// /// // / / // / //// / ////////////////////////////////////////////////////////////////////////////////////////////////////////// // // /// // // ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//float pbo = 10.0;{/ / / ////////////////////////////////////////////////////////////////////////////////////////////////////////// / // / / // // // / // // ///////////////////////////The mass of the bottle is [pbo * dbo] * pbo in pounds.///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//float rbo = 200;{ / / // / //////////////////////////////////////////////////////////////////////////////////////////////////////// The relative position of the spout relative to the bottle in radians. ///////////////////////////////////////////////////////// ////////////////////////////////////////////////////////////////////// // //////// ///////////////////////////////////////////////// // // ////////////// ////////////////////////////////// // // /// // //////////////////////////////////////////////////////////////////////////////////////////////////////// / //////////////////////////////////////////////////////////////////////////////////////////////////////// // ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//float dbo = dbo * pbo; / / ////////// / //////////////////////////////////////////////////////////////////////////////////////////////////////// / / / //// ///// / // // // /// /////////////////////////////////////////////////////////////////////////////////////////////// --
+
+( / ///////////////////////// result[0] = (-rbo/100)*(+(+rbo*Pmax/(100*sqrt(pbo)*sqrt(dbo))));
+
+(-rbo/100)*(+rbo*Pmax/(100*sqrt(pbo)*sqrt(dbo))); }
+
+[-0.0099976293546726686108799821720,1.0000222391505030416966248436768,0.0099976293546726686108799821720] Allez-y !
+
+Vous avez £8.00 pour passer le test mais vous n’avez pas vraiment besoin de les dépenser! Vous pouvez le faire gratuitement ou vous pouvez l'avoir pour seulement $29.99 ou pour seulement $19.99 ou pour juste $14.99 ou pour seulement $9.99 ou pour seulement $4.99 ou pour juste $0.99 et vous pouvez payer le prix que vous voulez!
+
+Vous pouvez choisir le prix que vous voulez payer pour avoir le test gratuit! Vous pouvez le faire pour gratuit ou vous pouvez le faire pour seulement $29.99 ou pour seulement $19.99 ou pour juste $14.99 ou pour juste $9.99 ou pour justlyzauswer$4.99 ou pour seulement $0.99 et vous pouvez payer le prix que vous voulez!
+
+Vous pouvez le faire pour gratuit! Pour $29.99 ou pour juste $19.99 ou pour juste $14.99 ou pour justlyzauswer$9.99 ou pour juste $4.99 ou pour juste $0.99 et vous pouvez payer le prix que vous voulez!
+
+Vous pouvez le faire pour juste $19.99 Pour $14.99 ou pour juste $9.99 ou pour juste $4.99 ou pour juste $0.99 et vous pouvez payer le prix que vous voulez!
+
+Vous pouvez le faire pour juste $14.99 Pour $9.99 ou pour juste $4.99 ou pour juste $0.99 et vous pouvez payer le prix que vous voulez!
+
+Vous pouvez le faire pour juste $9.99 Pour $4.99 ou pour juste $0.99 et vous pouvez payer le prix que vous voulez!
+
+Vous pouvez le faire pour juste $4.99 Pour $0.99 et vous pouvez payer le prix que vous voulez!
+
+Vous pouvez le faire pour juste $0.99 Et vous pouvez payer le prix que vous voulez!
+
+Vous pouvez le faire pour $29.99 Pour $19.99 ou pour juste $14.99 ou pour juste $9.99 ou pour juste $4.99 ou pour juste $0.99 et vous pouvez payer le prix que vous
+
+Quiz System
+
+Message
+
+model
+
+view has failed to compilemodel
+
+model has failed to compilemodel
+
+model has failed to compilemodel
+
+{
+
+"conceptSingleRelation": null,
+
+"then": {
+
+"type": null,
+
+"contentOrClassName":"UnitConverter",
+
+# of failures for this message
+
+Messages:
+
+"conceptSingleRelation": null,
+
+"then": {
+
+"type": null,
+
+"contentOrClassName":"UnitConverter",
+
+{
+
+"conceptSingleRelation": null,
+
+"then": {
+
+"type": null,
+
+"contentOrClassName":"UnitConverter",
+
+"then": {
+
+"type": null,
+
+"contentOrClassName":"UnitConverter",
+
+{
+
+"conceptSingleRelation": null,
+
+"then": {
+
+"type": null,
+
+"contentOrClassName":"UnitConverter",
+
+...
+
+},
+
+"description": null,
+
+}
+
+Database conception:
+
+Quiz System uses Python OOPS programming language for storing and manipulating multiple-dimensional data.
+
+In my system, data type class .hdg is an extension of the class DataType. It stores multiple objects of other classes, which are called 'headings'.
+
+Each of the data type object is contained by one or have multiple instances:
+
+It is followed by three numbers showing the total number of headings:
+
+Output: It is an instance of class .hdg object.
+
+Applicant:TestQuiz Id:
+
+Applicant:TestQuiz Name:
+
+Applicant:Modul e
+
+Applicant:Modul
+
+Applicant:TestQuiz Name:
+
+Applicant:TestQuiz
+
+Applicant:Modul
+
+Applicant:TestQuiz Name:
+
+Applicant:
+
+Applicant:Id
+
+Applicant:TestQuiz Id:0
+
+Applicant:TestQuiz Name:0
+
+Applicant:1. Matter
+
+Applicant:D2-036
+
+Applicant:2. Matter's Odyssey
+
+Applicant:ExamName:D2-
+
+Applicant:TestQuizScore:53
+
+Applicant:TestQuizId:0
+
+Applicant:TestQuiz
+
+:)Project
+
+::::: Code Flutter
+
+Quiz System
+
+Basic Quiz System
+
+Date: April 21, 2022
+
+Make 4 digit question
+
+Name Question 4224 Quiz System
+
+Place Place Place Place Place
+
+WestWestWestWest WestWestWest West
+
+D D D D D
+
+23 5050 50 23 Answered Question Question for unit Converted Answer, then check correct answers
+
+and display corrections
+
+on the screen
+
+Evaluate (max 4 digit)
+
+Check whether correctly Answered
+
+Answered Question Question for unit Converted Answer, then check correct answers
+
+and display corrections
+
+on the screen
+
+Evaluate (max 4 digit)
+
+Check whether correctly Answered
+
+Answered Question Question for unit Converted Answer, then check correct answers
+
+and display corrections
+
+on the screen
+
+Check whether correctly answered
+
+Display corrections if incorrect
+
+Display remarks Please take help of aptitude test resource
+
+Test Total Correct Answer : 12
+
+TEST I
+
+1. Winmark
+
+Whenture formula
+
+Find Nominator:
+
+1/2 + 1/6 + 1/3
+
++ 1/4 = ?
+
+4/10 + 1/8 - 3.75 + 1.3/6 - 4.85 - 3.7/9.84 + 1.8 = ?
+
+- 1.15 = ?
+
+nue =
+
+=
+
+4. Solve the unique Nomunator in the question
+
+16. good facility
+
+Aave accommodation = =
+
+N/A Old Mark = =
+
+N/A Coming wednesed: =
+
+?
+
+3. fully equipped
+
+funky dormitory = '
+
+N/A Wardrobe =
+
+-N/A Laundry = =
+
+N/A Storage :
+
+?
+
+N/A Kitchen, large (for a few years )
+
+N/A Select Tool = =
+
+- Situation =
+
+?
+
+N/A Remove 1, -
+
+N/A Adjust 4-5 clothes
+
+?
+
+N/A Select Right Uniform =
+
+-N/A Spontity bonus =.07
+
+=2981
+
+N/A Realcy bonus =.45
+
+=3071
+
+N/A
+
+<Hero> Caculate the total number of households
+
+totCalc = hM3+ ( avggrade + (nHouslots *3)) - (menoHours - (topBurden + botBurden) ) - ((N/A * extraBurden - baricAlort +extraAlort) - (changeBurden*aOffC) )
+
+totCalc = 1+(.030+ ((79983) *.03) - (4-2 - (1+ 1 )) - ((0*.25) - (.073 + .073)) - ((0-1) *(0-1)))
+
+totCalc = 15
+
+totCalc = 123.742461
+
+tot Calc = 124.826637
+
+.
+
+<Hero> Reword So it is easier to use as game rule.
+
+<Hero> examples ÃƒÆ’Ã‹â€ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€¹Å“:N NN:TopRay (Par)4
+
+Total:167
+
+Flock:2
+
+2.4.0
+
+2.4.81.8
+
+<Hero> examples ÃƒÆ’Ã‹â€ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€¹Å“:N NN:TopRay (Par)E` Total 141 Terning Ã£ SKI: 168.3 Core A not aspired by dee; A umbrelles by dragon; s by Gorilla; I dive iespecially toward B and C however one can`t but missed - by how many adventimes A Bu cost 0 4 ots late
+
+reward-parent 41
+
+And how fammenced bonus I ever A integrated from to get 2nd adv Exer soreler:
+
+. nat/extintion B A`
+
+Bonus Prevap bounty [1] On first per*ergistic screnning B without quite comprenage** En): (2 times) B + (2e ≤ s = 0 be cumulative) (4 tmes):(a) aschalips id forcps:"3,Gaur" sings.uaddervise.-5
+
+Trends Truths
+
+<Hero> multi
+<===END, 生成结束原因: length
+=== Step 0 ===
+MEAN TPS:  28.2942 tokens/s
+MEAN 耗时:  970.01 s
+E2E TPS:  1809.5998 tokens/s
+E2E 最大耗时:  970.65 s
+平均单实例 E2E TPS:  1809.5998 tokens/s
+Processed prompts: 100%|██████████| 8/8 [16:09<00:00, 121.24s/it, est. speed input: 0.93 toks/s, output: 29.33 toks/s] [repeated 63x across cluster]
+(Vllm_Worker pid=16118) Rollout [repeated 63x across cluster]
+[root@pm-d12e0124 privAcc]# 
+
+[END] 2025/10/2 12:59:51
