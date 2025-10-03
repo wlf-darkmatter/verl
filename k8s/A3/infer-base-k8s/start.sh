@@ -1,6 +1,6 @@
-export HCCL_SOCKET_IFNAME=ens45 # modify according to actual situation
-export TP_SOCKET_IFNAME=ens45   # modify according to actual situation
-export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
+export HCCL_SOCKET_IFNAME=bond1 # modify according to actual situation
+export TP_SOCKET_IFNAME=bond1   # modify according to actual situation
+export GLOO_SOCKET_IFNAME=bond1 # modify according to actual situation
 # export HYDRA_FULL_ERROR=1
 export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
@@ -30,8 +30,8 @@ unset LOCAL_WORLD_SIZE
 # unset WORLD_SIZE
 unset LOCAL_RANK
 
-export NPU_PER_NODE=8  # A2 NPU Number
-export NNODES=8         # example is 4 Nodes
+export NPU_PER_NODE=16  # A2 NPU Number
+export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
 export ASCEND_PROCESS_LOG_PATH=/opt/verl/logs/$MINDX_TASK_ID/plog # modify according to actual situation
@@ -59,16 +59,15 @@ else
 fi
 
 #! ------------------------------------------------------------
-TRAIN_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k.parquet"
-# MODEL_PATH="/data01/huawei-2025/weight/dpsk-v3-671B-BF16-dist_ckpt"
-MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf"
+TRAIN_FILE="/mnt/hpfs_test/data/data/dapo-math-17k.parquet"
+MODEL_PATH="/mnt/hpfs_test/weights/dsv3-base-fp8-zy-bf16"
 
 n_resp_per_prompt=4
-train_prompt_bsz=16
 
 gen_tp=8
 gen_dp=8
 
+train_prompt_bsz=$((16 * WORLD_SIZE / (gen_tp * gen_dp)))
 
 rm -f /opt/vllm/vllm/model_executor/model_loader/base_loader.py
 cp -f /home/new_verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/model_loader/base_loader.py

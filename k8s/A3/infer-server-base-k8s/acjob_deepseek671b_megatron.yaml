@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek671-verl-moe-infer-base  #sp-64-train-3b-moe-msrun #需要修改
+  name: deepseek671-verl-moe-infer-server-base  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -39,7 +39,7 @@ spec:
               command: ["/bin/bash", "-c"]
 
               args:
-                - "bash /home/new_verl/k8s/A3/infer-base-k8s/start.sh ;sleep 7d"
+                - "bash /home/new_verl/k8s/A3/infer-server-base-k8s/start.sh ;sleep 7d"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
@@ -110,7 +110,7 @@ spec:
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "bash /home/new_verl/k8s/A3/infer-base-k8s/start.sh ;sleep 7d"
+                - "bash /home/new_verl/k8s/A3/infer-server-base-k8s/start.sh ;sleep 7d"
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify
