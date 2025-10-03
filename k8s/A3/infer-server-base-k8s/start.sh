@@ -68,7 +68,7 @@ if [ "$RANK" = "0" ]; then
   echo "This is head node"
   echo "CURRENT_IP=$CURRENT_IP"
 
-  ray start --head --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
+  ray start --head --ray-debugger-external --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 
   while [[ $cnt -lt 10 ]]; do
     ray_status_output=$(ray status)
