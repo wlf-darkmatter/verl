@@ -5,6 +5,9 @@ export GLOO_SOCKET_IFNAME=bond1 # modify according to actual situation
 export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
 export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
+export VLLM_SLEEP_LEVEL=1
+export VERL_DEBUG_NOSHARDING=0
+
 export ASCEND_GLOBAL_LOG_LEVEL=3
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
@@ -15,9 +18,6 @@ export HCCL_EXEC_TIMEOUT=86400
 export HCCL_EVENT_TIMEOUT=86400
 export ACL_DEVICE_SYNC_TIMEOUT=86400
 export HCCL_ASYNC_ERROR_HANDLING=0
-export P2P_HCCL_BUFFSIZE=20
-export HCCL_BUFFSIZE=300
-export VLLM_ASCEND_ENABLE_MOE_ALL2ALL_SEQ=1
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
@@ -35,9 +35,6 @@ cp -f /home/new_verl/k8s/patch/vllm_ascend/ops/fused_moe.py /opt/vllm-ascend/vll
 
 
 #######################################
-
-mkdir -p /data01/huawei-2025/wlf/watch
-bash /data01/huawei-2025/wlf/verl/k8s/script/watch_stats.sh > /data01/huawei-2025/wlf/watch/rank${RANK}_${CURRENT_IP}.log &
 
 source /usr/local/Ascend/ascend-toolkit/set_env.sh;
 source /usr/local/Ascend/nnal/atb/set_env.sh;

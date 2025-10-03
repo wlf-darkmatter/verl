@@ -10,7 +10,7 @@ set -xeuo pipefail
 #huggingface-cli download deepseek-ai/DeepSeek-V3-0324 configuration_deepseek.py config.json
 
 project_name='DAPO'
-exp_name='DAPO-DeepSeek-671b-megatron-64NNODES--base'
+exp_name='DAPO-DeepSeek-671b-megatron-INSTRUCT-64NNODES'
 
 adv_estimator=grpo
 
@@ -23,10 +23,10 @@ clip_ratio_low=0.2
 clip_ratio_high=0.28
 
 max_prompt_length=$((1024 * 2))
-max_response_length=$((1024 * 4))
+max_response_length=$((1024 * 24))
 enable_overlong_buffer=True
 overlong_buffer_len=$((1024 * 1))
-overlong_penalty_factor=0.1
+overlong_penalty_factor=0.3
 
 loss_agg_mode="token-mean"
 
@@ -35,18 +35,18 @@ n_resp_per_prompt=16
 train_prompt_mini_bsz=32  # mini_bsz * n >= micro_bsz * pp * dp
 
 #NNODES=${NNODES:-1}
-NNODES=64
+NNODES=32
 
 # 1. download the dist_ckpt format model from https://huggingface.co/BearBiscuit05/dpsk-v3-671B-BF16-dist_ckpt/tree/main
 # change the MODEL_PATH and MCORE_MODEL_PATH to your own path
 # Paths
-MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf"
-MCORE_MODEL_PATH="/data01/huawei-2025/weight/dsv3_bf16_mcore_full_base"
+MODEL_PATH="/mnt/hpfs_test/weights/dsv3-bf16"
+MCORE_MODEL_PATH="/data01/huawei-2025/weight/dsv3_fp16_mcore_full_new"
 RAY_DATA_HOME="/opt"
-CKPTS_DIR=/data01/huawei-2025/weight/ckpt-DAPO-DeepSeek-671b-megatron-base-2k4k-val
+CKPTS_DIR=/mnt/hpfs_test/ckpt/ckpt-DAPO-DeepSeek-671b-megatron-2k24k
 
-TRAIN_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k.parquet"
-TEST_FILE="/data01/huawei-2025/rl_data/aime-2024/aime-2024.parquet"
+TRAIN_FILE="/mnt/hpfs_test/data/data/dapo-math-17k.parquet"
+TEST_FILE="/mnt/hpfs_test/data/data/dapo-math-17k.parquet"
 
 #TEST_FILE="['$aime24_test_path']"
 
@@ -54,13 +54,12 @@ TEST_FILE="/data01/huawei-2025/rl_data/aime-2024/aime-2024.parquet"
 temperature=1.0
 top_p=1.0
 top_k=-1 # 0 for HF rollout, -1 for vLLM rollout
-val_top_p=1.0
+val_top_p=0.7
 
 # Performance Related Parameter
 use_dynamic_bsz=True
-sp=2
-actor_ppo_max_token_len=$(((max_prompt_length + max_response_length)/sp))
-infer_ppo_max_token_len=$(((max_prompt_length + max_response_length)/sp))
+actor_ppo_max_token_len=$(((max_prompt_length + max_response_length)/2))
+infer_ppo_max_token_len=$(((max_prompt_length + max_response_length)/2))
 
 max_num_batched_tokens=$((6*1024))
 
@@ -74,6 +73,8 @@ train_pp=8
 enable_filter_group=False
 ETP=1
 
+load_weight=False
+
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 cd /opt/verl
 ray job submit --runtime-env="${RUNTIME_ENV}" \
@@ -82,7 +83,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     --config-name="dapo_megatron_trainer" \
     actor_rollout_ref.rollout.load_format=safetensors \
     actor_rollout_ref.rollout.skip.enable=False \
-    actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/wlf/rollout_dump-base" \
+    actor_rollout_ref.rollout.skip.dump_dir="/mnt/hpfs_test/wlf/rollout_dump" \
     actor_rollout_ref.rollout.skip.dump_step=500 \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
@@ -105,7 +106,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.model.path="${MODEL_PATH}" \
-    actor_rollout_ref.actor.optim.lr=3e-6 \
+    actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.actor.optim.lr_warmup_steps=5 \
     actor_rollout_ref.actor.optim.weight_decay=0.1 \
     actor_rollout_ref.actor.ppo_mini_batch_size=${train_prompt_mini_bsz} \
@@ -159,13 +160,13 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +reward_model.reward_kwargs.overlong_buffer_cfg.log=False \
     +reward_model.reward_kwargs.max_resp_len=${max_response_length} \
     trainer.logger='["console"]' \
-    actor_rollout_ref.actor.load_weight=True \
-    actor_rollout_ref.ref.load_weight=True \
+    actor_rollout_ref.actor.load_weight=${load_weight} \
+    actor_rollout_ref.ref.load_weight=${load_weight} \
     trainer.project_name="${project_name}" \
     trainer.experiment_name="${exp_name}" \
-    trainer.n_gpus_per_node=8 \
+    trainer.n_gpus_per_node=16 \
     trainer.nnodes="${NNODES}" \
-    trainer.val_before_train=True \
+    trainer.val_before_train=False \
     trainer.test_freq=-1 \
     trainer.save_freq=10 \
     trainer.total_epochs=10 \
@@ -175,7 +176,9 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.rollout.free_cache_engine=True \
     trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
 
+
+sleep 600
 ray_name=$(cat /tmp/ray.output | grep "submitted successfully" | awk -F "'" '{print $2}')
 ray_name=${ray_name//\'}
 echo "ray_name: $ray_name"
-ray job logs $ray_name --follow
+ray job logs $ray_name --follow | tee $(dirname $0)/ray.log
