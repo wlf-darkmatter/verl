@@ -1,0 +1,9 @@
+services:
+  A3_83RC1:
+    image: harbor.ai-bj.cn/library/verl:verl_CANN83RC1
+    build:
+      args: [BUILDKIT_PROGRESS=plain]
+      context: .
+      dockerfile: ./Dockerfile.83rc1.cann
+      network: host
+      
