@@ -54,7 +54,7 @@ TEST_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k.parquet"
 temperature=1.0
 top_p=1.0
 top_k=-1 # 0 for HF rollout, -1 for vLLM rollout
-val_top_p=0.7
+val_top_p=1
 
 # Performance Related Parameter
 use_dynamic_bsz=True

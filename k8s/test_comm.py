@@ -13,7 +13,7 @@ from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
 from verl.single_controller.ray import RayResourcePool
 from verl.single_controller.ray.base import sort_placement_group_by_node_ip
 from verl.utils.device import get_device_name, get_nccl_backend
-
+import socket
 
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
 os.environ["NCCL_DEBUG"] = "WARN"
@@ -41,6 +41,7 @@ parser.add_argument("--ray_init", action="store_true")
 args = parser.parse_args()
 
 
+@ray.remote
 def get_availale_curr_addr_port():
     host_ip_by_sdk = ray._private.services.get_node_ip_address()
     with socket.socket() as sock:
@@ -62,7 +63,9 @@ def ray_init():
                 f"`--ray_master_ip` should be set if nnodes({args.nnodes}) > 1."
             )
 
-        curr_addr, _ = get_availale_curr_addr_port()
+        hostname = socket.gethostname()
+        curr_addr = socket.gethostbyname(hostname)
+
         print(f"curr_addr = {curr_addr}", flush=True)
 
         if args.is_master or curr_addr == args.ray_master_ip:
@@ -117,7 +120,7 @@ def build_task(task_cls, config=None, device_name=None):
             rank += 1
             print(f"Building rank({rank}), local_rank({local_rank})", flush=True)
             if rank == 0:
-                master_addr, master_port = get_availale_curr_addr_port()
+                master_addr, master_port = ray.get(get_availale_curr_addr_port.remote())
                 print(f"Get master_addr from ray is {master_addr}", flush=True)
                 info = {
                     "MASTER_ADDR": master_addr,
@@ -198,7 +201,7 @@ class TestComm(BasrRay):
     def init_process_group(self):
         print(f"\033[32m开始建链\033[0m", flush=True)
         time.sleep(5)
-        
+
 
         backend = "cpu:gloo"
         if self.device_name == "npu":
