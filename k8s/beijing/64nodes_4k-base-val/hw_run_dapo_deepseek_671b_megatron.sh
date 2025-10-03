@@ -54,7 +54,7 @@ TEST_FILE="/data01/huawei-2025/rl_data/aime-2024/aime_2024_problems.parquet"
 temperature=1.0
 top_p=1.0
 top_k=-1 # 0 for HF rollout, -1 for vLLM rollout
-val_top_p=0.7
+val_top_p=1.0
 
 # Performance Related Parameter
 use_dynamic_bsz=True
@@ -165,7 +165,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.experiment_name="${exp_name}" \
     trainer.n_gpus_per_node=8 \
     trainer.nnodes="${NNODES}" \
-    trainer.val_before_train=False \
+    trainer.val_before_train=True \
     trainer.test_freq=-1 \
     trainer.save_freq=10 \
     trainer.total_epochs=10 \
