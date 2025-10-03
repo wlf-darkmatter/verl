@@ -34,3 +34,11 @@ ENV PIP_INDEX_URL=http://pypi.chinatelecom.ai/simple/ \
 #     export Torch_DIR=/opt/pyvenv/lib/python3.10/site-packages/torch/share/cmake ;\
 #     python setup.py develop -v
 
+RUN cd /opt ;\
+    rm -rf jemalloc ;\
+    tar -zxvf jemalloc.tar.gz ;\
+    cd jemalloc ;\
+    ./autogen.sh ;\
+    ./configure --prefix=/usr/local ;\
+    make -j 64 ;\
+    make install
