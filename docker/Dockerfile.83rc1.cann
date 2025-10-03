@@ -1,2 +1,36 @@
-FROM swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.5.1-cann_8.2.rc1-py_3.10-aarch64_0827a
+# FROM swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.5.1-cann_8.2.rc1-py_3.10-aarch64_0827a
+FROM harbor.ai-bj.cn/library/verl:verl_0912
+# cd /data01/huawei-2025/docker/pkg
+# python -m http.server 1111
+
+SHELL [ "/usr/bin/bash", "-c", "-l" ]
+
+
+RUN wget -q http://127.0.0.1:1111/Ascend-cann-toolkit_8.3.RC1_linux-aarch64.run ;\
+    bash Ascend-cann-toolkit_8.3.RC1_linux-aarch64.run -q --full --install-path=/usr/local/Ascend ;\
+    rm Ascend-cann-toolkit_8.3.RC1_linux-aarch64.run -f
+
+RUN wget -q http://127.0.0.1:1111/Ascend-cann-kernels-910b_8.3.RC1_linux-aarch64.run ;\
+    source /usr/local/Ascend/ascend-toolkit/set_env.sh ;\
+    bash Ascend-cann-kernels-910b_8.3.RC1_linux-aarch64.run -q --install --install-path=/usr/local/Ascend ;\
+    rm Ascend-cann-kernels-910b_8.3.RC1_linux-aarch64.run -f
+
+RUN wget -q http://127.0.0.1:1111/Ascend-cann-nnal_8.3.RC1_linux-aarch64.run ;\
+    source /usr/local/Ascend/ascend-toolkit/set_env.sh ;\
+    bash Ascend-cann-nnal_8.3.RC1_linux-aarch64.run -q --install --install-path=/usr/local/Ascend ;\
+    rm Ascend-cann-nnal_8.3.RC1_linux-aarch64.run -f
+
+#! 必须要有内部源
+ENV PIP_INDEX_URL=http://pypi.chinatelecom.ai/simple/ \
+    PIP_TRUSTED_HOST=pypi.chinatelecom.ai
+
+# #! 重新编译 vllm-ascend
+# RUN --mount=type=cache,target=/root/.cache/pip,id=pip \
+#     cd /tmp; wget -q http://127.0.0.1:1111/libascend_hal.so ;\
+#     mv libascend_hal.so /usr/local/Ascend/driver/lib64/driver/ ;\
+#     cd /opt/vllm-ascend ;\
+#     git config --global --add safe.directory /opt/vllm-ascend ;\
+#     source /usr/local/Ascend/nnal/atb/set_env.sh ;\
+#     export Torch_DIR=/opt/pyvenv/lib/python3.10/site-packages/torch/share/cmake ;\
+#     python setup.py develop -v
 

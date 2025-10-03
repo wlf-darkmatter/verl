@@ -67,3 +67,16 @@ fi
 cd /home/new_verl; python k8s/test_comm.py --ray_init --nnodes=2 --ray_master_ip=${MASTER_ADDR} --ray_master_port=${ServerPort} --device=npu ${kwargs[@]}
 
 ```
+
+## 共享盘上安装CANN 8.3.RC1
+
+```bash
+chmod -R 755
+bash Ascend-cann-toolkit_8.3.RC1_linux-aarch64.run -q --full --install-path=/data01/huawei-2025/CANN/8.3.RC1  ;\
+
+source /data01/huawei-2025/CANN/8.3.RC1/ascend-toolkit/set_env.sh
+bash Ascend-cann-kernels-910b_8.3.RC1_linux-aarch64.run -q --install --install-path=/data01/huawei-2025/CANN/8.3.RC1
+
+bash Ascend-cann-nnal_8.3.RC1_linux-aarch64.run -q --install --install-path=/usr/local/Ascend ;\
+
+```
