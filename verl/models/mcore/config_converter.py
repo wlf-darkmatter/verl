@@ -312,8 +312,11 @@ def hf_to_mcore_config_dpskv3(
         assert hf_config.num_nextn_predict_layers == 0, (
             "MTP is not supported for now, please modify the config.json to set num_nextn_predict_layers to 0"
         )
-
-    hf_config.pop("quantization_config")
+    try:
+        hf_config.pop("quantization_config")
+    except:
+        pass
+    
     assert "quantization_config" not in hf_config or not hf_config.quantization_config, (
         "quantization is not supported for now, please modify the config.json to remove quantization_config"
     )
