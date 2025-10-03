@@ -1,0 +1,612 @@
+[root@pm-d12e0124 verl]# kubectlrl logs deepseek671-16-verl-moe-infer-base-master-0 -f
+2025-10-02 13:29:40,000	INFO scripts.py:1392 -- Did not find any active Ray processes.
+This is head node
+CURRENT_IP=10.127.39.24
+INFO 10-02 13:30:15 [importing.py:17] Triton not installed or not compatible; certain GPU-related functions will not be available.
+WARNING 10-02 13:30:15 [importing.py:29] Triton is not installed. Using dummy decorators. Install it via `pip install triton` to enable kernel compilation.
+INFO 10-02 13:30:17 [__init__.py:39] Available plugins for group vllm.platform_plugins:
+INFO 10-02 13:30:17 [__init__.py:41] - ascend -> vllm_ascend:register
+INFO 10-02 13:30:17 [__init__.py:44] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 10-02 13:30:18 [__init__.py:235] Platform plugin ascend is activated
+/opt/pyvenv/lib/python3.10/site-packages/torch_npu/dynamo/torchair/__init__.py:8: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+WARNING 10-02 13:30:20 [_custom_ops.py:22] Failed to import from vllm._C with ModuleNotFoundError("No module named 'vllm._C'")
+curr_addr='10.127.39.24'
+Master
+[2025-10-02 13:30:28,789 W 346 346] global_state_accessor.cc:435: Retrying to get node with node ID 06c4550f90bb5ddabe7684ad4a377a1a4409d45fbe5c80c78ff78f16
+2025-10-02 13:30:25,055	INFO usage_lib.py:467 -- Usage stats collection is enabled by default without user confirmation because this terminal is detected to be non-interactive. To disable this, add `--disable-usage-stats` to the command that starts the cluster, or run the following command: `ray disable-usage-stats` before starting the cluster. See https://docs.ray.io/en/master/cluster/usage-stats.html for more details.
+2025-10-02 13:30:25,056	INFO scripts.py:971 -- Local node IP: 10.127.39.24
+2025-10-02 13:30:29,792	SUCC scripts.py:1007 -- --------------------
+2025-10-02 13:30:29,792	SUCC scripts.py:1008 -- Ray runtime started.
+2025-10-02 13:30:29,792	SUCC scripts.py:1009 -- --------------------
+2025-10-02 13:30:29,792	INFO scripts.py:1011 -- Next steps
+2025-10-02 13:30:29,792	INFO scripts.py:1014 -- To add another node to this Ray cluster, run
+2025-10-02 13:30:29,792	INFO scripts.py:1017 --   ray start --address='10.127.39.24:6666'
+2025-10-02 13:30:29,792	INFO scripts.py:1026 -- To connect to this Ray cluster:
+2025-10-02 13:30:29,792	INFO scripts.py:1028 -- import ray
+2025-10-02 13:30:29,792	INFO scripts.py:1029 -- ray.init()
+2025-10-02 13:30:29,792	INFO scripts.py:1041 -- To submit a Ray job using the Ray Jobs CLI:
+2025-10-02 13:30:29,793	INFO scripts.py:1042 --   RAY_ADDRESS='http://127.0.0.1:8265' ray job submit --working-dir . -- python my_script.py
+2025-10-02 13:30:29,793	INFO scripts.py:1051 -- See https://docs.ray.io/en/latest/cluster/running-applications/job-submission/index.html 
+2025-10-02 13:30:29,793	INFO scripts.py:1055 -- for more information on submitting Ray jobs to the Ray cluster.
+2025-10-02 13:30:29,793	INFO scripts.py:1060 -- To terminate the Ray runtime, run
+2025-10-02 13:30:29,793	INFO scripts.py:1061 --   ray stop
+2025-10-02 13:30:29,793	INFO scripts.py:1064 -- To view the status of the cluster, use
+2025-10-02 13:30:29,793	INFO scripts.py:1065 --   ray status
+2025-10-02 13:30:29,793	INFO scripts.py:1069 -- To monitor and debug Ray, view the dashboard at 
+2025-10-02 13:30:29,793	INFO scripts.py:1070 --   127.0.0.1:8265
+2025-10-02 13:30:29,793	INFO scripts.py:1077 -- If connection to the dashboard fails, check your firewall settings and network configuration.
+
+2025-10-02 13:30:30,703	INFO worker.py:1694 -- Connecting to existing Ray cluster at address: 10.127.39.24:6666...
+2025-10-02 13:30:30,713	INFO worker.py:1879 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Generating train split: 1791700 examples [00:02, 604254.46 examples/s]
+dataset len: 1791700
+Get master_addr from ray is 10.127.39.111
+(pid=889, ip=10.127.39.111) /opt/pyvenv/lib/python3.10/site-packages/torch_npu/dynamo/torchair/__init__.py:8: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+(pid=889, ip=10.127.39.111)   import pkg_resources
+Loading safetensors checkpoint shards:   0% Completed | 0/163 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards:   1% Completed | 1/163 [00:00<00:21,  7.39it/s]
+Loading safetensors checkpoint shards:   2% Completed | 3/163 [00:00<00:19,  8.25it/s]
+Loading safetensors checkpoint shards:   3% Completed | 5/163 [00:03<02:07,  1.24it/s]
+Loading safetensors checkpoint shards:   4% Completed | 6/163 [00:03<01:39,  1.57it/s]
+Loading safetensors checkpoint shards:   4% Completed | 7/163 [00:03<01:17,  2.01it/s]
+Loading safetensors checkpoint shards:   5% Completed | 8/163 [00:05<02:32,  1.02it/s]
+Loading safetensors checkpoint shards:   6% Completed | 10/163 [00:08<03:08,  1.23s/it]
+Loading safetensors checkpoint shards:   7% Completed | 11/163 [00:09<02:35,  1.02s/it]
+Loading safetensors checkpoint shards:   7% Completed | 12/163 [00:09<02:09,  1.17it/s]
+Loading safetensors checkpoint shards:   8% Completed | 13/163 [00:11<03:07,  1.25s/it]
+Loading safetensors checkpoint shards:  10% Completed | 16/163 [00:12<01:29,  1.64it/s]
+Loading safetensors checkpoint shards:  11% Completed | 18/163 [00:12<01:01,  2.35it/s]
+Loading safetensors checkpoint shards:  12% Completed | 20/163 [00:13<01:18,  1.82it/s]
+Loading safetensors checkpoint shards:  13% Completed | 21/163 [00:15<01:44,  1.35it/s]
+Loading safetensors checkpoint shards:  13% Completed | 22/163 [00:15<01:25,  1.66it/s]
+Loading safetensors checkpoint shards:  14% Completed | 23/163 [00:17<02:09,  1.08it/s]
+Loading safetensors checkpoint shards:  15% Completed | 25/163 [00:19<02:25,  1.05s/it]
+Loading safetensors checkpoint shards:  16% Completed | 26/163 [00:20<01:56,  1.17it/s]
+Loading safetensors checkpoint shards:  17% Completed | 28/163 [00:20<01:19,  1.70it/s]
+Loading safetensors checkpoint shards:  18% Completed | 29/163 [00:21<01:39,  1.35it/s]
+Loading safetensors checkpoint shards:  19% Completed | 31/163 [00:22<01:08,  1.92it/s]
+Loading safetensors checkpoint shards:  20% Completed | 33/163 [00:22<00:47,  2.72it/s]
+Loading safetensors checkpoint shards:  21% Completed | 34/163 [00:24<01:35,  1.35it/s]
+Loading safetensors checkpoint shards:  21% Completed | 35/163 [00:28<02:57,  1.39s/it]
+Loading safetensors checkpoint shards:  22% Completed | 36/163 [00:29<03:01,  1.43s/it]
+Loading safetensors checkpoint shards:  23% Completed | 38/163 [00:31<02:40,  1.29s/it]
+Loading safetensors checkpoint shards:  25% Completed | 40/163 [00:32<01:44,  1.18it/s]
+Loading safetensors checkpoint shards:  26% Completed | 42/163 [00:37<03:04,  1.53s/it]
+Loading safetensors checkpoint shards:  27% Completed | 44/163 [00:37<02:06,  1.06s/it]
+Loading safetensors checkpoint shards:  28% Completed | 45/163 [00:40<02:37,  1.34s/it]
+Loading safetensors checkpoint shards:  29% Completed | 47/163 [00:40<01:44,  1.11it/s]
+Loading safetensors checkpoint shards:  29% Completed | 48/163 [00:42<01:59,  1.04s/it]
+Loading safetensors checkpoint shards:  30% Completed | 49/163 [00:42<01:44,  1.10it/s]
+Loading safetensors checkpoint shards:  31% Completed | 50/163 [00:44<02:15,  1.20s/it]
+Loading safetensors checkpoint shards:  32% Completed | 52/163 [00:46<01:57,  1.06s/it]
+Loading safetensors checkpoint shards:  33% Completed | 54/163 [00:46<01:15,  1.45it/s]
+Loading safetensors checkpoint shards:  34% Completed | 56/163 [00:47<01:02,  1.71it/s]
+Loading safetensors checkpoint shards:  35% Completed | 57/163 [00:49<01:28,  1.20it/s]
+Loading safetensors checkpoint shards:  36% Completed | 59/163 [00:51<01:36,  1.08it/s]
+Loading safetensors checkpoint shards:  37% Completed | 61/163 [00:52<01:30,  1.13it/s]
+Loading safetensors checkpoint shards:  39% Completed | 63/163 [00:53<01:14,  1.34it/s]
+Loading safetensors checkpoint shards:  39% Completed | 64/163 [00:56<01:41,  1.03s/it]
+Loading safetensors checkpoint shards:  40% Completed | 66/163 [00:57<01:25,  1.13it/s]
+Loading safetensors checkpoint shards:  42% Completed | 69/163 [00:57<00:49,  1.89it/s]
+Loading safetensors checkpoint shards:  43% Completed | 70/163 [00:58<00:59,  1.57it/s]
+Loading safetensors checkpoint shards:  44% Completed | 72/163 [00:58<00:41,  2.17it/s]
+Loading safetensors checkpoint shards:  45% Completed | 73/163 [01:00<00:58,  1.54it/s]
+Loading safetensors checkpoint shards:  45% Completed | 74/163 [01:02<01:22,  1.08it/s]
+Loading safetensors checkpoint shards:  46% Completed | 75/163 [01:03<01:29,  1.02s/it]
+Loading safetensors checkpoint shards:  47% Completed | 76/163 [01:04<01:14,  1.17it/s]
+Loading safetensors checkpoint shards:  48% Completed | 78/163 [01:04<00:44,  1.91it/s]
+Loading safetensors checkpoint shards:  50% Completed | 81/163 [01:04<00:24,  3.31it/s]
+Loading safetensors checkpoint shards:  51% Completed | 83/163 [01:04<00:18,  4.38it/s]
+Loading safetensors checkpoint shards:  52% Completed | 85/163 [01:04<00:13,  5.63it/s]
+Loading safetensors checkpoint shards:  53% Completed | 87/163 [01:06<00:37,  2.05it/s]
+Loading safetensors checkpoint shards:  55% Completed | 89/163 [01:07<00:29,  2.48it/s]
+Loading safetensors checkpoint shards:  56% Completed | 91/163 [01:07<00:21,  3.33it/s]
+Loading safetensors checkpoint shards:  57% Completed | 93/163 [01:07<00:19,  3.54it/s]
+Loading safetensors checkpoint shards:  58% Completed | 94/163 [01:08<00:21,  3.14it/s]
+Loading safetensors checkpoint shards:  59% Completed | 96/163 [01:09<00:27,  2.44it/s]
+Loading safetensors checkpoint shards:  60% Completed | 98/163 [01:10<00:23,  2.73it/s]
+Loading safetensors checkpoint shards:  61% Completed | 99/163 [01:10<00:20,  3.13it/s]
+Loading safetensors checkpoint shards:  61% Completed | 100/163 [01:10<00:17,  3.64it/s]
+Loading safetensors checkpoint shards:  62% Completed | 101/163 [01:10<00:15,  4.03it/s]
+Loading safetensors checkpoint shards:  63% Completed | 102/163 [01:10<00:13,  4.69it/s]
+Loading safetensors checkpoint shards:  63% Completed | 103/163 [01:10<00:11,  5.18it/s]
+Loading safetensors checkpoint shards:  64% Completed | 104/163 [01:10<00:09,  5.92it/s]
+Loading safetensors checkpoint shards:  65% Completed | 106/163 [01:12<00:23,  2.42it/s]
+Loading safetensors checkpoint shards:  66% Completed | 107/163 [01:13<00:39,  1.43it/s]
+Loading safetensors checkpoint shards:  67% Completed | 109/163 [01:14<00:27,  1.93it/s]
+Loading safetensors checkpoint shards:  68% Completed | 111/163 [01:14<00:18,  2.86it/s]
+Loading safetensors checkpoint shards:  69% Completed | 113/163 [01:14<00:12,  4.01it/s]
+Loading safetensors checkpoint shards:  71% Completed | 116/163 [01:14<00:07,  6.01it/s]
+Loading safetensors checkpoint shards:  72% Completed | 118/163 [01:14<00:06,  7.42it/s]
+Loading safetensors checkpoint shards:  74% Completed | 120/163 [01:16<00:13,  3.22it/s]
+Loading safetensors checkpoint shards:  75% Completed | 122/163 [01:16<00:10,  3.86it/s]
+Loading safetensors checkpoint shards:  75% Completed | 123/163 [01:16<00:09,  4.26it/s]
+Loading safetensors checkpoint shards:  77% Completed | 125/163 [01:17<00:07,  5.39it/s]
+Loading safetensors checkpoint shards:  77% Completed | 126/163 [01:20<00:30,  1.20it/s]
+Loading safetensors checkpoint shards:  78% Completed | 127/163 [01:24<00:54,  1.50s/it]
+Loading safetensors checkpoint shards:  79% Completed | 129/163 [01:24<00:32,  1.04it/s]
+Loading safetensors checkpoint shards:  80% Completed | 131/163 [01:24<00:20,  1.56it/s]
+Loading safetensors checkpoint shards:  82% Completed | 133/163 [01:25<00:15,  1.88it/s]
+Loading safetensors checkpoint shards:  82% Completed | 134/163 [01:25<00:14,  1.99it/s]
+Loading safetensors checkpoint shards:  83% Completed | 135/163 [01:26<00:13,  2.09it/s]
+Loading safetensors checkpoint shards:  85% Completed | 138/163 [01:26<00:06,  3.69it/s]
+Loading safetensors checkpoint shards:  86% Completed | 140/163 [01:26<00:04,  4.85it/s]
+Loading safetensors checkpoint shards:  87% Completed | 142/163 [01:28<00:10,  2.09it/s]
+Loading safetensors checkpoint shards:  88% Completed | 144/163 [01:28<00:06,  2.83it/s]
+Loading safetensors checkpoint shards:  90% Completed | 146/163 [01:28<00:04,  3.80it/s]
+Loading safetensors checkpoint shards:  91% Completed | 148/163 [01:29<00:03,  4.43it/s]
+Loading safetensors checkpoint shards:  92% Completed | 150/163 [01:29<00:02,  5.66it/s]
+Loading safetensors checkpoint shards:  93% Completed | 152/163 [01:29<00:01,  5.60it/s]
+Loading safetensors checkpoint shards:  94% Completed | 154/163 [01:30<00:01,  5.28it/s]
+Loading safetensors checkpoint shards:  96% Completed | 156/163 [01:30<00:01,  4.61it/s]
+Loading safetensors checkpoint shards:  96% Completed | 157/163 [01:31<00:01,  4.19it/s]
+Loading safetensors checkpoint shards:  97% Completed | 158/163 [01:33<00:03,  1.55it/s]
+Loading safetensors checkpoint shards:  98% Completed | 159/163 [01:37<00:06,  1.51s/it]
+Loading safetensors checkpoint shards:  98% Completed | 160/163 [01:42<00:06,  2.32s/it]
+Loading safetensors checkpoint shards:  99% Completed | 161/163 [01:44<00:04,  2.21s/it]
+Loading safetensors checkpoint shards: 100% Completed | 163/163 [01:44<00:00,  1.31s/it]
+Loading safetensors checkpoint shards: 100% Completed | 163/163 [01:44<00:00,  1.56it/s]
+(Vllm_Worker pid=889, ip=10.127.39.111) 
+(Vllm_Worker pid=889, ip=10.127.39.111) [rank0]:[W1002 13:33:20.530885437 compiler_depend.ts:28] Warning: The oprator of MoeInitRouting will be removed from Pytorch and switch to AscendSpeed after 630. (function operator())
+(Vllm_Worker pid=889, ip=10.127.39.111) [rank0]:[W1002 13:33:23.268494622 compiler_depend.ts:26] Warning: Warning: kernel [ArgSort] can not support dtype int32 or int64 on AiCore, Now this kernel is running on AiCpu.If you are more concerned about high-performance execution,please cast dtype to float32. (function operator())
+Adding requests: 100%|██████████| 8/8 [00:00<00:00, 2451.02it/s]
+Processed prompts:   0%|          | 0/8 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]
+Adding requests:   0%|          | 0/8 [00:00<?, ?it/s]
+Adding requests: 100%|██████████| 8/8 [00:00<00:00, 2400.35it/s]
+Processed prompts:  12%|█▎        | 1/8 [00:43<05:02, 43.23s/it, est. speed input: 3.47 toks/s, output: 2.59 toks/s]
+Adding requests: 100%|██████████| 8/8 [00:00<00:00, 2118.60it/s] [repeated 57x across cluster]
+Processed prompts:   0%|          | 0/8 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s] [repeated 63x across cluster]
+Adding requests:   0%|          | 0/8 [00:00<?, ?it/s] [repeated 5x across cluster]
+Adding requests: 100%|██████████| 8/8 [00:00<00:00, 2252.13it/s] [repeated 5x across cluster]
+Processed prompts:  12%|█▎        | 1/8 [01:25<10:01, 85.88s/it, est. speed input: 2.14 toks/s, output: 3.44 toks/s] [repeated 8x across cluster]
+Processed prompts:  25%|██▌       | 2/8 [01:42<05:15, 52.55s/it, est. speed input: 2.93 toks/s, output: 4.66 toks/s] [repeated 8x across cluster]
+Processed prompts:  12%|█▎        | 1/8 [02:57<20:42, 177.43s/it, est. speed input: 0.48 toks/s, output: 3.90 toks/s] [repeated 8x across cluster]
+Processed prompts:  25%|██▌       | 2/8 [03:16<08:25, 84.23s/it, est. speed input: 1.15 toks/s, output: 7.48 toks/s]  [repeated 8x across cluster]
+Processed prompts:  38%|███▊      | 3/8 [04:21<06:18, 75.61s/it, est. speed input: 1.39 toks/s, output: 9.65 toks/s] [repeated 24x across cluster]
+Processed prompts:  38%|███▊      | 3/8 [04:41<09:11, 110.30s/it, est. speed input: 1.38 toks/s, output: 5.75 toks/s] [repeated 16x across cluster]
+Processed prompts:  12%|█▎        | 1/8 [06:12<43:26, 372.36s/it, est. speed input: 0.33 toks/s, output: 4.14 toks/s] [repeated 8x across cluster]
+Processed prompts:  25%|██▌       | 2/8 [08:40<27:08, 271.41s/it, est. speed input: 0.50 toks/s, output: 5.68 toks/s] [repeated 8x across cluster]
+Processed prompts:  25%|██▌       | 2/8 [09:05<25:30, 255.17s/it, est. speed input: 0.45 toks/s, output: 7.02 toks/s] [repeated 8x across cluster]
+Processed prompts:  12%|█▎        | 1/8 [10:25<1:12:59, 625.60s/it, est. speed input: 0.19 toks/s, output: 4.21 toks/s] [repeated 8x across cluster]
+Processed prompts:  25%|██▌       | 2/8 [15:42<50:46, 507.81s/it, est. speed input: 0.43 toks/s, output: 5.37 toks/s] [repeated 16x across cluster]
+Processed prompts: 100%|██████████| 8/8 [16:06<00:00, 120.85s/it, est. speed input: 1.07 toks/s, output: 28.48 toks/s]
+Processed prompts:  25%|██▌       | 2/8 [15:42<50:46, 507.77s/it, est. speed input: 0.43 toks/s, output: 5.37 toks/s] [repeated 7x across cluster]
+('Warning: torch.save with "_use_new_zipfile_serialization = False" is not recommended for npu tensor, which may bring unexpected errors and hopefully set "_use_new_zipfile_serialization = True"', 'if it is necessary to use this, please convert the npu tensor to cpu tensor for saving')
+(pid=892, ip=10.127.39.91) WARNING 10-02 13:30:46 [env_override.py:17] NCCL_CUMEM_ENABLE is set to 0, skipping override. This may increase memory overhead with cudagraph+allreduce: https://github.com/NVIDIA/nccl/issues/1234
+(pid=892, ip=10.127.39.91) WARNING 10-02 13:30:47 [importing.py:29] Triton is not installed. Using dummy decorators. Install it via `pip install triton` to enable kernel compilation.
+(pid=889, ip=10.127.39.111) WARNING 10-02 13:30:50 [_custom_ops.py:22] Failed to import from vllm._C with ModuleNotFoundError("No module named 'vllm._C'")
+(pid=893, ip=10.127.39.111) WARNING 10-02 13:30:48 [env_override.py:17] NCCL_CUMEM_ENABLE is set to 0, skipping override. This may increase memory overhead with cudagraph+allreduce: https://github.com/NVIDIA/nccl/issues/1234 [repeated 63x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#log-deduplication for more options.)
+(pid=893, ip=10.127.39.111) WARNING 10-02 13:30:49 [importing.py:29] Triton is not installed. Using dummy decorators. Install it via `pip install triton` to enable kernel compilation. [repeated 63x across cluster]
+(Vllm_Worker pid=889, ip=10.127.40.94) [VLLM] using world_size=64, TP=8, DP=8
+(pid=893, ip=10.127.39.111) WARNING 10-02 13:30:53 [_custom_ops.py:22] Failed to import from vllm._C with ModuleNotFoundError("No module named 'vllm._C'") [repeated 63x across cluster]
+(Vllm_Worker pid=894, ip=10.127.39.124) 构建LLM中
+(Vllm_Worker pid=889, ip=10.127.39.124) 构建LLM中
+(Vllm_Worker pid=891, ip=10.127.39.124) 构建LLM中
+(Vllm_Worker pid=896, ip=10.127.39.124) 构建LLM中
+(Vllm_Worker pid=892, ip=10.127.39.124) 构建LLM中
+(Vllm_Worker pid=893, ip=10.127.39.124) 构建LLM中
+(Vllm_Worker pid=890, ip=10.127.39.124) 构建LLM中
+(Vllm_Worker pid=895, ip=10.127.39.124) 构建LLM中
+(Vllm_Worker pid=16147) 构建LLM中
+(Vllm_Worker pid=16148) 构建LLM中
+(Vllm_Worker pid=16149) 构建LLM中
+(Vllm_Worker pid=16150) 构建LLM中
+(Vllm_Worker pid=16153) 构建LLM中
+(Vllm_Worker pid=16154) 构建LLM中
+(Vllm_Worker pid=16151) 构建LLM中
+(Vllm_Worker pid=16152) 构建LLM中
+(Vllm_Worker pid=885, ip=10.127.40.89) 构建LLM中
+(Vllm_Worker pid=889, ip=10.127.40.89) 构建LLM中
+(Vllm_Worker pid=893, ip=10.127.40.89) 构建LLM中
+(Vllm_Worker pid=888, ip=10.127.40.89) 构建LLM中
+(Vllm_Worker pid=896, ip=10.127.40.89) 构建LLM中
+(Vllm_Worker pid=892, ip=10.127.40.89) 构建LLM中
+(Vllm_Worker pid=895, ip=10.127.40.89) 构建LLM中
+(Vllm_Worker pid=894, ip=10.127.40.89) 构建LLM中
+(Vllm_Worker pid=876, ip=10.127.39.126) 构建LLM中
+(Vllm_Worker pid=877, ip=10.127.39.126) 构建LLM中
+(Vllm_Worker pid=882, ip=10.127.39.126) 构建LLM中
+(Vllm_Worker pid=880, ip=10.127.39.126) 构建LLM中
+(Vllm_Worker pid=878, ip=10.127.39.126) 构建LLM中
+(Vllm_Worker pid=879, ip=10.127.39.126) 构建LLM中
+(Vllm_Worker pid=881, ip=10.127.39.126) 构建LLM中
+(Vllm_Worker pid=883, ip=10.127.39.126) 构建LLM中
+(Vllm_Worker pid=892, ip=10.127.39.91) 构建LLM中
+(Vllm_Worker pid=891, ip=10.127.39.91) 构建LLM中
+(Vllm_Worker pid=894, ip=10.127.39.91) 构建LLM中
+(Vllm_Worker pid=893, ip=10.127.39.91) 构建LLM中
+(Vllm_Worker pid=890, ip=10.127.39.91) 构建LLM中
+(Vllm_Worker pid=895, ip=10.127.39.91) 构建LLM中
+(Vllm_Worker pid=896, ip=10.127.39.91) 构建LLM中
+(Vllm_Worker pid=889, ip=10.127.39.91) 构建LLM中
+(Vllm_Worker pid=891, ip=10.127.39.69) 构建LLM中
+(Vllm_Worker pid=889, ip=10.127.39.69) 构建LLM中
+(Vllm_Worker pid=889, ip=10.127.40.94) 构建LLM中
+(Vllm_Worker pid=890, ip=10.127.39.69) 构建LLM中
+(Vllm_Worker pid=891, ip=10.127.40.94) 构建LLM中
+(Vllm_Worker pid=892, ip=10.127.39.69) 构建LLM中
+(Vllm_Worker pid=895, ip=10.127.40.94) 构建LLM中
+(Vllm_Worker pid=896, ip=10.127.39.69) 构建LLM中
+(Vllm_Worker pid=893, ip=10.127.40.94) 构建LLM中
+(Vllm_Worker pid=893, ip=10.127.39.69) 构建LLM中
+(Vllm_Worker pid=892, ip=10.127.40.94) 构建LLM中
+(Vllm_Worker pid=894, ip=10.127.39.69) 构建LLM中
+(Vllm_Worker pid=894, ip=10.127.40.94) 构建LLM中
+(Vllm_Worker pid=895, ip=10.127.39.69) 构建LLM中
+(Vllm_Worker pid=890, ip=10.127.40.94) 构建LLM中
+(Vllm_Worker pid=896, ip=10.127.40.94) 构建LLM中
+(Vllm_Worker pid=889, ip=10.127.39.111) 构建LLM中
+(Vllm_Worker pid=890, ip=10.127.39.111) 构建LLM中
+(Vllm_Worker pid=891, ip=10.127.39.111) 构建LLM中
+(Vllm_Worker pid=896, ip=10.127.39.111) 构建LLM中
+(Vllm_Worker pid=892, ip=10.127.39.111) 构建LLM中
+(Vllm_Worker pid=894, ip=10.127.39.111) 构建LLM中
+(Vllm_Worker pid=895, ip=10.127.39.111) 构建LLM中
+(Vllm_Worker pid=893, ip=10.127.39.111) 构建LLM中
+(Vllm_Worker pid=889, ip=10.127.39.111) WARNING 10-02 13:31:06 [registry.py:401] Model architecture DeepSeekMTPModel is already registered, and will be overwritten by the new model class vllm_ascend.models.deepseek_mtp:CustomDeepSeekMTP.
+(Vllm_Worker pid=889, ip=10.127.39.111) WARNING 10-02 13:31:06 [registry.py:401] Model architecture Qwen2ForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen2:CustomQwen2ForCausalLM.
+(Vllm_Worker pid=889, ip=10.127.39.111) WARNING 10-02 13:31:06 [registry.py:401] Model architecture Qwen2VLForConditionalGeneration is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen2_vl:AscendQwen2VLForConditionalGeneration.
+(Vllm_Worker pid=889, ip=10.127.39.111) WARNING 10-02 13:31:06 [registry.py:401] Model architecture Qwen2_5_VLForConditionalGeneration is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen2_5_vl:AscendQwen2_5_VLForConditionalGeneration.
+(Vllm_Worker pid=889, ip=10.127.39.111) WARNING 10-02 13:31:06 [registry.py:401] Model architecture DeepseekV2ForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.deepseek_v2:CustomDeepseekV2ForCausalLM.
+(Vllm_Worker pid=889, ip=10.127.39.111) WARNING 10-02 13:31:06 [registry.py:401] Model architecture DeepseekV3ForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.deepseek_v2:CustomDeepseekV3ForCausalLM.
+(Vllm_Worker pid=889, ip=10.127.39.111) WARNING 10-02 13:31:06 [registry.py:401] Model architecture Qwen3MoeForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen3_moe:CustomQwen3MoeForCausalLM.
+(Vllm_Worker pid=889, ip=10.127.39.111) WARNING 10-02 13:31:06 [registry.py:401] Model architecture Qwen3ForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen3:CustomQwen3ForCausalLM.
+(Vllm_Worker pid=889, ip=10.127.40.89) WARNING 10-02 13:31:21 [arg_utils.py:1647] Detected VLLM_USE_V1=1 with npu. Usage should be considered experimental. Please report any issues on Github.
+(Vllm_Worker pid=889, ip=10.127.39.91) [VLLM] using world_size=64, TP=8, DP=8 [repeated 63x across cluster]
+(Vllm_Worker pid=893, ip=10.127.39.69) WARNING 10-02 13:31:06 [registry.py:401] Model architecture DeepSeekMTPModel is already registered, and will be overwritten by the new model class vllm_ascend.models.deepseek_mtp:CustomDeepSeekMTP. [repeated 63x across cluster]
+(Vllm_Worker pid=893, ip=10.127.39.69) WARNING 10-02 13:31:06 [registry.py:401] Model architecture Qwen3ForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen3:CustomQwen3ForCausalLM. [repeated 441x across cluster]
+(Vllm_Worker pid=16147) WARNING 10-02 13:31:24 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes not implemented in <vllm_ascend.worker.worker_v1.NPUWorker object at 0xffcc296d9e40>
+(Vllm_Worker pid=895, ip=10.127.39.124) ModelConfig(model='/data01/huawei-2025/weight/dsv3-base-hf-zy-mtp0', task='generate', tokenizer='/data01/huawei-2025/weight/dsv3-base-hf-zy-mtp0', tokenizer_mode='auto', trust_remote_code=True, dtype=torch.bfloat16, seed=0, hf_config_path=None, allowed_local_media_path='', revision=None, code_revision=None, rope_scaling={}, rope_theta=None, tokenizer_revision=None, max_model_len=6144, spec_target_max_model_len=None, quantization=None, enforce_eager=True, max_seq_len_to_capture=6144, max_logprobs=20, disable_sliding_window=False, disable_cascade_attn=False, skip_tokenizer_init=False, enable_prompt_embeds=False, served_model_name='/data01/huawei-2025/weight/dsv3-base-hf-zy-mtp0', limit_mm_per_prompt={}, use_async_output_proc=True, config_format=<ConfigFormat.AUTO: 'auto'>, hf_token=None, hf_overrides={}, mm_processor_kwargs=None, disable_mm_preprocessor_cache=False, override_neuron_config={}, pooler_config=None, override_pooler_config=None, logits_processor_pattern=None, generation_config='auto', override_generation_config={}, enable_sleep_mode=True, model_impl='auto')
+(Vllm_Worker pid=893, ip=10.127.39.69) WARNING 10-02 13:31:24 [arg_utils.py:1647] Detected VLLM_USE_V1=1 with npu. Usage should be considered experimental. Please report any issues on Github. [repeated 63x across cluster]
+(Vllm_Worker pid=893, ip=10.127.39.111) WARNING 10-02 13:31:25 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes not implemented in <vllm_ascend.worker.worker_v1.NPUWorker object at 0xffceb15cde40> [repeated 63x across cluster]
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.eh_proj.weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.embed_tokens.weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.enorm.weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.hnorm.weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.input_layernorm.weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w2_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.post_attention_layernorm.weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.shared_head.head.weight
+(Vllm_Worker pid=891, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.shared_head.norm.weight
+(Vllm_Worker pid=883, ip=10.127.39.126) ModelConfig(model='/data01/huawei-2025/weight/dsv3-base-hf-zy-mtp0', task='generate', tokenizer='/data01/huawei-2025/weight/dsv3-base-hf-zy-mtp0', tokenizer_mode='auto', trust_remote_code=True, dtype=torch.bfloat16, seed=0, hf_config_path=None, allowed_local_media_path='', revision=None, code_revision=None, rope_scaling={}, rope_theta=None, tokenizer_revision=None, max_model_len=6144, spec_target_max_model_len=None, quantization=None, enforce_eager=True, max_seq_len_to_capture=6144, max_logprobs=20, disable_sliding_window=False, disable_cascade_attn=False, skip_tokenizer_init=False, enable_prompt_embeds=False, served_model_name='/data01/huawei-2025/weight/dsv3-base-hf-zy-mtp0', limit_mm_per_prompt={}, use_async_output_proc=True, config_format=<ConfigFormat.AUTO: 'auto'>, hf_token=None, hf_overrides={}, mm_processor_kwargs=None, disable_mm_preprocessor_cache=False, override_neuron_config={}, pooler_config=None, override_pooler_config=None, logits_processor_pattern=None, generation_config='auto', override_generation_config={}, enable_sleep_mode=True, model_impl='auto') [repeated 63x across cluster]
+(Vllm_Worker pid=889, ip=10.127.39.124) Warning: Vllm failed to load model.layers.61.shared_head.norm.weight [repeated 4560x across cluster]
+(Vllm_Worker pid=896, ip=10.127.39.124) 
+(Vllm_Worker pid=892, ip=10.127.39.91) Warning: Vllm failed to load model.layers.61.mlp.gate.weight [repeated 2852x across cluster]
+(Vllm_Worker pid=890, ip=10.127.39.69) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight [repeated 2867x across cluster]
+(Vllm_Worker pid=893, ip=10.127.39.69) 
+(Vllm_Worker pid=892, ip=10.127.39.91) 
+(Vllm_Worker pid=889, ip=10.127.39.111) Warning: Vllm failed to load model.layers.61.shared_head.norm.weight [repeated 11167x across cluster]
+(Vllm_Worker pid=896, ip=10.127.39.111) 
+(Vllm_Worker pid=880, ip=10.127.39.126) 
+(Vllm_Worker pid=889, ip=10.127.40.94) Warning: Vllm failed to load model.layers.61.mlp.gate.weight [repeated 2726x across cluster]
+(Vllm_Worker pid=893, ip=10.127.39.111) Warning: Vllm failed to load model.layers.61.self_attn.q_b_proj.weight [repeated 1398x across cluster]
+(Vllm_Worker pid=895, ip=10.127.39.69) 
+(Vllm_Worker pid=890, ip=10.127.39.111) 
+(Vllm_Worker pid=885, ip=10.127.40.89) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight [repeated 13538x across cluster]
+(Vllm_Worker pid=885, ip=10.127.40.89) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight [repeated 4395x across cluster]
+(Vllm_Worker pid=893, ip=10.127.39.111) 
+(Vllm_Worker pid=892, ip=10.127.40.94) 
+(Vllm_Worker pid=891, ip=10.127.39.69) 构建LLM完毕
+(Vllm_Worker pid=892, ip=10.127.39.111) Warning: Vllm failed to load model.layers.61.mlp.experts.w13_weight [repeated 6739x across cluster]
+(Vllm_Worker pid=889, ip=10.127.39.69) 构建LLM完毕
+(Vllm_Worker pid=892, ip=10.127.39.69) 构建LLM完毕
+(Vllm_Worker pid=876, ip=10.127.39.126) 构建LLM完毕
+(Vllm_Worker pid=896, ip=10.127.39.69) 构建LLM完毕
+(Vllm_Worker pid=893, ip=10.127.39.69) 构建LLM完毕
+(Vllm_Worker pid=877, ip=10.127.39.126) 构建LLM完毕
+(Vllm_Worker pid=882, ip=10.127.39.126) 构建LLM完毕
+(Vllm_Worker pid=878, ip=10.127.39.126) 构建LLM完毕
+(Vllm_Worker pid=881, ip=10.127.39.126) 构建LLM完毕
+(Vllm_Worker pid=883, ip=10.127.39.126) 构建LLM完毕
+(Vllm_Worker pid=16147) 构建LLM完毕
+(Vllm_Worker pid=16148) 构建LLM完毕
+(Vllm_Worker pid=16149) 构建LLM完毕
+(Vllm_Worker pid=16150) 构建LLM完毕
+(Vllm_Worker pid=16154) 构建LLM完毕
+(Vllm_Worker pid=16151) 构建LLM完毕
+(Vllm_Worker pid=16152) 构建LLM完毕
+(Vllm_Worker pid=892, ip=10.127.39.91) 构建LLM完毕
+(Vllm_Worker pid=894, ip=10.127.39.91) 构建LLM完毕
+(Vllm_Worker pid=889, ip=10.127.39.111) 构建LLM完毕
+(Vllm_Worker pid=893, ip=10.127.39.91) 构建LLM完毕
+(Vllm_Worker pid=890, ip=10.127.39.111) 构建LLM完毕
+(Vllm_Worker pid=891, ip=10.127.39.111) 构建LLM完毕
+(Vllm_Worker pid=890, ip=10.127.39.91) 构建LLM完毕
+(Vllm_Worker pid=896, ip=10.127.39.111) 构建LLM完毕
+(Vllm_Worker pid=895, ip=10.127.39.91) 构建LLM完毕
+(Vllm_Worker pid=892, ip=10.127.39.111) 构建LLM完毕
+(Vllm_Worker pid=896, ip=10.127.39.91) 构建LLM完毕
+(Vllm_Worker pid=889, ip=10.127.39.91) 构建LLM完毕
+(Vllm_Worker pid=885, ip=10.127.40.89) 构建LLM完毕
+(Vllm_Worker pid=889, ip=10.127.40.89) 构建LLM完毕
+(Vllm_Worker pid=893, ip=10.127.40.89) 构建LLM完毕
+(Vllm_Worker pid=888, ip=10.127.40.89) 构建LLM完毕
+(Vllm_Worker pid=896, ip=10.127.40.89) 构建LLM完毕
+(Vllm_Worker pid=889, ip=10.127.40.94) 构建LLM完毕
+(Vllm_Worker pid=895, ip=10.127.40.89) 构建LLM完毕
+(Vllm_Worker pid=894, ip=10.127.40.89) 构建LLM完毕
+(Vllm_Worker pid=891, ip=10.127.40.94) 构建LLM完毕
+(Vllm_Worker pid=895, ip=10.127.40.94) 构建LLM完毕
+(Vllm_Worker pid=893, ip=10.127.40.94) 构建LLM完毕
+(Vllm_Worker pid=892, ip=10.127.40.94) 构建LLM完毕
+(Vllm_Worker pid=894, ip=10.127.40.94) 构建LLM完毕
+(Vllm_Worker pid=890, ip=10.127.40.94) 构建LLM完毕
+(Vllm_Worker pid=896, ip=10.127.40.94) 构建LLM完毕
+(Vllm_Worker pid=895, ip=10.127.39.124) 构建LLM完毕
+(Vllm_Worker pid=889, ip=10.127.39.124) 构建LLM完毕
+(Vllm_Worker pid=896, ip=10.127.39.124) 构建LLM完毕
+(Vllm_Worker pid=893, ip=10.127.39.124) 构建LLM完毕
+(Vllm_Worker pid=890, ip=10.127.39.124) 构建LLM完毕
+(Vllm_Worker pid=890, ip=10.127.39.69) 构建LLM完毕
+(Vllm_Worker pid=894, ip=10.127.39.69) 构建LLM完毕
+(Vllm_Worker pid=895, ip=10.127.39.69) 构建LLM完毕
+(Vllm_Worker pid=880, ip=10.127.39.126) 构建LLM完毕
+(Vllm_Worker pid=879, ip=10.127.39.126) 构建LLM完毕
+(Vllm_Worker pid=895, ip=10.127.39.111) 构建LLM完毕
+(Vllm_Worker pid=891, ip=10.127.39.91) 构建LLM完毕
+(Vllm_Worker pid=893, ip=10.127.39.111) 构建LLM完毕
+(Vllm_Worker pid=892, ip=10.127.40.89) 构建LLM完毕
+(Vllm_Worker pid=16153) 构建LLM完毕
+(Vllm_Worker pid=891, ip=10.127.39.124) 构建LLM完毕
+(Vllm_Worker pid=892, ip=10.127.39.124) 构建LLM完毕
+(Vllm_Worker pid=894, ip=10.127.39.111) 构建LLM完毕
+(Vllm_Worker pid=894, ip=10.127.39.124) 构建LLM完毕
+(Vllm_Worker pid=889, ip=10.127.39.111) Rollout
+===>Output===>
+куюxponentsepost
+
+We see that $\frac{y}{x}=\tan{\left(\frac{\pi}{6}\right)}=\frac{\sqrt{3}}{3}$, so $x=\sqrt{3}y=30$. Thus, $AD = 2y + x = 2y + 30 = 40$. Similarly, $\frac{z}{y}=\tan{\left(\frac{\pi}{6}\right)}=\frac{\sqrt{3}}{3}$, so $y=\sqrt{3}z=40\sqrt{3}$. Thus, $BD = 2z + y = 2z + 40\sqrt{3} = 60\sqrt{3}$. Let $\theta=\angle BAD$. Since $\sin{\angle DAC}=\frac{y-z}{2y}=\frac{40\sqrt{3}-z}{80\sqrt{3}}$ and $\sin{\angle BAD}=\frac{y-z}{40\sqrt{3}}=\frac{40\sqrt{3}-z}{40\sqrt{3}}$, the sine of $\angle DAC$ and $\angle BAD$ is equal to the sine of $\angle BAC$, so $\angle BAD=\angle DAC=\angle BAC$. Therefore, $\theta=\frac{180-90}{3}=30^\circ$. By the Law of Sines, $\frac{\sin{60}}{BD}=\frac{\sin{30}}{CD}$. Substituting in $BD=60\sqrt{3}$, we get $\frac{\sin{60}}{60\sqrt{3}}=\frac{1}{CD}$, or $CD=\frac{60\sqrt{3}}{2}=30\sqrt{3}$. Finally, $AC=AD-CD=2y-(30\sqrt{3})=40-x=10$. Thus, $a+b+c=\boxed{041}$.
+
+The answer is: $041$
+
+1First write latex code then invoke MathPix OCR to get recognized result in the form $A$ $A$ $Φegin{document}$ $\frac{1}{2} x \inpars{2} \frac{x}{2} ∈ [2,\frac{x}{2} ∈ [2, \frac{x}{2} ∈ [2, \frac{x}{2} ∈ [2, 2] → \mathbb{R}$ and $f(x) = x$ এর $f(x) = \frac{1}{2}x {\in } ( 0 , 2)$ $x \in (2 , \infty )$ এর $f(x) = \frac{x}{2} {\in } ( 0 , 2)$ $A$ $A$ $A$ $A$ $Φ는\frac 사$\frac 사$ $\frac$ -se また$\frac$ $\frac$ $\frac 사$ $\frac 사$ $\frac$ $\frac$ $\frac$ $\frac$ $\frac$ $\sim$ $\frac 사$ $\frac 사$ $\frac$ $\sim$ $\sim$ $\sim$ $\sim$ $\sim$ $\sim$ Solve the following math problem step by step. The last line of your response should be of the form Answer: $Answer (without quotes) where $Answer is the answer to the problem.
+
+Let $f(x) = \begin{cases} x, & 0 \le x \le 2 \\ 8-2x,& 2 < x \le 4 \end{cases}$. For any real number $x$, define $g(x) = 4 - c|x-2|$. The maximum value of $f(x) + g(x) $ can be written in the form $a + b\sqrt{c}$, where $a$, $b$, $c$ are unique non-negative integers and $c$ doesn't contain any squares. What is $a + b + c$?
+
+Remember to put your answer on its own line after "Answer:".
+
+2345제100 Analyzing the above answer gives: D1245 - 160 - /2 - 0.5-764 - 162.5 - 2.225 - t - 1.5 - 0.5 - t - 0.5 - t - 6.7 - 11.4 - 2.25 - .2 / 2 - 1 - (f) - 1 - (f) - 2.5 - t - 2.5 - 0 - 2.5 - 0 - 2.5 - 0 - 15.5 - p - 90 - 1 - 10.6 - 6 (a) - /1.2 - D12 - /2 - D2 - /2 - D1.1 - 0.5 - D2.8 - /1 - D5 - /1 - D2.7 - 0.5 - D2.25 - 0.5 - 2.5 - t - 2.25 - /0.5 - (a) - 0
+
+The maximum of $f(x) + g(x)$ will occur when $f(x)$ and $g(x)$ are maximized, or when $f(x)$ and $g(x)$ are minimized. Since $f(x)$ and $g(x)$ are positive, they are minimized when $x = 0$ and maximized when $x = 2$. Therefore, the maximum value of $f(x) + g(x)$ is $(2-2) + 4 - c|2-2| = 4 - c = \boxed{2}$.
+
+The answer is: $2$
+
+321.5 3
+
+32E 16 3
+
+316 4
+
+321 3
+
+321 2
+
+316 5
+
+32E 16 2 ) " \dots 16 - \dots) 6 .\cdot 6 :" 12 / \dots - \dots 16 : _\cdot - 16 \dots \cdot 16
+
+12 \dots \cdot 16 \}$
+
+321 2
+
+32E 16
+
+32E 16 2
+
+321 + 3
+
+\begin{comment}First write latex code then invoke MathPix OCR to get recognized result in the form $A$ $A$ We need to place the number of tails at the end of each run. We have 50 possible runs. It is possible that every possible run length can occur at least once, so $P(k) = 1$ for all $k$. So we simply place each run at the end of one of these 50 runs. We can avoid creating a difference greater than $k$ by making sure the difference is exactly $k$, meaning no tails are placed between the run and the end. This means that we can think of the 50 runs as a single run of length $N-50$, and just place all $k$ tails at the end. There are $N$ positions to place the $k$ tails, so this is $\binom{N}{k}$. However, the difference cannot be greater than $k$, so we must subtract the probability $P(k)$ of flipping tails. Therefore, the probability that the difference is greater than $k$ is $1 - \frac{\binom{N}{k}}{2^k}$. Then the sum of the probabilities is $P(N+1) + P(N) + P(N-1) + \dots + P(2) + P(1)$. However, notice that $P(N+1) = P(N)$. Therefore, we can simplify this further to $2P(N) + P(N-1) + \dots + P(2) + P(1)$. The sum of the probabilities $P(1)$ through $P(N)$ is $N$, because the difference is always less than $N$. We can set the $k$ tails to all equal heads, and then a single tail cannot be placed between two heads. Therefore, the last tail will always produce a difference that is greater than $N - N = 0$. Because a difference greater than 50 is impossible, the sum of the probabilities is $2N - 2N = 0$. We can divide this sum by $2^n$ to find the probability, giving us $\frac{0}{2^n} = \boxed{0}$. The answer is: $0$ .<|eot_id|> Solve the following math problem step by step. The last line of your response should be of the form Answer: $Answer (without quotes) where $Answer is the answer to the problem.
+
+A biased coin has probability $k$, where $0 < k < 1$, of landing heads. If the coin is flipped $50$ times, the probability that the number of heads is equal to twice the number of tails plus $k$ is $50 \texttt{choose} 2k$. Find the greatest integer less than or equal to $1000k$.
+
+Remember to put your answer on its own line after "Answer:".ancyxponentyexp(10) - t
+
+Since $1000 = 2^3 \cdot 5^3$, we use stars and bars along with complementary counting. There are ${50 \choose 2k}$ ways to choose where to put the heads. We want all the heads to appear before all the tails, giving $49$ distinct places to put the heads. We also need $2k \le 49 \implies k \le 24$. If the first two heads appear consecutively, then the third will appear before the second. This happens ${49 \choose 2k}$ ways. With a difference of $1$, ${50 \choose 2k} - {49 \choose 2k} = {49 \choose 2k}$. There are ${49 \choose 2k} + {49 \choose 2k} = {50 \choose 2k}$, so $1000k = \boxed{562}$.
+
+The answer is: $562$ Solve the following math problem step by step. The last line of your response should be of the form Answer: $Answer (without quotes) where $Answer is the answer to the problem.
+
+Point $Q$ lies in the interior of $\triangle ABC$. Prove that if lines $AQ$, $BQ$, and $CQ$ are extended to cut the sides of the triangle in the proportion $\frac{AQ}{QB}\cdot\frac{AB}{BC}\cdot\frac{BC}{CA}=\frac{AC}{BC}\cdot\frac{AQ}{QB}\cdot\frac{AB}{CA},$ then $Q$ is the centroid of $\triangle ABC$.
+
+Remember to put your answer on its own line after "Answer:". شکستگی Solvles یکنح الإمارات ကော်epotepotLet's first redefine "centroid". We say $Q$ is the centroid of $\triangle ABC$ if the medians $AA'$, $BB'$, and $CC'$ all pass through $Q$. Let us also define $X$, $Y$, and $Z$ respectively to be the points on lines $AQ$, $BQ$, $CQ$ such that $\frac{AQ}{QB} = \frac{AX}{XC'}$, $\frac{BQ}{QC} = \frac{BY}{YA'}$, and $\frac{AB}{BC} = \frac{AZ}{ZA'}$. By power-of-a-point, $AX \cdot XC' = BX \cdot XA'$ and $BY \cdot YA' = CX \cdot XA'$, so \begin{align*} \frac{AX}{XC'} \cdot \frac{XA'}{XA'} &= \frac{BX}{XA'} \cdot \frac{XC'}{XA'} \\ \frac{AX}{XC'} \cdot 1 &= \frac{BX}{XA'} \cdot \frac{XC'}{XA'} \\ \frac{AX}{XC'} &= \frac{BX}{XA'} \cdot 1 \\ \frac{AX}{XC'} &= \frac{BX}{XA'}. \end{align*} Similarly, $\frac{BY}{YA'} = \frac{BQ}{QA'}$ and $\frac{AZ}{ZA'} = \frac{AB}{AC'}$, so \begin{align*} \frac{AQ}{QB}\cdot\frac{AB}{BC}\cdot\frac{BC}{CA}&=\frac{AC}{BC}\cdot\frac{AQ}{QB}\cdot\frac{AB}{CA}\\ \frac{AX}{XC'}\cdot\frac{XA'}{XA'}\cdot 1&=\frac{YX}{XA'}\cdot\frac{AZ}{ZA'}\cdot\frac{YB}{BA'}\\ \frac{AX}{XC'}&=\frac{YX}{XA'}\\ \frac{BX}{XA'}\cdot\frac{YB}{BA'}&=\frac{YB}{BA'}\cdot\frac{AB}{CA'}\cdot\frac{BQ}{QA'}\\ \frac{AX}{XC'} \cdot 1&=\frac{YB}{BA'}\cdot1\\ \frac{AX}{XC'}&=\frac{YB}{BA'}. \end{align*} Therefore, the lines $AA'$, $BB'$, and $CC'$ all pass through point $Q$.
+
+Thus, the points $X$, $Y$, and $Z$ are collinear. The answer is: The line $XZYZ'$ must pass through The point $Q$ the points $A'$, $B'$, $C'$ Let the intersection of $AA'$ and $BB'$ be $Q'$. $Q'$ is on $BB'$, using $\triangle AB'C$ as a reference has $AA' \cap CC' = Q$. $Q'$ is therefore also on $CC'$. If $Q' \not = Q$, then $Q'$ is the centroid, but if $Q' \not = Q$, let the feet of $AA'$ be $P$, $BB'$ be $R$ and $CC'$ be $S$. We take $Q'$ to be $P$, $AP$ is the median to the midpoint of $B'C$, $A'P$ is the median to the midpoint of $B'C$ (from $Q'$), and has the same length to $B'C$ (from $AA' \parallel BB'$), so $\triangle APQ \cong \triangle A'PQ'$ leading to $A'C' \parallel AB'$. This contradicts the given. The answer is: $\boxed{A'}$ Solve the following math problem step by step. The last line of your response should be of the form Answer: $Answer (without quotes) where $Answer is the answer to the problem.
+
+Does someone falling into a black hole see the end of the universe?
+
+Remember to put your answer on its own line after "Answer:".
+
+Ignoring avoiding the singularity and strong time dilation effects, the answer is generally yes. Look at Kerr metric one more time: $c^2 dτ^2 = \left( 1 - \frac{r_s r}{\rho^2} \right) c^2 dt^2 - \frac{\rho^2}{\Delta} dr^2 - \rho^2 d\theta^2 - \left( r^2 + \alpha^2 + \frac{r_s r \alpha^2}{\rho^2} \sin^2 \theta \right) \sin^2 \theta \ d\phi^2 + \frac{2r_s r \alpha \sin^2 \theta }{\rho^2} c \, dt \, d\phi, $ Singularity at $r=0$ is inside the inner horizon ($r_{in} = M - √($M^2$ - a^2,8$)), but there is also a coordinate singularity for $r=r^2 + a^2 - 2Mr$, which has roots $r_{max}=M+√(M^2 - a^2)$ Now let's observe free-fall movement of a test particle $u = (u^t,u^r,u^θ,u^φ),~u^ru^r≤0$ Case I Normal geodesics. The observer encounters the singularity at $u^t = ∞$. That means, that time measured by a free-falling observer is infinite. It would mean, that seeing the Universe end is impossible. However, $u^t$ formula tells us, that $dt/du^t=0$, which makes it impossible to determine the time progression when we are almost at singularity. We can thus assume, that at some point, the observer starts observing processes outside black hole in slow motion. With $dr$ approaching $0$, the precise duration becomes less and less clear. This is why we can't be sure that the observer can't see the Universe's fate. Case II Free particles on good orbit Position vs time plot assumes the form of a helix: Those orbits are cycles, therefore, assuming the black hole will fully evaporate, one should be able to see the Universe's fate as the time passes. The only factor avoiding this situation is by admitting real, large (for a micro black hole) gaps between layers of the black hole spacetime fabric. Based on 1, $∆σ=∫4π^2R_0^2 d∆τ$ represents layer separation - the larger it is, the less time one has. If we ever make a black hole in basement conditions 2, the lifespan won't be long. Thanks to Hawking radiation, it will be too short for the observer to see anything, because $K$ value in $T(K) = (ħc^3)/(8πGMk_b͂)$ would be too high for the observer and naked eyes have limited sensitive wrt wavelength ranges.
+
+The answer is: nonequilibrium is the process of evaporation. I don't know if he/she/they may be trapped with me in a rotating black hole, but it may be possible to cross the Cauchy horizon (or simply cosmic event horizon, please let me know if I have it backwards) and fall into a universe where in our past someone can see our fate. As far as I understand, there are no singularities and no observable density nor temperature will always be exactly infinity, only potentially. It is possible to see the birth of a Universe. (The Big Bang is described the inflationary model as the inflationary Universe, but as it is popular science, it is unlikely to be wrong, although it could be fun to write one.) There is a singularity in our Universe as well as a black hole. The only singularity will be at the "center" of the black hole and no density will ever be infinity, despite "theory's" wording. The speed of light is not crushed, but slowed down. 007 First write latex code then invoke MathPix OCR to get recognized result in the form $A$ $A$ ਸ 472 ਤੇ \lambda $A$ $A$ Analysis of the above answer gives: $A$ $A$ $A$ $A$ $A$ $A$ $A$ $A$ 41 3 3 3 3 3f SOLVE: 472 ਤੇ \lambda $A$ $A$ ਕਲਗਨਫਲੰਗ ਦੇਨੂੰ*ਨ ਨੂੰ* + * ਨ 472 ਤੇ \lambda $A$ $A$ ਕਲਗਨਫਲੰਗ ਦੇਨੂੰ* ਊਲੜੀ ਪਰਿ*ਰਲਦੋ*ੈਂ $A$ $A$ ਊਲੜੀ ਪਰ
+<===END, 生成结束原因: length
+=== Step 0 ===
+MEAN TPS:  29.4319 tokens/s
+MEAN 耗时:  967.01 s
+E2E TPS:  1882.6174 tokens/s
+E2E 最大耗时:  967.53 s
+平均单实例 E2E TPS:  1882.6174 tokens/s
+Processed prompts: 100%|██████████| 8/8 [16:07<00:00, 120.88s/it, est. speed input: 0.94 toks/s, output: 32.37 toks/s] [repeated 63x across cluster]
+(Vllm_Worker pid=896, ip=10.127.40.94) Rollout [repeated 63x across cluster]
+^Z

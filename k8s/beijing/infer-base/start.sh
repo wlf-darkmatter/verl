@@ -37,6 +37,7 @@ export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according t
 export ASCEND_PROCESS_LOG_PATH=/opt/verl/logs/$MINDX_TASK_ID/plog # modify according to actual situation
 
 ray stop --force
+rm -rf /tmp/*.pkl
 rm -rf /tmp/ray
 rm -rf /opt/verl
 cp -r /home/new_verl /opt/verl
@@ -61,7 +62,8 @@ fi
 #! ------------------------------------------------------------
 TRAIN_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k.parquet"
 # MODEL_PATH="/data01/huawei-2025/weight/dpsk-v3-671B-BF16-dist_ckpt"
-MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf"
+# MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf"
+MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf-zy-mtp0"
 
 n_resp_per_prompt=4
 train_prompt_bsz=16

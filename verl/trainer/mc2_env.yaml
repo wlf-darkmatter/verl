@@ -1,5 +1,5 @@
 working_dir: ./
-excludes: ["/.git/", "/k8s"]
+excludes: ["/.git/", "/k8s", "/docker", "/doc", "/tmp"]
 env_vars:
 
   HCCL_EXEC_TIMEOUT: "7200"
