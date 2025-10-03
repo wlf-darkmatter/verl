@@ -46,7 +46,7 @@ RAY_DATA_HOME="/opt"
 CKPTS_DIR=/data01/huawei-2025/weight/ckpt-DAPO-DeepSeek-671b-megatron-base-2k4k-val
 
 TRAIN_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k.parquet"
-TEST_FILE="/data01/huawei-2025/rl_data/aime-2024/aime_2024_problems.parquet"
+TEST_FILE="/data01/huawei-2025/rl_data/aime-2024/aime-2024.parquet"
 
 #TEST_FILE="['$aime24_test_path']"
 
