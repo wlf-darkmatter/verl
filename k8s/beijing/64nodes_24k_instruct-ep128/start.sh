@@ -62,7 +62,8 @@ export NPU_PER_NODE=8  # A2 NPU Number
 export NNODES=64         # example is 4 Nodes
 
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
-export ASCEND_PROCESS_LOG_PATH=/opt/verl/logs/$MINDX_TASK_ID/plog # modify according to actual situation
+export ASCEND_PROCESS_LOG_PATH=/home/new_verl/plog/8.3.rc1/RANK_${RANK} # modify according to actual situation
+mkdir -p $ASCEND_PROCESS_LOG_PATH
 
 ray stop --force
 rm -rf /tmp/ray
