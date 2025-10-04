@@ -126,3 +126,6 @@ logs
 log
 outputs
 .history
+
+vllm_ascend
+vllm
