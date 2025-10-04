@@ -129,5 +129,5 @@ outputs
 
 vllm
 vllm_ascend
-
+megatron
 plog

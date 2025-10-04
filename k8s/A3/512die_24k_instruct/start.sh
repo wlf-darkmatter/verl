@@ -22,6 +22,7 @@ export HCCL_ASYNC_ERROR_HANDLING=0
 
 #! 注意，1003 加了这 几个超时配置
 export RAY_DEBUG_POST_MORTEM=0
+export ASCEND_LAUNCH_BLOCKING=1
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
@@ -38,6 +39,9 @@ cp -f /home/new_verl/k8s/patch/vllm_ascend/ops/fused_moe.py /opt/vllm-ascend/vll
 
 rm -f /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
 cp -f /home/new_verl/k8s/patch/megatron/dot_product_attention.py /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
+
+rm -f /opt/Megatron-LM/megatron/core/optimizer/optimizer.py
+cp -f /mnt/hpfs_test/wlf/verl/k8s/patch/megatron/optimizer.py /opt/Megatron-LM/megatron/core/optimizer/optimizer.py
 
 
 #######################################

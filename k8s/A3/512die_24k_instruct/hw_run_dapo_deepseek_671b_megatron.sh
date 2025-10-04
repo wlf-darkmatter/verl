@@ -41,7 +41,7 @@ NNODES=32
 # change the MODEL_PATH and MCORE_MODEL_PATH to your own path
 # Paths
 MODEL_PATH="/mnt/hpfs_test/weights/dsv3-bf16"
-MCORE_MODEL_PATH="/data01/huawei-2025/weight/dsv3_fp16_mcore_full_new"
+MCORE_MODEL_PATH="/mnt/hpfs_test/weights/dsv3_bf16_mcore_hs"
 RAY_DATA_HOME="/opt"
 CKPTS_DIR=/mnt/hpfs_test/ckpt/ckpt-DAPO-DeepSeek-671b-megatron-2k24k
 
@@ -73,7 +73,7 @@ train_pp=8
 enable_filter_group=False
 ETP=1
 
-load_weight=False
+load_weight=True
 
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 cd /opt/verl

@@ -24,15 +24,6 @@ RUN wget -q http://127.0.0.1:1111/Ascend-cann-nnal_8.3.RC1_linux-aarch64.run ;\
 ENV PIP_INDEX_URL=http://pypi.chinatelecom.ai/simple/ \
     PIP_TRUSTED_HOST=pypi.chinatelecom.ai
 
-# #! 重新编译 vllm-ascend
-# RUN --mount=type=cache,target=/root/.cache/pip,id=pip \
-#     cd /tmp; wget -q http://127.0.0.1:1111/libascend_hal.so ;\
-#     mv libascend_hal.so /usr/local/Ascend/driver/lib64/driver/ ;\
-#     cd /opt/vllm-ascend ;\
-#     git config --global --add safe.directory /opt/vllm-ascend ;\
-#     source /usr/local/Ascend/nnal/atb/set_env.sh ;\
-#     export Torch_DIR=/opt/pyvenv/lib/python3.10/site-packages/torch/share/cmake ;\
-#     python setup.py develop -v
 
 RUN cd /opt ;\
     rm -rf jemalloc ;\
@@ -42,3 +33,13 @@ RUN cd /opt ;\
     ./configure --prefix=/usr/local ;\
     make -j 64 ;\
     make install
+
+# #! 重新编译 vllm-ascend
+RUN --mount=type=cache,target=/root/.cache/pip,id=pip \
+    cd /tmp; wget -q http://127.0.0.1:1111/libascend_hal.so ;\
+    mv libascend_hal.so /usr/local/Ascend/driver/lib64/driver/ ;\
+    cd /opt/vllm-ascend ;\
+    git config --global --add safe.directory /opt/vllm-ascend ;\
+    source /usr/local/Ascend/nnal/atb/set_env.sh ;\
+    export Torch_DIR=/opt/pyvenv/lib/python3.10/site-packages/torch/share/cmake ;\
+    python setup.py develop -v
