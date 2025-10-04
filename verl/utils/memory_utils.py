@@ -27,7 +27,7 @@ from verl.utils.device import get_torch_device, is_cuda_available
 logger = logging.getLogger(__name__)
 
 
-def aggressive_empty_cache(force_sync: bool = True, max_retries: int = 3) -> None:
+def aggressive_empty_cache(force_sync: bool = True, max_retries: int = 3) -> tuple[int, int]:
     """
     More aggressive GPU memory cleanup function, tries to release PyTorch reserved
     but unallocated memory.
@@ -71,6 +71,8 @@ def aggressive_empty_cache(force_sync: bool = True, max_retries: int = 3) -> Non
         # Stop retrying if little memory was freed
         if reserved_freed < 1024**3:  # less than 1GB
             break
+    return after_reserved, after_allocated
+
 
 
 def reset_memory_stats() -> None:
@@ -105,14 +107,14 @@ def log_memory_usage(stage: str = "current") -> None:
         return
 
     info = get_memory_info()
-    logger.info(
-        f"Memory usage [{stage}]: "
-        f"Total: {info['total_memory_gb']:.2f} GB, "
-        f"Allocated: {info['allocated_memory_gb']:.2f} GB, "
-        f"Reserved: {info['reserved_memory_gb']:.2f} GB, "
+    str_info = f"Memory usage [{stage}]: " + \
+        f"Total: {info['total_memory_gb']:.2f} GB, " +\
+        f"Allocated: {info['allocated_memory_gb']:.2f} GB, " +\
+        f"Reserved: {info['reserved_memory_gb']:.2f} GB, " +\
         f"Cached: {info['cached_memory_gb']:.2f} GB"
-    )
 
+    logger.info(str_info)
+    return str_info
 
 def optimize_memory_for_inference() -> None:
     """Optimize GPU memory usage for inference"""

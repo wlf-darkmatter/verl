@@ -5,10 +5,13 @@ export GLOO_SOCKET_IFNAME=bond1 # modify according to actual situation
 export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
 export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
+export ASCEND_GLOBAL_LOG_LEVEL=3
+
+
+#! 注意，自定义配置
 export VLLM_SLEEP_LEVEL=1
 export VERL_DEBUG_NOSHARDING=0
-
-export ASCEND_GLOBAL_LOG_LEVEL=3
+export VERL_MEMORY_LOG_DIR="/home/new_verl/tmp/exp1"
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
