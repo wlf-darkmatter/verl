@@ -15,6 +15,9 @@ export HCCL_EXEC_TIMEOUT=86400
 export HCCL_EVENT_TIMEOUT=86400
 export ACL_DEVICE_SYNC_TIMEOUT=86400
 export HCCL_ASYNC_ERROR_HANDLING=0
+export P2P_HCCL_BUFFSIZE=20
+export HCCL_BUFFSIZE=300
+export VLLM_ASCEND_ENABLE_MOE_ALL2ALL_SEQ=1
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
@@ -68,7 +71,7 @@ if [ "$RANK" = "0" ]; then
   echo "This is head node"
   echo "CURRENT_IP=$CURRENT_IP"
 
-  ray start --head --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
+  ray start --head --ray-debugger-external --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 
   while [[ $cnt -lt 10 ]]; do
     ray_status_output=$(ray status)

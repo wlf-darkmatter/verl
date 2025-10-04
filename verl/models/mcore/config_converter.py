@@ -307,9 +307,16 @@ def hf_to_mcore_config_dpskv3(
 
     # disable MTP and quantization for now
     if "num_nextn_predict_layers" in hf_config:
+        print(f"\033[32m由于verl不支持 MTP，自动将 num_nextn_predict_layers 改成 0.\033[0m")
+        hf_config['num_nextn_predict_layers'] = 0
         assert hf_config.num_nextn_predict_layers == 0, (
             "MTP is not supported for now, please modify the config.json to set num_nextn_predict_layers to 0"
         )
+    try:
+        hf_config.pop("quantization_config")
+    except:
+        pass
+    
     assert "quantization_config" not in hf_config or not hf_config.quantization_config, (
         "quantization is not supported for now, please modify the config.json to remove quantization_config"
     )

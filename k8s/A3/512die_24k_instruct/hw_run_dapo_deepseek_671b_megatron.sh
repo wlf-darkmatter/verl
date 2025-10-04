@@ -35,18 +35,18 @@ n_resp_per_prompt=16
 train_prompt_mini_bsz=32  # mini_bsz * n >= micro_bsz * pp * dp
 
 #NNODES=${NNODES:-1}
-NNODES=64
+NNODES=32
 
 # 1. download the dist_ckpt format model from https://huggingface.co/BearBiscuit05/dpsk-v3-671B-BF16-dist_ckpt/tree/main
 # change the MODEL_PATH and MCORE_MODEL_PATH to your own path
 # Paths
-MODEL_PATH="/data01/huawei-2025/weight/dpsk-v3-671B-BF16-dist_ckpt"
+MODEL_PATH="/mnt/hpfs_test/weights/dsv3-bf16"
 MCORE_MODEL_PATH="/data01/huawei-2025/weight/dsv3_fp16_mcore_full_new"
 RAY_DATA_HOME="/opt"
-CKPTS_DIR=/data01/huawei-2025/weight/CKPT/ckpt-DAPO-DeepSeek-671b-megatron-2k24k
+CKPTS_DIR=/mnt/hpfs_test/ckpt/ckpt-DAPO-DeepSeek-671b-megatron-2k24k
 
-TRAIN_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k.parquet"
-TEST_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k.parquet"
+TRAIN_FILE="/mnt/hpfs_test/data/data/dapo-math-17k.parquet"
+TEST_FILE="/mnt/hpfs_test/data/data/dapo-math-17k.parquet"
 
 #TEST_FILE="['$aime24_test_path']"
 
@@ -73,6 +73,8 @@ train_pp=8
 enable_filter_group=False
 ETP=1
 
+load_weight=False
+
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 cd /opt/verl
 ray job submit --runtime-env="${RUNTIME_ENV}" \
@@ -81,7 +83,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     --config-name="dapo_megatron_trainer" \
     actor_rollout_ref.rollout.load_format=safetensors \
     actor_rollout_ref.rollout.skip.enable=False \
-    actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/wlf/rollout_dump" \
+    actor_rollout_ref.rollout.skip.dump_dir="/mnt/hpfs_test/wlf/rollout_dump" \
     actor_rollout_ref.rollout.skip.dump_step=500 \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
@@ -158,11 +160,11 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +reward_model.reward_kwargs.overlong_buffer_cfg.log=False \
     +reward_model.reward_kwargs.max_resp_len=${max_response_length} \
     trainer.logger='["console"]' \
-    actor_rollout_ref.actor.load_weight=True \
-    actor_rollout_ref.ref.load_weight=True \
+    actor_rollout_ref.actor.load_weight=${load_weight} \
+    actor_rollout_ref.ref.load_weight=${load_weight} \
     trainer.project_name="${project_name}" \
     trainer.experiment_name="${exp_name}" \
-    trainer.n_gpus_per_node=8 \
+    trainer.n_gpus_per_node=16 \
     trainer.nnodes="${NNODES}" \
     trainer.val_before_train=False \
     trainer.test_freq=-1 \
