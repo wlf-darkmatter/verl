@@ -19,12 +19,45 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
-
+import sys
 import torch
 
 from verl.utils.device import get_torch_device, is_cuda_available
 
 logger = logging.getLogger(__name__)
+
+dir_memory = os.getenv("VERL_MEMORY_LOG_DIR", "/tmp/verl_momory")
+
+def get_logger():
+
+    rank = torch.distributed.get_rank()
+    Path(dir_memory).mkdir(exist_ok=True, parents=True)
+    path_log_memory = Path(dir_memory).joinpath(f"{rank}.log")
+
+    logger_name = f"megatron_vllm_{rank}"
+    manager = logging.Logger.manager
+
+    logger_dict = manager.loggerDict
+
+    if logger_name in logger_dict:
+        logger_vllm = logging.getLogger(f"megatron_vllm_{rank}")
+    else:
+        logger_vllm = logging.getLogger(f"megatron_vllm_{rank}")
+        logger_vllm.setLevel("INFO")
+        formatter = logging.Formatter(
+                    '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S'
+                )
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.setLevel("INFO")
+        console_handler.setFormatter(formatter)
+        file_handler = logging.FileHandler(path_log_memory, encoding='utf-8')
+        file_handler.setLevel(logging.DEBUG)  # 文件记录更详细的日志
+        file_handler.setFormatter(formatter)
+        logger_vllm.addHandler(console_handler)
+        logger_vllm.addHandler(file_handler)
+
+    return logger_vllm
 
 
 def aggressive_empty_cache(force_sync: bool = True, max_retries: int = 3) -> tuple[int, int]:

@@ -32,7 +32,7 @@ from verl.third_party.vllm import LLM, VLLM_SLEEP_LEVEL
 from verl.third_party.vllm import parallel_state as vllm_ps
 from verl.utils.device import get_torch_device, set_expandable_segments
 from verl.utils.megatron_utils import load_megatron_model_to_gpu, offload_megatron_model_to_cpu, per_tensor_generator
-from verl.utils.memory_utils import aggressive_empty_cache, log_memory_usage
+from verl.utils.memory_utils import aggressive_empty_cache, log_memory_usage, get_logger
 from verl.utils.profiler import GPUMemoryLogger, log_gpu_memory_usage
 from verl.utils.profiler.performance import simple_timer
 from verl.utils.torch_functional import check_device_is_available
@@ -42,30 +42,6 @@ from .base import BaseShardingManager
 logger = logging.getLogger(__file__)
 logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
 
-
-dir_memory = os.getenv("VERL_MEMORY_LOG_DIR", "/tmp/verl_momory")
-
-
-def get_logger():
-    rank = torch.distributed.get_rank()
-    Path(dir_memory).mkdir(exist_ok=True, parents=True)
-    path_log_memory = Path(dir_memory).joinpath(f"{rank}.log")
-    logger_vllm = logging.getLogger("megatron_vllm")
-    logger_vllm.setLevel("INFO")
-    formatter = logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                datefmt='%Y-%m-%d %H:%M:%S'
-            )
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel("INFO")
-    console_handler.setFormatter(formatter)
-    file_handler = logging.FileHandler(path_log_memory, encoding='utf-8')
-    file_handler.setLevel(logging.DEBUG)  # 文件记录更详细的日志
-    file_handler.setFormatter(formatter)
-    logger_vllm.addHandler(console_handler)
-    logger_vllm.addHandler(file_handler)
-
-    return logger_vllm
 
 """
 Megatron Hybrid Engine:
