@@ -127,7 +127,5 @@ log
 outputs
 .history
 
-vllm
-vllm_ascend
-megatron
+
 plog
