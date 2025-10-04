@@ -5,7 +5,7 @@ export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
 export RAY_DEDUP_LOGS=0
 # export HCCL_EXEC_TIMEOUT=3600
 export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
-export VLLM_SLEEP_LEVEL=1
+export VLLM_SLEEP_LEVEL=0
 export VERL_DEBUG_NOSHARDING=0
 
 export ASCEND_GLOBAL_LOG_LEVEL=3

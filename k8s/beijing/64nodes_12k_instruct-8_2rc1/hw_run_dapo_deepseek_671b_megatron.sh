@@ -65,7 +65,7 @@ max_num_batched_tokens=$((6*1024))
 
 offload=True
 gen_tp=8
-gen_dp=16
+gen_dp=8
 # gen_world_size=$((NNODES*8))
 train_tp=8
 train_ep=64
@@ -166,7 +166,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.nnodes="${NNODES}" \
     trainer.val_before_train=False \
     trainer.test_freq=-1 \
-    trainer.save_freq=-1 \
+    trainer.save_freq=2 \
     trainer.total_epochs=10 \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
