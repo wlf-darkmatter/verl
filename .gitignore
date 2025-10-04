@@ -127,6 +127,7 @@ log
 outputs
 .history
 
-vllm_ascend
 vllm
-plot
+vllm_ascend
+
+plog

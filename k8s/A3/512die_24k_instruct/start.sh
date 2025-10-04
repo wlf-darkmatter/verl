@@ -2,7 +2,7 @@ export HCCL_SOCKET_IFNAME=bond1 # modify according to actual situation
 export TP_SOCKET_IFNAME=bond1   # modify according to actual situation
 export GLOO_SOCKET_IFNAME=bond1 # modify according to actual situation
 # export HYDRA_FULL_ERROR=1
-export RAY_DEDUP_LOGS=0
+export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
 export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
 export VLLM_SLEEP_LEVEL=1
@@ -16,11 +16,12 @@ export TASK_QUEUE_ENABLE=2
 #! 注意，1001 加了这 几个超时配置
 export HCCL_EXEC_TIMEOUT=86400
 export HCCL_EVENT_TIMEOUT=86400
+export HCCL_CONNECT_TIMEOUT=7200
 export ACL_DEVICE_SYNC_TIMEOUT=86400
 export HCCL_ASYNC_ERROR_HANDLING=0
 
 #! 注意，1003 加了这 几个超时配置
-export RAY_DEBUG_POST_MORTEM=1
+export RAY_DEBUG_POST_MORTEM=0
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
@@ -56,12 +57,13 @@ export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
-export ASCEND_PROCESS_LOG_PATH=/opt/verl/logs/$MINDX_TASK_ID/plog # modify according to actual situation
+export ASCEND_PROCESS_LOG_PATH=/home/new_verl/plog/$(date +"%Y-%m-%d--%H-%M-%S")
 
 ray stop --force
 rm -rf /tmp/ray
 rm -rf /opt/verl
 cp -r /home/new_verl /opt/verl
+rm -f /opt/verl/.gitignore
 cd $(dirname $0)
 
 export ServerPort=6666     # modify according to actual situation

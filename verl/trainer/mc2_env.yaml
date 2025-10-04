@@ -1,5 +1,5 @@
 working_dir: ./
-excludes: ["/.git/", "/k8s", "/docker", "/doc", "/tmp"]
+excludes: ["/.git/", "/k8s", "/docker", "/doc", "/tmp", "kernel_meta"]
 env_vars:
 
   VLLM_USE_V1: "1"

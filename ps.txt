@@ -1,0 +1,989 @@
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.0  0.0   3724  2628 ?        Ss   11:46   0:00 /bin/bash -c bash /home/new_verl/k8s/A3/512die_24k_instruct/start.sh ;sleep 7d
+root           6  0.0  0.0   3856  2992 ?        S    11:46   0:00 bash /home/new_verl/k8s/A3/512die_24k_instruct/start.sh
+root         163 24.2  0.2 15206452 5778764 ?    Sl   11:47   8:19 /opt/pyvenv/lib/python3.10/site-packages/ray/core/src/ray/gcs/gcs_server --log_dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs --config_list=eyJvYmplY3Rfc3BpbGxpbmdfY29uZmlnIjogIntcInR5cGVcIjogXCJmaWxlc3lzdGVtXCIsIFwicGFyYW1zXCI6IHtcImRpcmVjdG9yeV9wYXRoXCI6IFwiL3RtcC9yYXkvc2Vzc2lvbl8yMDI1LTEwLTA0XzExLTQ3LTA3XzQ2NDc1NV85NlwifX0iLCAiaXNfZXh0ZXJuYWxfc3RvcmFnZV90eXBlX2ZzIjogdHJ1ZX0= --gcs_server_port=6666 --metrics-agent-port=61519 --node-ip-address=172.16.2.77 --session-name=session_2025-10-04_11-47-07_464755_96 --ray-commit=c3dd2ca0c2a24ddf327a213d2e936bd4eaa4ca0a --stdout_filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/gcs_server.out --stderr_filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/gcs_server.err
+root         710  1.9  0.0 505908 237548 ?       Sl   11:47   0:40 /opt/pyvenv/bin/python3 -u /opt/pyvenv/lib/python3.10/site-packages/ray/autoscaler/_private/monitor.py --logs-dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --gcs-address=172.16.2.77:6666 --stdout-filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/monitor.out --stderr-filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/monitor.err --monitor-ip=172.16.2.77
+root         711  0.1  0.0 658576 295420 ?       Sl   11:47   0:03 /opt/pyvenv/bin/python3 -m ray.util.client.server --address=172.16.2.77:6666 --host=0.0.0.0 --port=10001 --mode=proxy --runtime-env-agent-address=http://172.16.2.77:57927
+root         712  1.5  0.0 1030716 368300 ?      Sl   11:47   0:31 /opt/pyvenv/bin/python3 /opt/pyvenv/lib/python3.10/site-packages/ray/dashboard/dashboard.py --host=172.16.2.77 --port=8888 --port-retries=0 --temp-dir=/tmp/ray --log-dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs --session-dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96 --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --gcs-address=172.16.2.77:6666 --cluster-id-hex=a12ea2981be51af55496cb5dd58bdebd284822fc0f816e9e13443778 --node-ip-address=172.16.2.77 --stdout-filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/dashboard.out --stderr-filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/dashboard.err
+root         822  0.0  0.0  37196 19972 ?        S    11:47   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(25)
+root         823  0.1  0.0 717160 342792 ?       Sl   11:47   0:02 ray-dashboard-MetricsHead-0 (/opt/pyvenv/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=26, pipe_handle=28) --multiprocessing-fork)
+root         824  0.1  0.0 716136 318968 ?       Sl   11:47   0:02 ray-dashboard-DataHead-0 (/opt/pyvenv/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=26, pipe_handle=31) --multiprocessing-fork)
+root         825  3.8  0.0 749880 351464 ?       Sl   11:47   1:18 ray-dashboard-EventHead-0 (/opt/pyvenv/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=26, pipe_handle=34) --multiprocessing-fork)
+root         827  0.6  0.0 1046952 388656 ?      Sl   11:47   0:13 ray-dashboard-JobHead-0 (/opt/pyvenv/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=26, pipe_handle=37) --multiprocessing-fork)
+root         828  3.6  0.0 926452 429568 ?       Sl   11:47   1:14 ray-dashboard-NodeHead-0 (/opt/pyvenv/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=26, pipe_handle=40) --multiprocessing-fork)
+root         829  0.2  0.0 802296 374644 ?       Sl   11:47   0:05 ray-dashboard-ReportHead-0 (/opt/pyvenv/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=26, pipe_handle=43) --multiprocessing-fork)
+root         830  0.1  0.0 717160 335152 ?       Sl   11:47   0:02 ray-dashboard-ServeHead-0 (/opt/pyvenv/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=26, pipe_handle=46) --multiprocessing-fork)
+root         831  0.1  0.0 731896 330624 ?       Sl   11:47   0:02 ray-dashboard-StateHead-0 (/opt/pyvenv/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=26, pipe_handle=49) --multiprocessing-fork)
+root         832  0.1  0.0 718184 329408 ?       Sl   11:47   0:02 ray-dashboard-TrainHead-0 (/opt/pyvenv/bin/python3 -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=26, pipe_handle=52) --multiprocessing-fork)
+root        1298 16.4  0.0 199192888 1352348 ?   Sl   11:47   5:37 /opt/pyvenv/lib/python3.10/site-packages/ray/core/src/ray/raylet/raylet --raylet_socket_name=/tmp/ray/session_2025-10-04_11-47-07_464755_96/sockets/raylet --store_socket_name=/tmp/ray/session_2025-10-04_11-47-07_464755_96/sockets/plasma_store --object_manager_port=0 --min_worker_port=10002 --max_worker_port=19999 --node_manager_port=0 --node_id=4247b7f7fd8adbebf9c7898e27ed4942cf2b472878098d0b96400591 --node_ip_address=172.16.2.77 --maximum_startup_concurrency=640 --static_resource_list=node:172.16.2.77,1.0,node:__internal_head__,1.0,NPU,16,accelerator_type:Ascend910_9392,1,CPU,640,memory,650508132352,object_store_memory,200000000000 --python_worker_command=/opt/pyvenv/bin/python3 /opt/pyvenv/lib/python3.10/site-packages/ray/_private/workers/setup_worker.py /opt/pyvenv/lib/python3.10/site-packages/ray/_private/workers/default_worker.py --node-ip-address=172.16.2.77 --node-manager-port=RAY_NODE_MANAGER_PORT_PLACEHOLDER --object-store-name=/tmp/ray/session_2025-10-04_11-47-07_464755_96/sockets/plasma_store --raylet-name=/tmp/ray/session_2025-10-04_11-47-07_464755_96/sockets/raylet --redis-address=None --metrics-agent-port=61519 --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --runtime-env-agent-port=57927 --gcs-address=172.16.2.77:6666 --session-name=session_2025-10-04_11-47-07_464755_96 --temp-dir=/tmp/ray --webui=172.16.2.77:8888 --cluster-id=a12ea2981be51af55496cb5dd58bdebd284822fc0f816e9e13443778 RAY_WORKER_DYNAMIC_OPTION_PLACEHOLDER --java_worker_command= --cpp_worker_command= --native_library_path=/opt/pyvenv/lib/python3.10/site-packages/ray/cpp/lib --temp_dir=/tmp/ray --session_dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96 --log_dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs --resource_dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96/runtime_resources --metrics-agent-port=61519 --metrics_export_port=53789 --runtime_env_agent_port=57927 --object_store_memory=200000000000 --plasma_directory=/dev/shm --fallback_directory=/tmp/ray/session_2025-10-04_11-47-07_464755_96 --ray-debugger-external=1 --gcs-address=172.16.2.77:6666 --session-name=session_2025-10-04_11-47-07_464755_96 --labels= --cluster-id=a12ea2981be51af55496cb5dd58bdebd284822fc0f816e9e13443778 --stdout_filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/raylet.out --stderr_filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/raylet.err --head --num_prestart_python_workers=640 --dashboard_agent_command=/opt/pyvenv/bin/python3 -u /opt/pyvenv/lib/python3.10/site-packages/ray/dashboard/agent.py --node-ip-address=172.16.2.77 --metrics-export-port=53789 --dashboard-agent-port=61519 --listen-port=52365 --node-manager-port=RAY_NODE_MANAGER_PORT_PLACEHOLDER --object-store-name=/tmp/ray/session_2025-10-04_11-47-07_464755_96/sockets/plasma_store --raylet-name=/tmp/ray/session_2025-10-04_11-47-07_464755_96/sockets/raylet --temp-dir=/tmp/ray --session-dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96 --log-dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --session-name=session_2025-10-04_11-47-07_464755_96 --gcs-address=172.16.2.77:6666 --cluster-id-hex=a12ea2981be51af55496cb5dd58bdebd284822fc0f816e9e13443778 --stdout-filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/dashboard_agent.out --stderr-filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/dashboard_agent.err --runtime_env_agent_command=/opt/pyvenv/bin/python3 -u /opt/pyvenv/lib/python3.10/site-packages/ray/_private/runtime_env/agent/main.py --node-ip-address=172.16.2.77 --runtime-env-agent-port=57927 --gcs-address=172.16.2.77:6666 --cluster-id-hex=a12ea2981be51af55496cb5dd58bdebd284822fc0f816e9e13443778 --runtime-env-dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96/runtime_resources --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --log-dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs --temp-dir=/tmp/ray --stdout-filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/runtime_env_agent.out --stderr-filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/runtime_env_agent.err --node-name=172.16.2.77
+root        1328  5.8  0.0 456564 222636 ?       Sl   11:47   2:00 /opt/pyvenv/bin/python3 -u /opt/pyvenv/lib/python3.10/site-packages/ray/_private/log_monitor.py --session-dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96 --logs-dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs --gcs-address=172.16.2.77:6666 --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --stdout-filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/log_monitor.out --stderr-filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/log_monitor.err
+root        1374 61.7  0.0 214050016 380168 ?    Rl   11:47  21:09 /opt/pyvenv/bin/python3 -u /opt/pyvenv/lib/python3.10/site-packages/ray/dashboard/agent.py --node-ip-address=172.16.2.77 --metrics-export-port=53789 --dashboard-agent-port=61519 --listen-port=52365 --node-manager-port=39533 --object-store-name=/tmp/ray/session_2025-10-04_11-47-07_464755_96/sockets/plasma_store --raylet-name=/tmp/ray/session_2025-10-04_11-47-07_464755_96/sockets/raylet --temp-dir=/tmp/ray --session-dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96 --log-dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --session-name=session_2025-10-04_11-47-07_464755_96 --gcs-address=172.16.2.77:6666 --cluster-id-hex=a12ea2981be51af55496cb5dd58bdebd284822fc0f816e9e13443778 --stdout-filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/dashboard_agent.out --stderr-filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/dashboard_agent.err
+root        1378  0.0  0.0 2166552 105256 ?      Sl   11:47   0:01 /opt/pyvenv/bin/python3 -u /opt/pyvenv/lib/python3.10/site-packages/ray/_private/runtime_env/agent/main.py --node-ip-address=172.16.2.77 --runtime-env-agent-port=57927 --gcs-address=172.16.2.77:6666 --cluster-id-hex=a12ea2981be51af55496cb5dd58bdebd284822fc0f816e9e13443778 --runtime-env-dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96/runtime_resources --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --log-dir=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs --temp-dir=/tmp/ray --stdout-filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/runtime_env_agent.out --stderr-filepath=/tmp/ray/session_2025-10-04_11-47-07_464755_96/logs/runtime_env_agent.err
+root        1889  0.0  0.0   3856  2764 ?        S    11:48   0:00 bash hw_run_dapo_deepseek_671b_megatron.sh
+root        1890  0.3  0.0 4590780 202320 ?      Sl   11:48   0:07 /opt/pyvenv/bin/python3 /opt/pyvenv/bin/ray job submit --runtime-env=verl/trainer/mc2_env.yaml -- python3 -m recipe.dapo.main_dapo --config-path=config --config-name=dapo_megatron_trainer actor_rollout_ref.rollout.load_format=safetensors actor_rollout_ref.rollout.skip.enable=False actor_rollout_ref.rollout.skip.dump_dir=/mnt/hpfs_test/wlf/rollout_dump actor_rollout_ref.rollout.skip.dump_step=500 data.train_files=/mnt/hpfs_test/data/data/dapo-math-17k.parquet data.val_files=/mnt/hpfs_test/data/data/dapo-math-17k.parquet data.prompt_key=prompt data.truncation=left data.max_prompt_length=2048 data.max_response_length=24576 data.train_batch_size=128 actor_rollout_ref.rollout.n=16 algorithm.adv_estimator=grpo algorithm.use_kl_in_reward=False algorithm.kl_ctrl.kl_coef=0.0 algorithm.filter_groups.enable=False actor_rollout_ref.actor.use_kl_loss=False actor_rollout_ref.actor.kl_loss_coef=0.0 actor_rollout_ref.actor.clip_ratio_low=0.2 actor_rollout_ref.actor.clip_ratio_high=0.28 actor_rollout_ref.actor.clip_ratio_c=10.0 actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 actor_rollout_ref.model.path=/mnt/hpfs_test/weights/dsv3-bf16 actor_rollout_ref.actor.optim.lr=1e-6 actor_rollout_ref.actor.optim.lr_warmup_steps=5 actor_rollout_ref.actor.optim.weight_decay=0.1 actor_rollout_ref.actor.ppo_mini_batch_size=32 actor_rollout_ref.actor.megatron.param_offload=True actor_rollout_ref.actor.megatron.optimizer_offload=True actor_rollout_ref.actor.megatron.grad_offload=True actor_rollout_ref.actor.megatron.pipeline_model_parallel_size=8 actor_rollout_ref.actor.megatron.tensor_model_parallel_size=8 actor_rollout_ref.actor.megatron.expert_model_parallel_size=64 actor_rollout_ref.actor.megatron.dist_checkpointing_path=/data01/huawei-2025/weight/dsv3_fp16_mcore_full_new actor_rollout_ref.actor.megatron.use_dist_checkpointing=Ture +actor_rollout_ref.ref.megatron.override_transformer_config.use_flash_attn=True actor_rollout_ref.actor.megatron.expert_tensor_parallel_size=1 actor_rollout_ref.ref.megatron.expert_tensor_parallel_size=1 +actor_rollout_ref.actor.megatron.override_transformer_config.use_flash_attn=True +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_method=uniform +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_granularity=full +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=1 +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_first_pipeline_stage=7 +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_pipeline_stage=6 actor_rollout_ref.actor.entropy_coeff=0 actor_rollout_ref.actor.optim.clip_grad=1.0 actor_rollout_ref.actor.loss_agg_mode=token-mean actor_rollout_ref.rollout.gpu_memory_utilization=0.70 actor_rollout_ref.rollout.tensor_model_parallel_size=8 actor_rollout_ref.rollout.dp_model_parallel_size=8 actor_rollout_ref.rollout.enable_chunked_prefill=False actor_rollout_ref.rollout.enable_prefix_caching=False actor_rollout_ref.rollout.max_num_batched_tokens=6144 actor_rollout_ref.rollout.max_num_seqs=32 actor_rollout_ref.rollout.temperature=1.0 actor_rollout_ref.rollout.top_p=1.0 actor_rollout_ref.rollout.top_k=-1 actor_rollout_ref.rollout.val_kwargs.temperature=1.0 actor_rollout_ref.rollout.val_kwargs.top_p=0.7 actor_rollout_ref.rollout.val_kwargs.top_k=-1 actor_rollout_ref.rollout.val_kwargs.do_sample=True actor_rollout_ref.rollout.val_kwargs.n=1 actor_rollout_ref.rollout.enforce_eager=True actor_rollout_ref.rollout.name=vllm actor_rollout_ref.ref.megatron.pipeline_model_parallel_size=8 actor_rollout_ref.ref.megatron.tensor_model_parallel_size=8 actor_rollout_ref.ref.megatron.expert_model_parallel_size=64 actor_rollout_ref.ref.megatron.param_offload=True actor_rollout_ref.ref.megatron.dist_checkpointing_path=/data01/huawei-2025/weight/dsv3_fp16_mcore_full_new actor_rollout_ref.ref.megatron.use_dist_checkpointing=True reward_model.reward_manager=dapo +reward_model.reward_kwargs.overlong_buffer_cfg.enable=True +reward_model.reward_kwargs.overlong_buffer_cfg.len=1024 +reward_model.reward_kwargs.overlong_buffer_cfg.penalty_factor=0.3 +reward_model.reward_kwargs.overlong_buffer_cfg.log=False +reward_model.reward_kwargs.max_resp_len=24576 trainer.logger=["console"] actor_rollout_ref.actor.load_weight=False actor_rollout_ref.ref.load_weight=False trainer.project_name=DAPO trainer.experiment_name=DAPO-DeepSeek-671b-megatron-INSTRUCT-64NNODES trainer.n_gpus_per_node=16 trainer.nnodes=32 trainer.val_before_train=False trainer.test_freq=-1 trainer.save_freq=10 trainer.total_epochs=10 trainer.default_local_dir=/mnt/hpfs_test/ckpt/ckpt-DAPO-DeepSeek-671b-megatron-2k24k trainer.resume_mode=auto trainer.log_val_generations=10 actor_rollout_ref.rollout.free_cache_engine=True trainer.device=npu
+root        1891  0.0  0.0   2224   780 ?        S    11:48   0:00 tee /tmp/ray.output
+root        1995  0.2  0.0 208822924 97628 ?     SNl  11:48   0:05 ray::IDLE
+root        1996  0.2  0.0 208822932 97320 ?     SNl  11:48   0:05 ray::IDLE
+root        1997  0.2  0.0 208822932 100016 ?    SNl  11:48   0:05 ray::IDLE
+root        1998  0.2  0.0 208822928 97460 ?     SNl  11:48   0:05 ray::IDLE
+root        1999  0.2  0.0 208822936 99572 ?     SNl  11:48   0:05 ray::IDLE
+root        2000  0.2  0.0 208822920 99952 ?     SNl  11:48   0:05 ray::IDLE
+root        2001  0.2  0.0 208822928 95620 ?     SNl  11:48   0:05 ray::IDLE
+root        2002  0.2  0.0 208822932 99932 ?     SNl  11:48   0:05 ray::IDLE
+root        2003  0.2  0.0 208822932 97516 ?     SNl  11:48   0:05 ray::IDLE
+root        2004  0.2  0.0 208822928 97996 ?     SNl  11:48   0:05 ray::IDLE
+root        2005  0.2  0.0 208822924 97740 ?     SNl  11:48   0:05 ray::IDLE
+root        2006  0.2  0.0 208822928 99872 ?     SNl  11:48   0:05 ray::IDLE
+root        2007  0.2  0.0 208822996 95864 ?     SNl  11:48   0:05 ray::IDLE
+root        2008  0.2  0.0 208822928 97876 ?     SNl  11:48   0:05 ray::IDLE
+root        2009  0.2  0.0 208822936 95528 ?     SNl  11:48   0:05 ray::IDLE
+root        2010  0.3  0.0 208822920 97740 ?     SNl  11:48   0:06 ray::IDLE
+root        2011  0.2  0.0 208822924 97960 ?     SNl  11:48   0:05 ray::IDLE
+root        2012  0.2  0.0 208822916 96100 ?     SNl  11:48   0:05 ray::IDLE
+root        2013  0.2  0.0 208822944 97612 ?     SNl  11:48   0:05 ray::IDLE
+root        2014  0.2  0.0 208822920 98104 ?     SNl  11:48   0:05 ray::IDLE
+root        2015  0.2  0.0 208822920 98088 ?     SNl  11:48   0:05 ray::IDLE
+root        2016  0.2  0.0 208822924 97884 ?     SNl  11:48   0:05 ray::IDLE
+root        2018  0.2  0.0 208822920 99848 ?     SNl  11:48   0:05 ray::IDLE
+root        2046  0.2  0.0 208822920 99536 ?     SNl  11:48   0:05 ray::IDLE
+root        2073  0.3  0.0 208822920 97784 ?     SNl  11:48   0:06 ray::IDLE
+root        2078  0.2  0.0 208822920 99688 ?     SNl  11:48   0:05 ray::IDLE
+root        2132  0.3  0.0 208822932 97444 ?     SNl  11:48   0:06 ray::IDLE
+root        2155  0.2  0.0 208822920 100272 ?    SNl  11:48   0:05 ray::IDLE
+root        2210  0.2  0.0 208822932 96140 ?     SNl  11:48   0:05 ray::IDLE
+root        2241  0.2  0.0 208822932 97752 ?     SNl  11:48   0:05 ray::IDLE
+root        2267  0.2  0.0 208822928 97612 ?     SNl  11:48   0:05 ray::IDLE
+root        2297  0.3  0.0 208822924 97516 ?     SNl  11:48   0:06 ray::IDLE
+root        2327  0.2  0.0 208822928 98064 ?     SNl  11:48   0:05 ray::IDLE
+root        2357  0.2  0.0 208822924 99996 ?     SNl  11:48   0:05 ray::IDLE
+root        2383  0.2  0.0 208822924 98012 ?     SNl  11:48   0:05 ray::IDLE
+root        2433  0.2  0.0 208822924 98140 ?     SNl  11:48   0:05 ray::IDLE
+root        2461  0.3  0.0 208822932 99548 ?     SNl  11:48   0:06 ray::IDLE
+root        2464  0.3  0.0 208822920 97876 ?     SNl  11:48   0:06 ray::IDLE
+root        2468  0.2  0.0 208822924 96044 ?     SNl  11:48   0:05 ray::IDLE
+root        2518  0.2  0.0 208822924 99696 ?     SNl  11:48   0:05 ray::IDLE
+root        2521  0.2  0.0 208822924 97648 ?     SNl  11:48   0:05 ray::IDLE
+root        2525  0.2  0.0 208822936 97020 ?     SNl  11:48   0:05 ray::IDLE
+root        2576  0.2  0.0 208822932 97972 ?     SNl  11:48   0:05 ray::IDLE
+root        2624  0.2  0.0 208822936 99176 ?     SNl  11:48   0:05 ray::IDLE
+root        2663  0.2  0.0 208822940 97780 ?     SNl  11:48   0:05 ray::IDLE
+root        2676  0.2  0.0 208822932 99044 ?     SNl  11:48   0:05 ray::IDLE
+root        2705  0.2  0.0 208822920 97512 ?     SNl  11:48   0:05 ray::IDLE
+root        2731  0.2  0.0 208822924 97992 ?     SNl  11:48   0:05 ray::IDLE
+root        2757  0.2  0.0 208822932 97904 ?     SNl  11:48   0:05 ray::IDLE
+root        2780  0.2  0.0 208822924 96120 ?     SNl  11:48   0:05 ray::IDLE
+root        2784  0.2  0.0 208822936 99788 ?     SNl  11:48   0:05 ray::IDLE
+root        2823  0.2  0.0 208822936 97664 ?     SNl  11:48   0:05 ray::IDLE
+root        2833  0.3  0.0 208822916 97932 ?     SNl  11:48   0:06 ray::IDLE
+root        2862  0.2  0.0 208822932 99908 ?     SNl  11:48   0:05 ray::IDLE
+root        2888  0.2  0.0 208822924 98156 ?     SNl  11:48   0:05 ray::IDLE
+root        2940  0.2  0.0 208822924 99752 ?     SNl  11:48   0:05 ray::IDLE
+root        2946  0.2  0.0 208822920 100008 ?    SNl  11:48   0:05 ray::IDLE
+root        2995  0.2  0.0 208822916 100240 ?    SNl  11:48   0:05 ray::IDLE
+root        3084  0.2  0.0 208822932 99756 ?     SNl  11:48   0:05 ray::IDLE
+root        3090  0.2  0.0 208822928 98124 ?     SNl  11:48   0:05 ray::IDLE
+root        3124  0.2  0.0 208822920 98044 ?     SNl  11:48   0:05 ray::IDLE
+root        3162  0.2  0.0 208822924 100016 ?    SNl  11:48   0:05 ray::IDLE
+root        3186  0.3  0.0 208822928 97868 ?     SNl  11:48   0:06 ray::IDLE
+root        3216  0.2  0.0 208822936 97656 ?     SNl  11:48   0:05 ray::IDLE
+root        3244  0.2  0.0 208822936 101888 ?    SNl  11:48   0:05 ray::IDLE
+root        3276  0.2  0.0 208822924 95972 ?     SNl  11:48   0:05 ray::IDLE
+root        3308  0.2  0.0 208822924 97768 ?     SNl  11:48   0:05 ray::IDLE
+root        3331  0.2  0.0 208822932 99060 ?     SNl  11:48   0:05 ray::IDLE
+root        3347  0.2  0.0 208822928 97636 ?     SNl  11:48   0:05 ray::IDLE
+root        3417  0.2  0.0 208822932 99648 ?     SNl  11:48   0:05 ray::IDLE
+root        3442  0.2  0.0 208822920 99964 ?     SNl  11:48   0:05 ray::IDLE
+root        3471  0.2  0.0 208822940 98004 ?     SNl  11:48   0:05 ray::IDLE
+root        3498  0.3  0.0 208822928 95700 ?     SNl  11:48   0:06 ray::IDLE
+root        3524  0.2  0.0 208822940 97820 ?     SNl  11:48   0:05 ray::IDLE
+root        3552  0.2  0.0 208822940 97676 ?     SNl  11:48   0:05 ray::IDLE
+root        3556  0.2  0.0 208822936 99300 ?     SNl  11:48   0:05 ray::IDLE
+root        3606  0.2  0.0 208822920 97500 ?     SNl  11:48   0:05 ray::IDLE
+root        3614  0.2  0.0 208822936 100148 ?    SNl  11:48   0:05 ray::IDLE
+root        3639  0.2  0.0 208822936 97820 ?     SNl  11:48   0:05 ray::IDLE
+root        3640  0.2  0.0 208822936 97724 ?     SNl  11:48   0:05 ray::IDLE
+root        3644  0.3  0.0 208822936 98008 ?     SNl  11:48   0:06 ray::IDLE
+root        3675  0.2  0.0 208822924 99616 ?     SNl  11:48   0:05 ray::IDLE
+root        3720  0.3  0.0 208822940 95976 ?     SNl  11:48   0:06 ray::IDLE
+root        3750  0.2  0.0 208822936 100132 ?    SNl  11:48   0:05 ray::IDLE
+root        3756  0.2  0.0 208822924 97400 ?     SNl  11:48   0:05 ray::IDLE
+root        3784  0.2  0.0 208822924 99948 ?     SNl  11:48   0:05 ray::IDLE
+root        3812  0.2  0.0 208822932 99560 ?     SNl  11:48   0:05 ray::IDLE
+root        3841  0.2  0.0 208822924 97468 ?     SNl  11:48   0:05 ray::IDLE
+root        3868  0.2  0.0 208822936 98012 ?     SNl  11:48   0:05 ray::IDLE
+root        3896  0.2  0.0 208822924 99636 ?     SNl  11:48   0:05 ray::IDLE
+root        3946  0.2  0.0 208822932 100088 ?    SNl  11:48   0:05 ray::IDLE
+root        3949  0.2  0.0 208822940 97784 ?     SNl  11:48   0:05 ray::IDLE
+root        3968  0.3  0.0 208822932 96092 ?     SNl  11:48   0:06 ray::IDLE
+root        4006  0.2  0.0 208822928 99944 ?     SNl  11:48   0:05 ray::IDLE
+root        4032  0.2  0.0 208822928 95580 ?     SNl  11:48   0:05 ray::IDLE
+root        4060  0.2  0.0 208822936 99876 ?     SNl  11:48   0:05 ray::IDLE
+root        4099  0.2  0.0 208822936 97616 ?     SNl  11:48   0:05 ray::IDLE
+root        4120  0.2  0.0 208822936 99560 ?     SNl  11:48   0:05 ray::IDLE
+root        4146  0.3  0.0 208822932 99436 ?     SNl  11:48   0:06 ray::IDLE
+root        4182  0.3  0.0 208822924 97960 ?     SNl  11:48   0:06 ray::IDLE
+root        4212  0.2  0.0 208822928 99928 ?     SNl  11:48   0:05 ray::IDLE
+root        4230  0.3  0.0 208822936 99668 ?     SNl  11:48   0:06 ray::IDLE
+root        4258  0.2  0.0 208822920 100080 ?    SNl  11:48   0:05 ray::IDLE
+root        4285  0.2  0.0 208822924 99888 ?     SNl  11:48   0:05 ray::IDLE
+root        4286  0.2  0.0 208822928 98012 ?     SNl  11:48   0:05 ray::IDLE
+root        4288  0.3  0.0 208822928 97820 ?     SNl  11:48   0:06 ray::IDLE
+root        4338  0.2  0.0 208822928 97468 ?     SNl  11:48   0:05 ray::IDLE
+root        4347  0.2  0.0 208822936 99736 ?     SNl  11:48   0:05 ray::IDLE
+root        4402  0.2  0.0 208822928 97632 ?     SNl  11:48   0:05 ray::IDLE
+root        4456  0.2  0.0 208822928 96020 ?     SNl  11:48   0:05 ray::IDLE
+root        4484  0.2  0.0 208822936 100052 ?    SNl  11:48   0:05 ray::IDLE
+root        4512  0.2  0.0 208822924 96236 ?     SNl  11:48   0:05 ray::IDLE
+root        4560  0.2  0.0 208822936 95956 ?     SNl  11:48   0:05 ray::IDLE
+root        4595  0.2  0.0 208822920 97804 ?     SNl  11:48   0:05 ray::IDLE
+root        4618  0.2  0.0 208822936 99884 ?     SNl  11:48   0:05 ray::IDLE
+root        4646  0.2  0.0 208822932 98144 ?     SNl  11:48   0:05 ray::IDLE
+root        4735  0.2  0.0 208822936 99984 ?     SNl  11:48   0:05 ray::IDLE
+root        4759  0.3  0.0 208822932 100188 ?    SNl  11:48   0:06 ray::IDLE
+root        4787  0.2  0.0 208822928 96064 ?     SNl  11:48   0:05 ray::IDLE
+root        4801  0.2  0.0 208822924 98136 ?     SNl  11:48   0:05 ray::IDLE
+root        4845  0.3  0.0 208822928 97708 ?     SNl  11:48   0:06 ray::IDLE
+root        4870  0.2  0.0 208822924 97460 ?     SNl  11:48   0:05 ray::IDLE
+root        4899  0.2  0.0 208822924 97924 ?     SNl  11:48   0:05 ray::IDLE
+root        4929  0.2  0.0 208822932 95864 ?     SNl  11:48   0:05 ray::IDLE
+root        4955  0.2  0.0 208822928 97988 ?     SNl  11:48   0:05 ray::IDLE
+root        5007  0.2  0.0 208822920 99936 ?     SNl  11:48   0:05 ray::IDLE
+root        5039  0.2  0.0 208822928 99960 ?     SNl  11:48   0:05 ray::IDLE
+root        5090  0.2  0.0 208822928 97912 ?     SNl  11:48   0:05 ray::IDLE
+root        5118  0.3  0.0 208822936 99520 ?     SNl  11:48   0:06 ray::IDLE
+root        5147  0.2  0.0 208822924 99924 ?     SNl  11:48   0:05 ray::IDLE
+root        5176  0.2  0.0 208822928 99964 ?     SNl  11:48   0:05 ray::IDLE
+root        5181  0.2  0.0 208822924 95992 ?     SNl  11:48   0:05 ray::IDLE
+root        5232  0.2  0.0 208822924 99760 ?     SNl  11:48   0:05 ray::IDLE
+root        5258  0.2  0.0 208822924 98188 ?     SNl  11:48   0:05 ray::IDLE
+root        5261  0.2  0.0 208822928 100012 ?    SNl  11:48   0:05 ray::IDLE
+root        5262  0.3  0.0 208822924 97964 ?     SNl  11:48   0:06 ray::IDLE
+root        5266  0.2  0.0 208822920 98120 ?     SNl  11:48   0:05 ray::IDLE
+root        5294  0.2  0.0 208822928 95604 ?     SNl  11:48   0:05 ray::IDLE
+root        5323  0.2  0.0 208822928 96024 ?     SNl  11:48   0:05 ray::IDLE
+root        5372  0.3  0.0 208822928 99776 ?     SNl  11:48   0:06 ray::IDLE
+root        5378  0.2  0.0 208822928 97912 ?     SNl  11:48   0:05 ray::IDLE
+root        5428  0.2  0.0 208822928 97584 ?     SNl  11:48   0:05 ray::IDLE
+root        5456  0.2  0.0 208822924 95984 ?     SNl  11:48   0:05 ray::IDLE
+root        5484  0.2  0.0 208822932 96120 ?     SNl  11:48   0:05 ray::IDLE
+root        5515  0.3  0.0 208822924 99868 ?     SNl  11:48   0:06 ray::IDLE
+root        5543  0.2  0.0 208822924 97828 ?     SNl  11:48   0:05 ray::IDLE
+root        5569  0.3  0.0 208822928 98292 ?     SNl  11:48   0:06 ray::IDLE
+root        5596  0.2  0.0 208822928 99616 ?     SNl  11:48   0:05 ray::IDLE
+root        5624  0.2  0.0 208822924 96000 ?     SNl  11:48   0:05 ray::IDLE
+root        5655  0.2  0.0 208822924 99816 ?     SNl  11:48   0:05 ray::IDLE
+root        5685  0.2  0.0 208822920 99572 ?     SNl  11:48   0:05 ray::IDLE
+root        5711  0.2  0.0 208822928 97776 ?     SNl  11:48   0:05 ray::IDLE
+root        5736  0.2  0.0 208822924 98004 ?     SNl  11:48   0:05 ray::IDLE
+root        5764  0.2  0.0 208822928 99988 ?     SNl  11:48   0:05 ray::IDLE
+root        5775  0.2  0.0 208822928 95944 ?     SNl  11:48   0:05 ray::IDLE
+root        5826  0.2  0.0 208822936 99920 ?     SNl  11:48   0:05 ray::IDLE
+root        5849  0.2  0.0 208822924 99556 ?     SNl  11:48   0:05 ray::IDLE
+root        5880  0.3  0.0 208822924 98028 ?     SNl  11:48   0:06 ray::IDLE
+root        5907  0.3  0.0 208822924 100076 ?    SNl  11:48   0:06 ray::IDLE
+root        5958  0.2  0.0 208822924 98048 ?     SNl  11:48   0:05 ray::IDLE
+root        5964  0.3  0.0 208822936 100244 ?    SNl  11:48   0:06 ray::IDLE
+root        5992  0.2  0.0 208822928 99996 ?     SNl  11:48   0:05 ray::IDLE
+root        6022  0.2  0.0 208822948 97856 ?     SNl  11:48   0:05 ray::IDLE
+root        6047  0.2  0.0 208822928 97524 ?     SNl  11:48   0:05 ray::IDLE
+root        6052  0.2  0.0 208822924 100048 ?    SNl  11:48   0:05 ray::IDLE
+root        6099  0.2  0.0 208822924 100072 ?    SNl  11:48   0:05 ray::IDLE
+root        6132  0.2  0.0 208822932 97988 ?     SNl  11:48   0:05 ray::IDLE
+root        6162  0.2  0.0 208822936 99728 ?     SNl  11:48   0:05 ray::IDLE
+root        6190  0.2  0.0 208822932 97628 ?     SNl  11:48   0:05 ray::IDLE
+root        6216  0.3  0.0 208822936 98004 ?     SNl  11:48   0:06 ray::IDLE
+root        6248  0.2  0.0 208822936 99680 ?     SNl  11:48   0:05 ray::IDLE
+root        6292  0.2  0.0 208822920 99980 ?     SNl  11:48   0:05 ray::IDLE
+root        6302  0.2  0.0 208822940 95808 ?     SNl  11:48   0:05 ray::IDLE
+root        6330  0.2  0.0 208822928 98152 ?     SNl  11:48   0:05 ray::IDLE
+root        6355  0.2  0.0 208822924 97892 ?     SNl  11:48   0:05 ray::IDLE
+root        6384  0.2  0.0 208822936 99832 ?     SNl  11:48   0:05 ray::IDLE
+root        6414  0.2  0.0 208822932 97892 ?     SNl  11:48   0:05 ray::IDLE
+root        6442  0.2  0.0 208822928 100004 ?    SNl  11:48   0:05 ray::IDLE
+root        6470  0.2  0.0 208822928 96260 ?     SNl  11:48   0:05 ray::IDLE
+root        6498  0.2  0.0 208822928 97800 ?     SNl  11:48   0:05 ray::IDLE
+root        6526  0.2  0.0 208822920 98028 ?     SNl  11:48   0:05 ray::IDLE
+root        6554  0.3  0.0 208822928 99944 ?     SNl  11:48   0:06 ray::IDLE
+root        6582  0.2  0.0 208822928 100136 ?    SNl  11:48   0:05 ray::IDLE
+root        6610  0.2  0.0 208822928 99792 ?     SNl  11:48   0:05 ray::IDLE
+root        6660  0.2  0.0 208822928 97888 ?     SNl  11:48   0:05 ray::IDLE
+root        6666  0.2  0.0 208822924 98048 ?     SNl  11:48   0:05 ray::IDLE
+root        6667  0.3  0.0 208822928 99904 ?     SNl  11:48   0:06 ray::IDLE
+root        6708  0.2  0.0 208822924 100124 ?    SNl  11:48   0:05 ray::IDLE
+root        6719  0.2  0.0 208822940 97484 ?     SNl  11:48   0:05 ray::IDLE
+root        6747  0.3  0.0 208822936 97908 ?     SNl  11:48   0:06 ray::IDLE
+root        6778  0.2  0.0 208822920 97808 ?     SNl  11:48   0:05 ray::IDLE
+root        6808  0.2  0.0 208822924 98048 ?     SNl  11:48   0:05 ray::IDLE
+root        6858  0.2  0.0 208822928 97764 ?     SNl  11:48   0:05 ray::IDLE
+root        6886  0.2  0.0 208822924 100140 ?    SNl  11:48   0:05 ray::IDLE
+root        6914  0.2  0.0 208822928 97904 ?     SNl  11:48   0:05 ray::IDLE
+root        6942  0.2  0.0 208822924 97596 ?     SNl  11:48   0:05 ray::IDLE
+root        6970  0.2  0.0 208822924 99980 ?     SNl  11:48   0:05 ray::IDLE
+root        6998  0.2  0.0 208822928 96128 ?     SNl  11:48   0:05 ray::IDLE
+root        7004  0.2  0.0 208822924 100324 ?    SNl  11:48   0:05 ray::IDLE
+root        7037  0.2  0.0 208822928 100008 ?    SNl  11:48   0:05 ray::IDLE
+root        7060  0.2  0.0 208822928 96268 ?     SNl  11:48   0:05 ray::IDLE
+root        7092  0.2  0.0 208822924 99736 ?     SNl  11:48   0:05 ray::IDLE
+root        7138  0.3  0.0 208822924 100064 ?    SNl  11:48   0:06 ray::IDLE
+root        7166  0.2  0.0 208822924 98060 ?     SNl  11:48   0:05 ray::IDLE
+root        7183  0.2  0.0 208822924 100052 ?    SNl  11:48   0:05 ray::IDLE
+root        7222  0.2  0.0 208822928 97912 ?     SNl  11:48   0:05 ray::IDLE
+root        7228  0.2  0.0 208822936 100080 ?    SNl  11:48   0:05 ray::IDLE
+root        7281  0.2  0.0 208822924 97728 ?     SNl  11:48   0:05 ray::IDLE
+root        7306  0.2  0.0 208822928 99804 ?     SNl  11:48   0:05 ray::IDLE
+root        7337  0.2  0.0 208822928 99520 ?     SNl  11:48   0:05 ray::IDLE
+root        7365  0.2  0.0 208822928 99704 ?     SNl  11:48   0:05 ray::IDLE
+root        7391  0.2  0.0 208822924 95704 ?     SNl  11:48   0:05 ray::IDLE
+root        7418  0.2  0.0 208822924 98080 ?     SNl  11:48   0:05 ray::IDLE
+root        7424  0.2  0.0 208822924 97500 ?     SNl  11:48   0:05 ray::IDLE
+root        7452  0.3  0.0 208822932 99916 ?     SNl  11:48   0:06 ray::IDLE
+root        7480  0.2  0.0 208822928 100088 ?    SNl  11:48   0:05 ray::IDLE
+root        7513  0.2  0.0 208822924 99868 ?     SNl  11:48   0:05 ray::IDLE
+root        7558  0.2  0.0 208822928 97988 ?     SNl  11:48   0:05 ray::IDLE
+root        7564  0.2  0.0 208822928 100100 ?    SNl  11:48   0:05 ray::IDLE
+root        7593  0.2  0.0 208822928 97724 ?     SNl  11:48   0:05 ray::IDLE
+root        7620  0.2  0.0 208822928 99916 ?     SNl  11:48   0:05 ray::IDLE
+root        7670  0.2  0.0 208822932 99676 ?     SNl  11:48   0:05 ray::IDLE
+root        7676  0.2  0.0 208822924 98136 ?     SNl  11:48   0:05 ray::IDLE
+root        7701  0.3  0.0 208822924 98300 ?     SNl  11:48   0:06 ray::IDLE
+root        7730  0.2  0.0 208822924 97940 ?     SNl  11:48   0:05 ray::IDLE
+root        7758  0.2  0.0 208822924 97932 ?     SNl  11:48   0:05 ray::IDLE
+root        7793  0.2  0.0 208822928 100056 ?    SNl  11:48   0:05 ray::IDLE
+root        7819  0.2  0.0 208822924 99868 ?     SNl  11:48   0:05 ray::IDLE
+root        7864  0.2  0.0 208822932 98060 ?     SNl  11:48   0:05 ray::IDLE
+root        7870  0.3  0.0 208822944 97996 ?     SNl  11:48   0:06 ray::IDLE
+root        7898  0.2  0.0 208822928 99552 ?     SNl  11:48   0:05 ray::IDLE
+root        7928  0.2  0.0 208822924 95980 ?     SNl  11:48   0:05 ray::IDLE
+root        7978  0.3  0.0 208822928 97868 ?     SNl  11:48   0:06 ray::IDLE
+root        7984  0.2  0.0 208822940 99692 ?     SNl  11:48   0:05 ray::IDLE
+root        8012  0.2  0.0 208822932 99568 ?     SNl  11:48   0:05 ray::IDLE
+root        8040  0.2  0.0 208822936 97576 ?     SNl  11:48   0:05 ray::IDLE
+root        8063  0.2  0.0 208822924 97484 ?     SNl  11:48   0:05 ray::IDLE
+root        8116  0.2  0.0 208822928 99528 ?     SNl  11:48   0:05 ray::IDLE
+root        8122  0.2  0.0 208822928 99768 ?     SNl  11:48   0:05 ray::IDLE
+root        8150  0.2  0.0 208822936 97768 ?     SNl  11:48   0:05 ray::IDLE
+root        8153  0.2  0.0 208822936 99964 ?     SNl  11:48   0:05 ray::IDLE
+root        8182  0.2  0.0 208822924 97580 ?     SNl  11:48   0:05 ray::IDLE
+root        8231  0.2  0.0 208822928 97880 ?     SNl  11:48   0:05 ray::IDLE
+root        8325  0.2  0.0 208822936 97620 ?     SNl  11:48   0:05 ray::IDLE
+root        8344  0.2  0.0 208822932 97520 ?     SNl  11:48   0:05 ray::IDLE
+root        8349  0.2  0.0 208822924 99964 ?     SNl  11:48   0:05 ray::IDLE
+root        8381  0.2  0.0 208822924 97716 ?     SNl  11:48   0:05 ray::IDLE
+root        8437  0.3  0.0 208822944 100080 ?    SNl  11:48   0:06 ray::IDLE
+root        8466  0.2  0.0 208822924 99596 ?     SNl  11:48   0:05 ray::IDLE
+root        8495  0.3  0.0 208822928 100196 ?    SNl  11:48   0:06 ray::IDLE
+root        8523  0.3  0.0 208822932 99660 ?     SNl  11:48   0:06 ray::IDLE
+root        8552  0.2  0.0 208822928 99764 ?     SNl  11:48   0:05 ray::IDLE
+root        8583  0.3  0.0 208822932 99660 ?     SNl  11:48   0:06 ray::IDLE
+root        8612  0.2  0.0 208822924 97900 ?     SNl  11:48   0:05 ray::IDLE
+root        8641  0.2  0.0 208822924 97932 ?     SNl  11:48   0:05 ray::IDLE
+root        8670  0.3  0.0 208822936 98136 ?     SNl  11:48   0:06 ray::IDLE
+root        8696  0.3  0.0 208822924 97788 ?     SNl  11:48   0:06 ray::IDLE
+root        8748  0.2  0.0 208822928 95636 ?     SNl  11:48   0:05 ray::IDLE
+root        8756  0.2  0.0 208822924 99524 ?     SNl  11:48   0:05 ray::IDLE
+root        8783  0.2  0.0 208822916 97904 ?     SNl  11:48   0:05 ray::IDLE
+root        8835  0.2  0.0 208822928 99976 ?     SNl  11:48   0:05 ray::IDLE
+root        8841  0.2  0.0 208822916 95948 ?     SNl  11:48   0:05 ray::IDLE
+root        8844  0.2  0.0 208822928 97868 ?     SNl  11:48   0:05 ray::IDLE
+root        8850  0.2  0.0 208822928 97672 ?     SNl  11:48   0:05 ray::IDLE
+root        8900  0.2  0.0 208822928 100136 ?    SNl  11:48   0:05 ray::IDLE
+root        8929  0.2  0.0 208822924 97768 ?     SNl  11:48   0:05 ray::IDLE
+root        8958  0.3  0.0 208822924 97508 ?     SNl  11:48   0:06 ray::IDLE
+root        8968  0.2  0.0 208822928 97916 ?     SNl  11:48   0:05 ray::IDLE
+root        8999  0.2  0.0 208822924 97896 ?     SNl  11:48   0:05 ray::IDLE
+root        9020  0.2  0.0 208822924 99924 ?     SNl  11:48   0:05 ray::IDLE
+root        9047  0.2  0.0 208822924 97860 ?     SNl  11:48   0:05 ray::IDLE
+root        9054  0.2  0.0 208822924 98084 ?     SNl  11:48   0:05 ray::IDLE
+root        9108  0.2  0.0 208822924 101756 ?    SNl  11:48   0:05 ray::IDLE
+root        9136  0.2  0.0 208822928 95672 ?     SNl  11:48   0:05 ray::IDLE
+root        9141  0.3  0.0 208822932 98060 ?     SNl  11:48   0:06 ray::IDLE
+root        9170  0.3  0.0 208822936 97768 ?     SNl  11:48   0:05 ray::IDLE
+root        9204  0.2  0.0 208822924 100196 ?    SNl  11:48   0:05 ray::IDLE
+root        9251  0.2  0.0 208822940 97876 ?     SNl  11:48   0:05 ray::IDLE
+root        9281  0.2  0.0 208822924 100048 ?    SNl  11:48   0:05 ray::IDLE
+root        9283  0.2  0.0 208822932 97992 ?     SNl  11:48   0:05 ray::IDLE
+root        9310  0.2  0.0 208822924 97660 ?     SNl  11:48   0:05 ray::IDLE
+root        9367  0.3  0.0 208822928 100176 ?    SNl  11:48   0:06 ray::IDLE
+root        9398  0.2  0.0 208822924 99984 ?     SNl  11:48   0:05 ray::IDLE
+root        9418  0.2  0.0 208822928 97640 ?     SNl  11:48   0:05 ray::IDLE
+root        9456  0.2  0.0 208822924 98020 ?     SNl  11:48   0:05 ray::IDLE
+root        9461  0.2  0.0 208822924 99672 ?     SNl  11:48   0:05 ray::IDLE
+root        9516  0.2  0.0 208822928 101720 ?    SNl  11:48   0:05 ray::IDLE
+root        9547  0.2  0.0 208822932 95596 ?     SNl  11:48   0:05 ray::IDLE
+root        9597  0.2  0.0 208822924 96024 ?     SNl  11:48   0:05 ray::IDLE
+root        9603  0.2  0.0 208822928 99816 ?     SNl  11:48   0:05 ray::IDLE
+root        9632  0.2  0.0 208822932 98004 ?     SNl  11:48   0:05 ray::IDLE
+root        9663  0.2  0.0 208822936 99180 ?     SNl  11:48   0:05 ray::IDLE
+root        9717  0.2  0.0 208822924 100096 ?    SNl  11:48   0:05 ray::IDLE
+root        9745  0.2  0.0 208822932 100116 ?    SNl  11:48   0:05 ray::IDLE
+root        9747  0.3  0.0 208822924 97884 ?     SNl  11:48   0:06 ray::IDLE
+root        9776  0.2  0.0 208822928 97580 ?     SNl  11:48   0:05 ray::IDLE
+root        9799  0.2  0.0 208822940 100020 ?    SNl  11:48   0:05 ray::IDLE
+root        9829  0.3  0.0 208822928 100024 ?    SNl  11:48   0:06 ray::IDLE
+root        9864  0.2  0.0 208822924 98052 ?     SNl  11:48   0:05 ray::IDLE
+root        9902  0.2  0.0 208822928 98268 ?     SNl  11:48   0:05 ray::IDLE
+root        9910  0.3  0.0 208822924 97848 ?     SNl  11:48   0:06 ray::IDLE
+root        9942  0.2  0.0 208822924 97920 ?     SNl  11:48   0:05 ray::IDLE
+root        9970  0.2  0.0 208822928 100180 ?    SNl  11:48   0:05 ray::IDLE
+root       10002  0.2  0.0 208822928 97876 ?     SNl  11:48   0:05 ray::IDLE
+root       10032  0.2  0.0 208822928 100040 ?    SNl  11:48   0:05 ray::IDLE
+root       10055  0.2  0.0 208822928 95996 ?     SNl  11:48   0:05 ray::IDLE
+root       10086  0.2  0.0 208822932 101692 ?    SNl  11:48   0:05 ray::IDLE
+root       10115  0.2  0.0 208822928 99780 ?     SNl  11:48   0:05 ray::IDLE
+root       10149  0.2  0.0 208822924 97716 ?     SNl  11:48   0:05 ray::IDLE
+root       10178  0.2  0.0 208822924 100108 ?    SNl  11:48   0:05 ray::IDLE
+root       10206  0.2  0.0 208822924 96056 ?     SNl  11:48   0:05 ray::IDLE
+root       10235  0.2  0.0 208822924 99608 ?     SNl  11:48   0:05 ray::IDLE
+root       10264  0.2  0.0 208822928 100092 ?    SNl  11:48   0:05 ray::IDLE
+root       10277  0.2  0.0 208822928 100220 ?    SNl  11:48   0:05 ray::IDLE
+root       10316  0.2  0.0 208822928 98028 ?     SNl  11:48   0:05 ray::IDLE
+root       10332  0.2  0.0 208822924 97620 ?     SNl  11:48   0:05 ray::IDLE
+root       10360  0.2  0.0 208822928 95824 ?     SNl  11:48   0:05 ray::IDLE
+root       10414  0.2  0.0 208822928 97524 ?     SNl  11:48   0:05 ray::IDLE
+root       10443  0.2  0.0 208822924 98016 ?     SNl  11:48   0:05 ray::IDLE
+root       10473  0.2  0.0 208822924 97888 ?     SNl  11:48   0:05 ray::IDLE
+root       10502  0.2  0.0 208822924 98044 ?     SNl  11:48   0:05 ray::IDLE
+root       10529  0.2  0.0 208822928 97828 ?     SNl  11:48   0:05 ray::IDLE
+root       10557  0.2  0.0 208822928 99916 ?     SNl  11:48   0:05 ray::IDLE
+root       10589  0.2  0.0 208822924 98100 ?     SNl  11:48   0:05 ray::IDLE
+root       10620  0.2  0.0 208822928 98144 ?     SNl  11:48   0:05 ray::IDLE
+root       10649  0.2  0.0 208822924 98008 ?     SNl  11:48   0:05 ray::IDLE
+root       10679  0.2  0.0 208822924 97748 ?     SNl  11:48   0:05 ray::IDLE
+root       10708  0.3  0.0 208822924 97648 ?     SNl  11:48   0:05 ray::IDLE
+root       10738  0.2  0.0 208822928 95708 ?     SNl  11:48   0:05 ray::IDLE
+root       10766  0.2  0.0 208822924 101896 ?    SNl  11:48   0:05 ray::IDLE
+root       10795  0.2  0.0 208822924 96096 ?     SNl  11:48   0:05 ray::IDLE
+root       10846  0.2  0.0 208822928 98120 ?     SNl  11:48   0:05 ray::IDLE
+root       10875  0.2  0.0 208822928 100076 ?    SNl  11:48   0:05 ray::IDLE
+root       10882  0.2  0.0 208822924 99916 ?     SNl  11:48   0:05 ray::IDLE
+root       10919  0.2  0.0 208822924 95864 ?     SNl  11:48   0:05 ray::IDLE
+root       10962  0.3  0.0 208822920 97860 ?     SNl  11:48   0:06 ray::IDLE
+root       10967  0.2  0.0 208822920 101692 ?    SNl  11:48   0:05 ray::IDLE
+root       10996  0.2  0.0 208822928 98076 ?     SNl  11:48   0:05 ray::IDLE
+root       11027  0.2  0.0 208822924 99768 ?     SNl  11:48   0:05 ray::IDLE
+root       11056  0.2  0.0 208822924 98108 ?     SNl  11:48   0:05 ray::IDLE
+root       11085  0.2  0.0 208822924 99968 ?     SNl  11:48   0:05 ray::IDLE
+root       11136  0.2  0.0 208822936 99536 ?     SNl  11:48   0:05 ray::IDLE
+root       11144  0.2  0.0 208822936 99760 ?     SNl  11:48   0:05 ray::IDLE
+root       11173  0.2  0.0 208822924 99764 ?     SNl  11:48   0:05 ray::IDLE
+root       11202  0.2  0.0 208822924 98128 ?     SNl  11:48   0:05 ray::IDLE
+root       11231  0.2  0.0 208822928 100196 ?    SNl  11:48   0:05 ray::IDLE
+root       11259  0.2  0.0 208822928 98072 ?     SNl  11:48   0:05 ray::IDLE
+root       11309  0.2  0.0 208822924 95912 ?     SNl  11:48   0:05 ray::IDLE
+root       11319  0.2  0.0 208822944 97760 ?     SNl  11:48   0:05 ray::IDLE
+root       11356  0.2  0.0 208822928 98048 ?     SNl  11:48   0:05 ray::IDLE
+root       11372  0.2  0.0 208822924 95784 ?     SNl  11:48   0:05 ray::IDLE
+root       11401  0.2  0.0 208822928 97548 ?     SNl  11:48   0:05 ray::IDLE
+root       11427  0.2  0.0 208822928 97712 ?     SNl  11:48   0:05 ray::IDLE
+root       11434  0.2  0.0 208822920 99940 ?     SNl  11:48   0:05 ray::IDLE
+root       11472  0.2  0.0 208822928 97956 ?     SNl  11:48   0:05 ray::IDLE
+root       11517  0.2  0.0 208822928 98012 ?     SNl  11:48   0:05 ray::IDLE
+root       11570  0.2  0.0 208822928 99888 ?     SNl  11:48   0:05 ray::IDLE
+root       11577  0.2  0.0 208822924 97756 ?     SNl  11:48   0:05 ray::IDLE
+root       11607  0.2  0.0 208822928 96024 ?     SNl  11:48   0:05 ray::IDLE
+root       11657  0.2  0.0 208822924 95672 ?     SNl  11:48   0:05 ray::IDLE
+root       11687  0.2  0.0 208822932 100128 ?    SNl  11:48   0:05 ray::IDLE
+root       11694  0.2  0.0 208822924 99944 ?     SNl  11:48   0:05 ray::IDLE
+root       11723  0.2  0.0 208822924 97588 ?     SNl  11:48   0:05 ray::IDLE
+root       11773  0.2  0.0 208822920 100192 ?    SNl  11:48   0:05 ray::IDLE
+root       11802  0.2  0.0 208822932 97904 ?     SNl  11:48   0:05 ray::IDLE
+root       11806  0.2  0.0 208822924 97948 ?     SNl  11:48   0:05 ray::IDLE
+root       11835  0.2  0.0 208822932 97808 ?     SNl  11:48   0:05 ray::IDLE
+root       11866  0.2  0.0 208822924 97996 ?     SNl  11:48   0:05 ray::IDLE
+root       11896  0.3  0.0 208822924 97580 ?     SNl  11:48   0:05 ray::IDLE
+root       11926  0.2  0.0 208822928 97748 ?     SNl  11:48   0:05 ray::IDLE
+root       11952  0.2  0.0 208822928 97528 ?     SNl  11:48   0:05 ray::IDLE
+root       11982  0.3  0.0 208822932 99824 ?     SNl  11:48   0:05 ray::IDLE
+root       12013  0.2  0.0 208822924 98084 ?     SNl  11:48   0:05 ray::IDLE
+root       12065  0.2  0.0 208822924 98188 ?     SNl  11:48   0:05 ray::IDLE
+root       12095  0.2  0.0 208822920 99924 ?     SNl  11:48   0:05 ray::IDLE
+root       12122  0.2  0.0 208822928 97584 ?     SNl  11:48   0:05 ray::IDLE
+root       12125  0.2  0.0 208822928 98292 ?     SNl  11:48   0:05 ray::IDLE
+root       12153  0.2  0.0 208822928 99908 ?     SNl  11:48   0:05 ray::IDLE
+root       12182  0.3  0.0 208822924 97952 ?     SNl  11:48   0:06 ray::IDLE
+root       12208  0.2  0.0 208822928 98036 ?     SNl  11:48   0:05 ray::IDLE
+root       12242  0.2  0.0 208822928 97916 ?     SNl  11:48   0:05 ray::IDLE
+root       12269  0.2  0.0 208822928 97592 ?     SNl  11:48   0:05 ray::IDLE
+root       12299  0.2  0.0 208822924 100080 ?    SNl  11:48   0:05 ray::IDLE
+root       12329  0.2  0.0 208822920 97528 ?     SNl  11:48   0:05 ray::IDLE
+root       12361  0.2  0.0 208822924 100056 ?    SNl  11:48   0:05 ray::IDLE
+root       12387  0.2  0.0 208822928 100104 ?    SNl  11:48   0:05 ray::IDLE
+root       12413  0.2  0.0 208822940 99972 ?     SNl  11:48   0:05 ray::IDLE
+root       12443  0.2  0.0 208822924 101820 ?    SNl  11:48   0:05 ray::IDLE
+root       12474  0.2  0.0 208822940 99920 ?     SNl  11:48   0:05 ray::IDLE
+root       12500  0.2  0.0 208822928 99848 ?     SNl  11:48   0:05 ray::IDLE
+root       12534  0.2  0.0 208822944 100040 ?    SNl  11:48   0:05 ray::IDLE
+root       12585  0.2  0.0 208822936 99748 ?     SNl  11:48   0:05 ray::IDLE
+root       12592  0.2  0.0 208822936 97652 ?     SNl  11:48   0:05 ray::IDLE
+root       12621  0.2  0.0 208822924 98004 ?     SNl  11:48   0:05 ray::IDLE
+root       12672  0.2  0.0 208822924 95812 ?     SNl  11:48   0:05 ray::IDLE
+root       12701  0.2  0.0 208822940 100064 ?    SNl  11:48   0:05 ray::IDLE
+root       12731  0.2  0.0 208822940 97808 ?     SNl  11:48   0:05 ray::IDLE
+root       12760  0.2  0.0 208822936 97780 ?     SNl  11:48   0:05 ray::IDLE
+root       12789  0.3  0.0 208822928 96200 ?     SNl  11:48   0:06 ray::IDLE
+root       12819  0.2  0.0 208822928 97640 ?     SNl  11:48   0:05 ray::IDLE
+root       12847  0.2  0.0 208822932 97656 ?     SNl  11:48   0:05 ray::IDLE
+root       12878  0.2  0.0 208822924 97396 ?     SNl  11:48   0:05 ray::IDLE
+root       12883  0.3  0.0 208822928 100048 ?    SNl  11:48   0:05 ray::IDLE
+root       12933  0.2  0.0 208822920 97732 ?     SNl  11:48   0:05 ray::IDLE
+root       12960  0.2  0.0 208822928 101876 ?    SNl  11:48   0:05 ray::IDLE
+root       12974  0.2  0.0 208822928 98016 ?     SNl  11:48   0:05 ray::IDLE
+root       13020  0.3  0.0 208822932 99808 ?     SNl  11:48   0:06 ray::IDLE
+root       13028  0.2  0.0 208822924 100072 ?    SNl  11:48   0:05 ray::IDLE
+root       13081  0.2  0.0 208822928 99980 ?     SNl  11:48   0:05 ray::IDLE
+root       13106  0.3  0.0 208822920 97996 ?     SNl  11:48   0:05 ray::IDLE
+root       13113  0.2  0.0 208822928 99532 ?     SNl  11:48   0:05 ray::IDLE
+root       13142  0.2  0.0 208822928 100280 ?    SNl  11:48   0:05 ray::IDLE
+root       13172  0.2  0.0 208822924 98000 ?     SNl  11:48   0:05 ray::IDLE
+root       13200  0.2  0.0 208822928 99792 ?     SNl  11:48   0:05 ray::IDLE
+root       13230  0.2  0.0 208822928 97924 ?     SNl  11:48   0:05 ray::IDLE
+root       13259  0.2  0.0 208822932 100120 ?    SNl  11:48   0:05 ray::IDLE
+root       13290  0.2  0.0 208822928 97864 ?     SNl  11:48   0:05 ray::IDLE
+root       13317  0.2  0.0 208822924 98004 ?     SNl  11:48   0:05 ray::IDLE
+root       13345  0.2  0.0 208822924 95552 ?     SNl  11:48   0:05 ray::IDLE
+root       13375  0.3  0.0 208822924 97756 ?     SNl  11:48   0:05 ray::IDLE
+root       13415  0.3  0.0 208822928 98144 ?     SNl  11:48   0:06 ray::IDLE
+root       13433  0.2  0.0 208822928 97768 ?     SNl  11:48   0:05 ray::IDLE
+root       13484  0.2  0.0 208822924 98120 ?     SNl  11:48   0:05 ray::IDLE
+root       13514  0.2  0.0 208822924 97512 ?     SNl  11:48   0:05 ray::IDLE
+root       13519  0.2  0.0 208822924 95644 ?     SNl  11:48   0:05 ray::IDLE
+root       13549  0.2  0.0 208822924 98016 ?     SNl  11:48   0:05 ray::IDLE
+root       13576  0.2  0.0 208822928 98032 ?     SNl  11:48   0:05 ray::IDLE
+root       13628  0.2  0.0 208822924 97616 ?     SNl  11:48   0:05 ray::IDLE
+root       13658  0.2  0.0 208822928 95572 ?     SNl  11:48   0:05 ray::IDLE
+root       13666  0.2  0.0 208822928 97600 ?     SNl  11:48   0:05 ray::IDLE
+root       13717  0.2  0.0 208822928 95856 ?     SNl  11:48   0:05 ray::IDLE
+root       13745  0.2  0.0 208822924 98156 ?     SNl  11:48   0:05 ray::IDLE
+root       13774  0.2  0.0 208822924 96032 ?     SNl  11:48   0:05 ray::IDLE
+root       13806  0.2  0.0 208822924 97700 ?     SNl  11:48   0:05 ray::IDLE
+root       13834  0.2  0.0 208822936 95600 ?     SNl  11:48   0:05 ray::IDLE
+root       13837  0.2  0.0 208822936 98008 ?     SNl  11:48   0:05 ray::IDLE
+root       13865  0.2  0.0 208822924 97796 ?     SNl  11:48   0:05 ray::IDLE
+root       13897  0.2  0.0 208822944 98140 ?     SNl  11:48   0:05 ray::IDLE
+root       13925  0.2  0.0 208822928 97964 ?     SNl  11:48   0:05 ray::IDLE
+root       13952  0.2  0.0 208822936 96096 ?     SNl  11:48   0:05 ray::IDLE
+root       13978  0.2  0.0 208822928 95772 ?     SNl  11:48   0:05 ray::IDLE
+root       14023  0.2  0.0 208822924 98132 ?     SNl  11:48   0:05 ray::IDLE
+root       14039  0.2  0.0 208822928 95944 ?     SNl  11:48   0:05 ray::IDLE
+root       14062  0.2  0.0 208822936 97756 ?     SNl  11:48   0:05 ray::IDLE
+root       14102  0.2  0.0 208822924 98264 ?     SNl  11:48   0:05 ray::IDLE
+root       14128  0.2  0.0 208822928 97452 ?     SNl  11:48   0:05 ray::IDLE
+root       14173  0.2  0.0 208822928 96048 ?     SNl  11:48   0:05 ray::IDLE
+root       14187  0.2  0.0 208822924 97716 ?     SNl  11:48   0:05 ray::IDLE
+root       14238  0.2  0.0 208822920 99636 ?     SNl  11:48   0:05 ray::IDLE
+root       14268  0.2  0.0 208822940 99492 ?     SNl  11:48   0:05 ray::IDLE
+root       14296  0.2  0.0 208822928 96108 ?     SNl  11:48   0:05 ray::IDLE
+root       14303  0.2  0.0 208822924 98004 ?     SNl  11:48   0:05 ray::IDLE
+root       14332  0.2  0.0 208822928 97624 ?     SNl  11:48   0:05 ray::IDLE
+root       14383  0.2  0.0 208822924 97784 ?     SNl  11:48   0:05 ray::IDLE
+root       14392  0.2  0.0 208822924 97724 ?     SNl  11:48   0:05 ray::IDLE
+root       14444  0.2  0.0 208822924 97872 ?     SNl  11:48   0:05 ray::IDLE
+root       14473  0.3  0.0 208822924 97592 ?     SNl  11:48   0:06 ray::IDLE
+root       14502  0.3  0.0 208822936 97996 ?     SNl  11:48   0:05 ray::IDLE
+root       14510  0.2  0.0 208822932 97528 ?     SNl  11:48   0:05 ray::IDLE
+root       14560  0.2  0.0 208822924 97716 ?     SNl  11:48   0:05 ray::IDLE
+root       14564  0.2  0.0 208822924 95716 ?     SNl  11:48   0:05 ray::IDLE
+root       14615  0.2  0.0 208822924 97964 ?     SNl  11:48   0:05 ray::IDLE
+root       14645  0.2  0.0 208822920 97988 ?     SNl  11:48   0:05 ray::IDLE
+root       14675  0.2  0.0 208822924 97512 ?     SNl  11:48   0:05 ray::IDLE
+root       14701  0.2  0.0 208822928 99576 ?     SNl  11:48   0:05 ray::IDLE
+root       14720  0.2  0.0 208822924 100068 ?    SNl  11:48   0:05 ray::IDLE
+root       14761  0.2  0.0 208822928 95744 ?     SNl  11:48   0:05 ray::IDLE
+root       14768  0.2  0.0 208822928 95816 ?     SNl  11:48   0:05 ray::IDLE
+root       14819  0.2  0.0 208822924 99580 ?     SNl  11:48   0:05 ray::IDLE
+root       14826  0.2  0.0 208822928 100096 ?    SNl  11:48   0:05 ray::IDLE
+root       14878  0.2  0.0 208822928 96084 ?     SNl  11:48   0:05 ray::IDLE
+root       14907  0.2  0.0 208822936 98284 ?     SNl  11:48   0:05 ray::IDLE
+root       14935  0.2  0.0 208822944 99536 ?     SNl  11:48   0:05 ray::IDLE
+root       14948  0.2  0.0 208822924 98120 ?     SNl  11:48   0:05 ray::IDLE
+root       14993  0.2  0.0 208822924 97708 ?     SNl  11:48   0:05 ray::IDLE
+root       14999  0.2  0.0 208822936 95100 ?     SNl  11:48   0:05 ray::IDLE
+root       15029  0.2  0.0 208822916 98016 ?     SNl  11:48   0:05 ray::IDLE
+root       15064  0.2  0.0 208822940 97620 ?     SNl  11:48   0:05 ray::IDLE
+root       15086  0.2  0.0 208822936 97620 ?     SNl  11:48   0:05 ray::IDLE
+root       15119  0.3  0.0 208822924 98040 ?     SNl  11:48   0:06 ray::IDLE
+root       15169  0.2  0.0 208822924 97904 ?     SNl  11:48   0:05 ray::IDLE
+root       15199  0.3  0.0 208822924 99040 ?     SNl  11:48   0:05 ray::IDLE
+root       15229  0.2  0.0 208822932 95460 ?     SNl  11:48   0:05 ray::IDLE
+root       15258  0.2  0.0 208822924 99864 ?     SNl  11:48   0:05 ray::IDLE
+root       15287  0.2  0.0 208822936 98276 ?     SNl  11:48   0:05 ray::IDLE
+root       15333  0.2  0.0 208822928 95924 ?     SNl  11:48   0:05 ray::IDLE
+root       15342  0.2  0.0 208822940 95980 ?     SNl  11:48   0:05 ray::IDLE
+root       15369  0.2  0.0 208822928 97836 ?     SNl  11:48   0:05 ray::IDLE
+root       15402  0.2  0.0 208822928 98020 ?     SNl  11:48   0:05 ray::IDLE
+root       15431  0.2  0.0 208822932 98004 ?     SNl  11:48   0:05 ray::IDLE
+root       15463  0.2  0.0 208822928 97712 ?     SNl  11:48   0:05 ray::IDLE
+root       15511  0.2  0.0 208822932 97716 ?     SNl  11:48   0:05 ray::IDLE
+root       15516  0.3  0.0 208822928 98040 ?     SNl  11:48   0:05 ray::IDLE
+root       15545  0.2  0.0 208822924 97484 ?     SNl  11:48   0:05 ray::IDLE
+root       15571  0.2  0.0 208822936 97364 ?     SNl  11:48   0:05 ray::IDLE
+root       15606  0.2  0.0 208822932 95564 ?     SNl  11:48   0:05 ray::IDLE
+root       15629  0.2  0.0 208822924 97760 ?     SNl  11:48   0:05 ray::IDLE
+root       15658  0.2  0.0 208822924 98028 ?     SNl  11:48   0:05 ray::IDLE
+root       15688  0.3  0.0 208822928 97908 ?     SNl  11:48   0:06 ray::IDLE
+root       15802  0.2  0.0 208822928 100008 ?    SNl  11:48   0:05 ray::IDLE
+root       15807  0.2  0.0 208822932 98048 ?     SNl  11:48   0:05 ray::IDLE
+root       15836  0.2  0.0 208822928 97960 ?     SNl  11:48   0:05 ray::IDLE
+root       15866  0.2  0.0 208822924 97736 ?     SNl  11:48   0:05 ray::IDLE
+root       15893  0.2  0.0 208822928 98068 ?     SNl  11:48   0:05 ray::IDLE
+root       15923  0.3  0.0 208822924 97996 ?     SNl  11:48   0:05 ray::IDLE
+root       15950  0.2  0.0 208822924 98060 ?     SNl  11:48   0:05 ray::IDLE
+root       16002  0.3  0.0 208822924 97828 ?     SNl  11:48   0:06 ray::IDLE
+root       16012  0.2  0.0 208822924 97928 ?     SNl  11:48   0:05 ray::IDLE
+root       16040  0.3  0.0 208822924 98052 ?     SNl  11:48   0:06 ray::IDLE
+root       16065  0.2  0.0 208822928 97604 ?     SNl  11:48   0:05 ray::IDLE
+root       16075  0.3  0.0 208822916 98056 ?     SNl  11:48   0:06 ray::IDLE
+root       16149  0.2  0.0 208822924 95872 ?     SNl  11:48   0:05 ray::IDLE
+root       16181  0.2  0.0 208822924 95712 ?     SNl  11:48   0:05 ray::IDLE
+root       16210  0.2  0.0 208822928 97756 ?     SNl  11:48   0:05 ray::IDLE
+root       16236  0.2  0.0 208822924 95976 ?     SNl  11:48   0:05 ray::IDLE
+root       16265  0.3  0.0 208822924 97804 ?     SNl  11:48   0:05 ray::IDLE
+root       16269  0.2  0.0 208822928 98000 ?     SNl  11:48   0:05 ray::IDLE
+root       16272  0.2  0.0 208822924 97756 ?     SNl  11:48   0:05 ray::IDLE
+root       16277  0.2  0.0 208822940 95752 ?     SNl  11:48   0:05 ray::IDLE
+root       16279  0.2  0.0 208822940 97880 ?     SNl  11:48   0:05 ray::IDLE
+root       16330  0.3  0.0 208822924 99960 ?     SNl  11:48   0:05 ray::IDLE
+root       16358  0.2  0.0 208822924 98136 ?     SNl  11:48   0:05 ray::IDLE
+root       16388  0.2  0.0 208822924 97904 ?     SNl  11:48   0:05 ray::IDLE
+root       16394  0.2  0.0 208822928 97904 ?     SNl  11:48   0:05 ray::IDLE
+root       16423  0.2  0.0 208822928 98028 ?     SNl  11:48   0:05 ray::IDLE
+root       16452  0.2  0.0 208822920 95852 ?     SNl  11:48   0:05 ray::IDLE
+root       16481  0.2  0.0 208822940 97856 ?     SNl  11:48   0:05 ray::IDLE
+root       16509  0.2  0.0 208822940 95824 ?     SNl  11:48   0:05 ray::IDLE
+root       16540  0.2  0.0 208822924 97788 ?     SNl  11:48   0:05 ray::IDLE
+root       16590  0.2  0.0 208822932 98120 ?     SNl  11:48   0:05 ray::IDLE
+root       16596  0.2  0.0 208822928 97692 ?     SNl  11:48   0:05 ray::IDLE
+root       16626  0.2  0.0 208822928 97780 ?     SNl  11:48   0:05 ray::IDLE
+root       16672  0.2  0.0 208822936 97376 ?     SNl  11:48   0:05 ray::IDLE
+root       16708  0.2  0.0 208822940 95716 ?     SNl  11:48   0:05 ray::IDLE
+root       16714  0.2  0.0 208822924 95804 ?     SNl  11:48   0:05 ray::IDLE
+root       16742  0.2  0.0 208822928 97536 ?     SNl  11:48   0:05 ray::IDLE
+root       16794  0.2  0.0 208822924 99572 ?     SNl  11:48   0:05 ray::IDLE
+root       16799  0.2  0.0 208822928 97928 ?     SNl  11:48   0:05 ray::IDLE
+root       16830  0.2  0.0 208822924 95972 ?     SNl  11:48   0:05 ray::IDLE
+root       16858  0.2  0.0 208822940 98104 ?     SNl  11:48   0:05 ray::IDLE
+root       16910  0.2  0.0 208822928 97472 ?     SNl  11:48   0:05 ray::IDLE
+root       16916  0.2  0.0 208822924 97660 ?     SNl  11:48   0:05 ray::IDLE
+root       16971  0.2  0.0 208822936 100012 ?    SNl  11:48   0:05 ray::IDLE
+root       17002  0.2  0.0 208822940 95800 ?     SNl  11:48   0:05 ray::IDLE
+root       17005  0.2  0.0 208822932 97568 ?     SNl  11:48   0:05 ray::IDLE
+root       17055  0.2  0.0 208822920 95544 ?     SNl  11:48   0:05 ray::IDLE
+root       17062  0.3  0.0 208822928 97992 ?     SNl  11:48   0:06 ray::IDLE
+root       17107  0.3  0.0 208822944 97988 ?     SNl  11:48   0:06 ray::IDLE
+root       17142  0.2  0.0 208822928 96036 ?     SNl  11:48   0:05 ray::IDLE
+root       17149  0.2  0.0 208822928 97708 ?     SNl  11:48   0:05 ray::IDLE
+root       17201  0.2  0.0 208822924 95940 ?     SNl  11:48   0:05 ray::IDLE
+root       17207  0.2  0.0 208822924 96000 ?     SNl  11:48   0:05 ray::IDLE
+root       17241  0.2  0.0 208822924 100036 ?    SNl  11:48   0:05 ray::IDLE
+root       17267  0.2  0.0 208822936 100188 ?    SNl  11:48   0:05 ray::IDLE
+root       17291  0.2  0.0 208822924 97668 ?     SNl  11:48   0:05 ray::IDLE
+root       17343  0.2  0.0 208822936 97716 ?     SNl  11:48   0:05 ray::IDLE
+root       17352  0.2  0.0 208822936 97616 ?     SNl  11:48   0:05 ray::IDLE
+root       17403  0.2  0.0 208822936 97812 ?     SNl  11:48   0:05 ray::IDLE
+root       17409  0.2  0.0 208822924 97868 ?     SNl  11:48   0:05 ray::IDLE
+root       17438  0.2  0.0 208822928 99512 ?     SNl  11:48   0:05 ray::IDLE
+root       17464  0.2  0.0 208822936 97804 ?     SNl  11:48   0:05 ray::IDLE
+root       17511  0.2  0.0 208822920 98152 ?     SNl  11:48   0:05 ray::IDLE
+root       17526  0.2  0.0 208822932 95740 ?     SNl  11:48   0:05 ray::IDLE
+root       17555  0.2  0.0 208822928 95848 ?     SNl  11:48   0:05 ray::IDLE
+root       17609  0.2  0.0 208822936 98108 ?     SNl  11:48   0:05 ray::IDLE
+root       17626  0.2  0.0 208822940 97540 ?     SNl  11:48   0:05 ray::IDLE
+root       17638  0.2  0.0 208822924 97896 ?     SNl  11:48   0:05 ray::IDLE
+root       17665  0.2  0.0 208822924 95972 ?     SNl  11:48   0:05 ray::IDLE
+root       17697  0.2  0.0 208822936 97124 ?     SNl  11:48   0:05 ray::IDLE
+root       17726  0.2  0.0 208822944 98020 ?     SNl  11:48   0:05 ray::IDLE
+root       17755  0.2  0.0 208822924 95808 ?     SNl  11:48   0:05 ray::IDLE
+root       17787  0.2  0.0 208822924 97480 ?     SNl  11:48   0:05 ray::IDLE
+root       17816  0.3  0.0 208822920 96240 ?     SNl  11:48   0:06 ray::IDLE
+root       17845  0.2  0.0 208822928 97984 ?     SNl  11:48   0:05 ray::IDLE
+root       17896  0.2  0.0 208822932 96128 ?     SNl  11:48   0:05 ray::IDLE
+root       17902  0.2  0.0 208822928 95892 ?     SNl  11:48   0:05 ray::IDLE
+root       17953  0.2  0.0 208822924 95784 ?     SNl  11:48   0:05 ray::IDLE
+root       17986  0.2  0.0 208822920 97968 ?     SNl  11:48   0:05 ray::IDLE
+root       18015  0.2  0.0 208822924 97860 ?     SNl  11:48   0:05 ray::IDLE
+root       18046  0.2  0.0 208822928 99596 ?     SNl  11:48   0:05 ray::IDLE
+root       18075  0.3  0.0 208822924 97904 ?     SNl  11:48   0:06 ray::IDLE
+root       18080  0.2  0.0 208822924 100224 ?    SNl  11:48   0:05 ray::IDLE
+root       18106  0.2  0.0 208822928 99896 ?     SNl  11:48   0:05 ray::IDLE
+root       18134  0.2  0.0 208822924 97632 ?     SNl  11:48   0:05 ray::IDLE
+root       18168  0.2  0.0 208822924 98040 ?     SNl  11:48   0:05 ray::IDLE
+root       18215  0.2  0.0 208822928 97892 ?     SNl  11:48   0:05 ray::IDLE
+root       18222  0.2  0.0 208822928 96232 ?     SNl  11:48   0:05 ray::IDLE
+root       18274  0.2  0.0 208822924 95704 ?     SNl  11:48   0:05 ray::IDLE
+root       18306  0.2  0.0 208822924 99844 ?     SNl  11:48   0:05 ray::IDLE
+root       18335  0.2  0.0 208822928 97916 ?     SNl  11:48   0:05 ray::IDLE
+root       18366  0.2  0.0 208896716 100224 ?    SNl  11:48   0:05 ray::IDLE
+root       18396  0.2  0.0 208822928 96256 ?     SNl  11:48   0:05 ray::IDLE
+root       18449  0.2  0.0 208822928 97964 ?     SNl  11:48   0:05 ray::IDLE
+root       18457  0.2  0.0 208822928 98032 ?     SNl  11:48   0:05 ray::IDLE
+root       18506  0.2  0.0 208822924 97864 ?     SNl  11:48   0:05 ray::IDLE
+root       18534  0.2  0.0 208822924 98052 ?     SNl  11:48   0:05 ray::IDLE
+root       18542  0.2  0.0 208822928 98076 ?     SNl  11:48   0:05 ray::IDLE
+root       18591  0.2  0.0 208822924 95996 ?     SNl  11:48   0:05 ray::IDLE
+root       18610  0.3  0.0 208822928 95972 ?     SNl  11:48   0:05 ray::IDLE
+root       18630  0.2  0.0 208822940 97932 ?     SNl  11:48   0:05 ray::IDLE
+root       18681  0.2  0.0 208822940 99616 ?     SNl  11:48   0:05 ray::IDLE
+root       18687  0.2  0.0 208822936 97828 ?     SNl  11:48   0:05 ray::IDLE
+root       18714  0.2  0.0 208822920 97708 ?     SNl  11:48   0:05 ray::IDLE
+root       18718  0.2  0.0 208822932 99508 ?     SNl  11:48   0:05 ray::IDLE
+root       18772  0.2  0.0 208822928 97920 ?     SNl  11:48   0:05 ray::IDLE
+root       18817  0.2  0.0 208822936 99860 ?     SNl  11:48   0:05 ray::IDLE
+root       18855  0.2  0.0 208822936 97720 ?     SNl  11:48   0:05 ray::IDLE
+root       18883  0.2  0.0 208822940 98096 ?     SNl  11:48   0:05 ray::IDLE
+root       18913  0.2  0.0 208822932 98124 ?     SNl  11:48   0:05 ray::IDLE
+root       18942  0.2  0.0 208822928 98176 ?     SNl  11:48   0:05 ray::IDLE
+root       18950  0.2  0.0 208822932 95688 ?     SNl  11:48   0:05 ray::IDLE
+root       18974  0.2  0.0 208822932 97488 ?     SNl  11:48   0:05 ray::IDLE
+root       18980  0.3  0.0 208822916 98276 ?     SNl  11:48   0:05 ray::IDLE
+root       19030  0.2  0.0 208822924 97892 ?     SNl  11:48   0:05 ray::IDLE
+root       19059  0.2  0.0 208822932 97664 ?     SNl  11:48   0:05 ray::IDLE
+root       19066  0.2  0.0 208822928 99688 ?     SNl  11:48   0:05 ray::IDLE
+root       19092  0.2  0.0 208822928 98284 ?     SNl  11:48   0:05 ray::IDLE
+root       19098  0.2  0.0 208822924 97716 ?     SNl  11:48   0:05 ray::IDLE
+root       19128  0.2  0.0 208822936 98108 ?     SNl  11:48   0:05 ray::IDLE
+root       19212  0.2  0.0 208822928 95628 ?     SNl  11:48   0:05 ray::IDLE
+root       19238  0.2  0.0 208822928 97740 ?     SNl  11:48   0:05 ray::IDLE
+root       19268  0.2  0.0 208822940 97480 ?     SNl  11:48   0:05 ray::IDLE
+root       37746  0.5  0.0 211270212 166128 ?    Sl   11:48   0:10 ray::JobSupervisor
+root       38024  1.0  0.0 220526084 1192240 ?   Ssl  11:48   0:21 python3 -m recipe.dapo.main_dapo --config-path=config --config-name=dapo_megatron_trainer actor_rollout_ref.rollout.load_format=safetensors actor_rollout_ref.rollout.skip.enable=False actor_rollout_ref.rollout.skip.dump_dir=/mnt/hpfs_test/wlf/rollout_dump actor_rollout_ref.rollout.skip.dump_step=500 data.train_files=/mnt/hpfs_test/data/data/dapo-math-17k.parquet data.val_files=/mnt/hpfs_test/data/data/dapo-math-17k.parquet data.prompt_key=prompt data.truncation=left data.max_prompt_length=2048 data.max_response_length=24576 data.train_batch_size=128 actor_rollout_ref.rollout.n=16 algorithm.adv_estimator=grpo algorithm.use_kl_in_reward=False algorithm.kl_ctrl.kl_coef=0.0 algorithm.filter_groups.enable=False actor_rollout_ref.actor.use_kl_loss=False actor_rollout_ref.actor.kl_loss_coef=0.0 actor_rollout_ref.actor.clip_ratio_low=0.2 actor_rollout_ref.actor.clip_ratio_high=0.28 actor_rollout_ref.actor.clip_ratio_c=10.0 actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 actor_rollout_ref.model.path=/mnt/hpfs_test/weights/dsv3-bf16 actor_rollout_ref.actor.optim.lr=1e-6 actor_rollout_ref.actor.optim.lr_warmup_steps=5 actor_rollout_ref.actor.optim.weight_decay=0.1 actor_rollout_ref.actor.ppo_mini_batch_size=32 actor_rollout_ref.actor.megatron.param_offload=True actor_rollout_ref.actor.megatron.optimizer_offload=True actor_rollout_ref.actor.megatron.grad_offload=True actor_rollout_ref.actor.megatron.pipeline_model_parallel_size=8 actor_rollout_ref.actor.megatron.tensor_model_parallel_size=8 actor_rollout_ref.actor.megatron.expert_model_parallel_size=64 actor_rollout_ref.actor.megatron.dist_checkpointing_path=/data01/huawei-2025/weight/dsv3_fp16_mcore_full_new actor_rollout_ref.actor.megatron.use_dist_checkpointing=Ture +actor_rollout_ref.ref.megatron.override_transformer_config.use_flash_attn=True actor_rollout_ref.actor.megatron.expert_tensor_parallel_size=1 actor_rollout_ref.ref.megatron.expert_tensor_parallel_size=1 +actor_rollout_ref.actor.megatron.override_transformer_config.use_flash_attn=True +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_method=uniform +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_granularity=full +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=1 +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_first_pipeline_stage=7 +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_pipeline_stage=6 actor_rollout_ref.actor.entropy_coeff=0 actor_rollout_ref.actor.optim.clip_grad=1.0 actor_rollout_ref.actor.loss_agg_mode=token-mean actor_rollout_ref.rollout.gpu_memory_utilization=0.70 actor_rollout_ref.rollout.tensor_model_parallel_size=8 actor_rollout_ref.rollout.dp_model_parallel_size=8 actor_rollout_ref.rollout.enable_chunked_prefill=False actor_rollout_ref.rollout.enable_prefix_caching=False actor_rollout_ref.rollout.max_num_batched_tokens=6144 actor_rollout_ref.rollout.max_num_seqs=32 actor_rollout_ref.rollout.temperature=1.0 actor_rollout_ref.rollout.top_p=1.0 actor_rollout_ref.rollout.top_k=-1 actor_rollout_ref.rollout.val_kwargs.temperature=1.0 actor_rollout_ref.rollout.val_kwargs.top_p=0.7 actor_rollout_ref.rollout.val_kwargs.top_k=-1 actor_rollout_ref.rollout.val_kwargs.do_sample=True actor_rollout_ref.rollout.val_kwargs.n=1 actor_rollout_ref.rollout.enforce_eager=True actor_rollout_ref.rollout.name=vllm actor_rollout_ref.ref.megatron.pipeline_model_parallel_size=8 actor_rollout_ref.ref.megatron.tensor_model_parallel_size=8 actor_rollout_ref.ref.megatron.expert_model_parallel_size=64 actor_rollout_ref.ref.megatron.param_offload=True actor_rollout_ref.ref.megatron.dist_checkpointing_path=/data01/huawei-2025/weight/dsv3_fp16_mcore_full_new actor_rollout_ref.ref.megatron.use_dist_checkpointing=True reward_model.reward_manager=dapo +reward_model.reward_kwargs.overlong_buffer_cfg.enable=True +reward_model.reward_kwargs.overlong_buffer_cfg.len=1024 +reward_model.reward_kwargs.overlong_buffer_cfg.penalty_factor=0.3 +reward_model.reward_kwargs.overlong_buffer_cfg.log=False +reward_model.reward_kwargs.max_resp_len=24576 trainer.logger=["console"] actor_rollout_ref.actor.load_weight=False actor_rollout_ref.ref.load_weight=False trainer.project_name=DAPO trainer.experiment_name=DAPO-DeepSeek-671b-megatron-INSTRUCT-64NNODES trainer.n_gpus_per_node=16 trainer.nnodes=32 trainer.val_before_train=False trainer.test_freq=-1 trainer.save_freq=10 trainer.total_epochs=10 trainer.default_local_dir=/mnt/hpfs_test/ckpt/ckpt-DAPO-DeepSeek-671b-megatron-2k24k trainer.resume_mode=auto trainer.log_val_generations=10 actor_rollout_ref.rollout.free_cache_engine=True trainer.device=npu
+root       38026  0.0  0.0   7376  3124 ?        S    11:48   0:00 /bin/sh -c while kill -s 0 37746; do sleep 1; done; kill -9 -38024
+root       38355  0.9  0.1 225187196 2928496 ?   SNl  11:48   0:19 ray::TaskRunner.run
+root      141348  0.3  0.0 208942752 142280 ?    SNl  11:48   0:06 ray::IDLE
+root      141569  5.1  0.1 8806313732 2683220 ?  SNl  11:48   1:41 ray::WorkerDict.actor_rollout_init_model
+root      141570  5.2  0.1 8806313748 2699032 ?  SNl  11:48   1:43 ray::WorkerDict.actor_rollout_init_model
+root      141571  4.8  0.1 8806312748 2698108 ?  SNl  11:48   1:35 ray::WorkerDict.actor_rollout_init_model
+root      141572  4.8  0.1 8806312692 2701828 ?  SNl  11:48   1:35 ray::WorkerDict.actor_rollout_init_model
+root      141575  4.9  0.1 8806312740 2698864 ?  SNl  11:48   1:37 ray::WorkerDict.actor_rollout_init_model
+root      141576  4.9  0.1 8806312556 2693928 ?  SNl  11:48   1:36 ray::WorkerDict.actor_rollout_init_model
+root      141577  4.8  0.1 8806313692 2699988 ?  SNl  11:48   1:35 ray::WorkerDict.actor_rollout_init_model
+root      141578  5.1  0.1 8806313644 2698528 ?  SNl  11:48   1:41 ray::WorkerDict.actor_rollout_init_model
+root      141582  5.1  0.1 8806305352 2693632 ?  SNl  11:48   1:40 ray::WorkerDict.actor_rollout_init_model
+root      141583  4.9  0.1 8806304276 2694936 ?  SNl  11:48   1:36 ray::WorkerDict.actor_rollout_init_model
+root      141587  4.9  0.1 8806305172 2688076 ?  SNl  11:48   1:37 ray::WorkerDict.actor_rollout_init_model
+root      141591  5.0  0.1 8806305396 2699700 ?  SNl  11:48   1:39 ray::WorkerDict.actor_rollout_init_model
+root      141596  4.8  0.1 8806305388 2700812 ?  SNl  11:48   1:36 ray::WorkerDict.actor_rollout_init_model
+root      141603  4.8  0.1 8806305360 2700076 ?  SNl  11:48   1:35 ray::WorkerDict.actor_rollout_init_model
+root      141605  4.8  0.1 8806305208 2689544 ?  SNl  11:48   1:34 ray::WorkerDict.actor_rollout_init_model
+root      141614  4.8  0.1 8806305140 2692420 ?  SNl  11:48   1:35 ray::WorkerDict.actor_rollout_init_model
+root      145287  0.1  0.0 203834756 1603440 ?   SNl  11:48   0:02 ray::F47Z5SWorkerDict_12:2:WorkerDict.__init__
+root      145289  0.1  0.0 203834772 1603872 ?   SNl  11:48   0:02 ray::F47Z5SWorkerDict_12:3:WorkerDict.__init__
+root      145290  0.0  0.0 203835560 1603496 ?   SNl  11:48   0:01 ray::F47Z5SWorkerDict_12:15:WorkerDict.__init__
+root      145295  0.1  0.0 203835652 1603912 ?   SNl  11:48   0:02 ray::F47Z5SWorkerDict_12:8:WorkerDict.__init__
+root      145296  0.1  0.0 203837480 1597584 ?   SNl  11:48   0:01 ray::F47Z5SWorkerDict_12:10:WorkerDict.__init__
+root      145297  0.1  0.0 203835624 1603632 ?   SNl  11:48   0:01 ray::F47Z5SWorkerDict_12:11:WorkerDict.__init__
+root      145299  0.1  0.0 203834812 1603800 ?   SNl  11:48   0:02 ray::F47Z5SWorkerDict_12:4:WorkerDict.__init__
+root      145300  0.1  0.0 203835676 1603640 ?   SNl  11:48   0:02 ray::F47Z5SWorkerDict_12:7:WorkerDict.__init__
+root      145306  0.0  0.0 203835620 1603712 ?   SNl  11:48   0:01 ray::F47Z5SWorkerDict_12:12:WorkerDict.__init__
+root      145307  0.1  0.0 203835668 1603720 ?   SNl  11:48   0:02 ray::F47Z5SWorkerDict_12:6:WorkerDict.__init__
+root      145316  0.1  0.0 203835320 1603628 ?   SNl  11:48   0:02 ray::F47Z5SWorkerDict_12:14:WorkerDict.__init__
+root      145319  0.1  0.0 203834524 1603680 ?   SNl  11:48   0:02 ray::F47Z5SWorkerDict_12:9:WorkerDict.__init__
+root      145324  0.1  0.0 203834604 1603824 ?   SNl  11:48   0:02 ray::F47Z5SWorkerDict_12:5:WorkerDict.__init__
+root      145341  0.1  0.0 203829172 1597460 ?   SNl  11:48   0:02 ray::F47Z5SWorkerDict_12:13:WorkerDict.__init__
+root      145352  0.1  0.0 203835804 1603824 ?   SNl  11:48   0:02 ray::F47Z5SWorkerDict_12:0:WorkerDict.__init__
+root      145399  0.1  0.0 203844048 1603848 ?   SNl  11:48   0:02 ray::F47Z5SWorkerDict_12:1:WorkerDict.__init__
+root      145760  0.0  0.0  17568 10520 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(135)
+root      145816  0.0  0.0  18952 11368 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      145826  0.0  0.0  17568 10520 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(135)
+root      145917  0.0  0.0  18952 11460 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146090  0.0  0.0  17568 10496 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(135)
+root      146091  0.0  0.0  17568 10528 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(135)
+root      146102  0.0  0.0  17568 10524 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(135)
+root      146125  0.0  0.0  17568 10604 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(135)
+root      146141  0.0  0.0  18952 11392 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146142  0.0  0.0  17568 10552 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(135)
+root      146147  0.0  0.0  18952 11488 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146149  0.0  0.0  17568 10516 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(135)
+root      146156  0.0  0.0  18952 11412 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146157  0.0  0.0  17568 10524 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(135)
+root      146167  0.0  0.0  18952 11568 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146170  0.0  0.0  17568 10500 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(135)
+root      146172  0.0  0.0  17572 10496 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(135)
+root      146175  0.0  0.0  17568 10520 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(135)
+root      146181  0.0  0.0  18952 11404 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146186  0.0  0.0  18952 11516 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146187  0.0  0.0  17568 10504 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(135)
+root      146189  0.0  0.0  17568 10472 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(135)
+root      146190  0.0  0.0  18952 11516 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146191  0.0  0.0  18952 11572 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146192  0.0  0.0  18952 11480 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146194  0.0  0.0  18952 11552 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146197  0.0  0.0  17568 10508 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(135)
+root      146200  0.0  0.0  18952 11416 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146202  0.0  0.0  18952 11424 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146207  0.0  0.0  18952 11416 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146213  0.0  0.0  17568 10596 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.resource_tracker import main;main(135)
+root      146214  0.0  0.0  18952 11524 ?        SN   11:48   0:00 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146215  0.1  0.0 561864 381848 ?       SN   11:48   0:01 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146216  0.0  0.0 561820 384764 ?       SN   11:48   0:01 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146217  0.1  0.0 561864 384864 ?       SN   11:48   0:02 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146218  0.3  0.0 561828 384788 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146219  0.0  0.0 561856 381832 ?       SN   11:48   0:01 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146220  0.1  0.0 561828 384788 ?       SN   11:48   0:02 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146221  0.1  0.0 561836 384824 ?       SN   11:48   0:02 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146222  0.1  0.0 561824 384716 ?       SN   11:48   0:02 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146223  0.3  0.0 561836 384480 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146224  0.1  0.0 561824 384408 ?       SN   11:48   0:02 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146225  0.0  0.0 561828 384772 ?       SN   11:48   0:01 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146226  0.1  0.0 561860 384852 ?       SN   11:48   0:03 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146227  0.3  0.0 561824 384760 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146228  0.1  0.0 561856 384856 ?       SN   11:48   0:01 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146229  0.2  0.0 561824 384760 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146230  0.2  0.0 561864 384864 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146231  0.2  0.0 561816 384780 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146232  0.2  0.0 561828 385008 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146233  0.2  0.0 561828 384928 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146234  0.2  0.0 561744 384900 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146235  0.2  0.0 561820 385120 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146236  0.2  0.0 561824 384820 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146237  0.2  0.0 561744 384936 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146238  0.2  0.0 561740 384532 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146239  0.2  0.0 561820 385296 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146240  0.2  0.0 561824 384916 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146241  0.2  0.0 561828 384804 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146242  0.2  0.0 561820 385120 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146243  0.2  0.0 561828 384800 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146244  0.2  0.0 561828 384232 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146245  0.2  0.0 561744 384896 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146246  0.2  0.0 561832 384804 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146247  0.2  0.0 561864 384708 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146248  0.2  0.0 561824 384920 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146249  0.2  0.0 561820 385124 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146250  0.2  0.0 561828 384432 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146251  0.2  0.0 561744 384932 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146252  0.2  0.0 561828 384808 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146253  0.2  0.0 561824 384812 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146254  0.3  0.0 561860 384712 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146255  0.2  0.0 561820 385124 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146256  0.2  0.0 561828 384804 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146257  0.2  0.0 561860 384680 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146258  0.2  0.0 561828 384476 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146259  0.3  0.0 561744 384936 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146260  0.2  0.0 561836 385856 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146261  0.2  0.0 561824 385060 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146262  0.2  0.0 561816 385408 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146263  0.2  0.0 561860 385628 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146264  0.2  0.0 561828 384992 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146265  0.2  0.0 561820 385012 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146266  0.2  0.0 561828 384956 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146267  0.2  0.0 561824 384812 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146268  0.2  0.0 561860 384680 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146269  0.2  0.0 561744 384880 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146270  0.2  0.0 561828 384800 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146271  0.2  0.0 561820 385316 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146272  0.2  0.0 561828 384544 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146273  0.2  0.0 561832 385732 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146274  0.2  0.0 561824 384824 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146275  0.3  0.0 561824 385012 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146276  0.2  0.0 561820 385108 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146277  0.2  0.0 561860 384688 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146278  0.2  0.0 561868 385752 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146279  0.2  0.0 561812 384760 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146280  0.2  0.0 561820 385384 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146281  0.2  0.0 561860 385764 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146282  0.2  0.0 561820 384808 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146283  0.2  0.0 561828 384828 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146284  0.3  0.0 561856 384676 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146285  0.2  0.0 561816 384940 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146286  0.2  0.0 561828 384496 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146287  0.2  0.0 561820 385124 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146288  0.2  0.0 561824 384872 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146289  0.2  0.0 561856 384620 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146290  0.2  0.0 561860 384356 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146291  0.2  0.0 561820 385436 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146292  0.2  0.0 561840 385880 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146293  0.2  0.0 561860 385680 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146294  0.3  0.0 561824 384764 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146295  0.2  0.0 561824 384812 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146296  0.2  0.0 561860 384828 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146297  0.2  0.0 561828 384544 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146298  0.2  0.0 561820 384512 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146299  0.2  0.0 561824 385044 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146300  0.2  0.0 561852 384680 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146301  0.2  0.0 561860 384432 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146302  0.2  0.0 561820 385264 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146303  0.2  0.0 561820 385384 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146304  0.2  0.0 561860 385612 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146305  0.3  0.0 561840 384448 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146306  0.2  0.0 561828 384828 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146307  0.2  0.0 561828 384508 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146308  0.2  0.0 561840 385728 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146309  0.3  0.0 561824 385064 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146310  0.2  0.0 561852 384668 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146311  0.2  0.0 561828 384784 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146312  0.2  0.0 561860 384464 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146313  0.2  0.0 561860 384504 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146314  0.3  0.0 561840 384444 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146315  0.3  0.0 561820 385356 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146316  0.3  0.0 561860 385748 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146317  0.3  0.0 561828 384576 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146318  0.2  0.0 561820 384684 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146319  0.2  0.0 561824 384828 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146320  0.2  0.0 561824 384932 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146321  0.2  0.0 561860 384712 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146322  0.2  0.0 561864 384472 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146323  0.3  0.0 561840 384448 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146324  0.2  0.0 561868 385760 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146325  0.2  0.0 561824 384812 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146326  0.2  0.0 561840 384272 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146327  0.2  0.0 561860 384660 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146328  0.2  0.0 561820 384452 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146329  0.3  0.0 561820 385428 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146330  0.2  0.0 561828 384624 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146331  0.2  0.0 561832 385732 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146332  0.2  0.0 561824 385000 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146333  0.2  0.0 561824 385060 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146334  0.2  0.0 561836 384608 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146335  0.2  0.0 561820 384616 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146336  0.3  0.0 561868 385764 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146338  0.2  0.0 561864 384712 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146339  0.2  0.0 561828 384540 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146340  0.2  0.0 561820 385436 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146341  0.2  0.0 561860 385756 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146342  0.3  0.0 561820 384820 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146343  0.3  0.0 561816 385084 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146344  0.3  0.0 561860 384704 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146345  0.2  0.0 561824 384656 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146346  0.3  0.0 561840 385736 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146347  0.3  0.0 561828 384624 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146348  0.2  0.0 561824 384840 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146349  0.2  0.0 561816 385576 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146350  0.2  0.0 561820 385908 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146351  0.2  0.0 561824 384596 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146352  0.2  0.0 561824 384528 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146353  0.2  0.0 561840 385716 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146354  0.3  0.0 561828 384620 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146355  0.2  0.0 561820 384740 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146356  0.2  0.0 561740 385744 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146357  0.2  0.0 561828 384624 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146358  0.2  0.0 561828 384596 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146359  0.3  0.0 561816 384612 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146360  0.2  0.0 561844 385892 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146361  0.2  0.0 561768 383868 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146362  0.2  0.0 561824 383852 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146363  0.2  0.0 561776 385548 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146364  0.2  0.0 561840 385348 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146365  0.2  0.0 561840 384876 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146366  0.2  0.0 561836 385648 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146367  0.2  0.0 561768 385124 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146368  0.2  0.0 561840 385360 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146369  0.3  0.0 561776 385328 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146370  0.2  0.0 561844 385688 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146371  0.2  0.0 561776 385772 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146372  0.2  0.0 561840 385240 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146373  0.2  0.0 561844 385064 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146374  0.3  0.0 561836 385004 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146375  0.2  0.0 561772 384964 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146376  0.3  0.0 561776 385032 ?       SN   11:48   0:06 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146377  0.3  0.0 561832 385796 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146378  0.2  0.0 561844 385064 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146379  0.2  0.0 561772 385212 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146380  0.2  0.0 561828 385492 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146381  0.2  0.0 561780 385328 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146382  0.2  0.0 561776 385500 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146383  0.2  0.0 561768 385376 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146384  0.2  0.0 561848 385792 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146385  0.2  0.0 561844 385864 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146386  0.2  0.0 561840 385148 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146387  0.2  0.0 561840 384624 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146388  0.2  0.0 561840 385640 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146389  0.2  0.0 561772 385216 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146390  0.2  0.0 561772 385776 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146391  0.2  0.0 561844 384744 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146392  0.2  0.0 561848 385808 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146393  0.2  0.0 561780 384996 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146394  0.2  0.0 561824 385308 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146395  0.2  0.0 561828 385448 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146396  0.2  0.0 561828 385008 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146397  0.2  0.0 561780 385360 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146398  0.2  0.0 561776 385352 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146399  0.2  0.0 561776 385636 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146400  0.2  0.0 561828 385432 ?       SN   11:48   0:03 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146401  0.2  0.0 561780 385160 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146402  0.2  0.0 561844 385172 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146403  0.2  0.0 561772 384928 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146404  0.2  0.0 561776 384732 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146405  0.2  0.0 561844 385732 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146406  0.2  0.0 561776 385072 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146407  0.2  0.0 561852 384884 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146408  0.2  0.0 561836 385488 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146409  0.2  0.0 561848 385276 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146410  0.2  0.0 561772 385068 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146411  0.2  0.0 561776 385816 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146412  0.2  0.0 561840 385532 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146413  0.2  0.0 561844 385320 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146414  0.2  0.0 561828 385324 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146415  0.2  0.0 561840 385516 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146416  0.2  0.0 561776 385112 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146417  0.2  0.0 561840 385820 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146418  0.2  0.0 561844 385852 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146419  0.2  0.0 561852 384944 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146420  0.2  0.0 561844 384836 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146421  0.3  0.0 561768 385328 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146422  0.2  0.0 561772 385080 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146423  0.2  0.0 561824 385224 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146424  0.2  0.0 561824 385216 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146425  0.2  0.0 561776 385124 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146426  0.2  0.0 561776 385832 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146427  0.2  0.0 561848 385764 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146428  0.2  0.0 561776 385036 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146429  0.2  0.0 561776 385116 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146430  0.2  0.0 561852 385036 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146431  0.2  0.0 561852 385324 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146432  0.2  0.0 561772 384844 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146433  0.2  0.0 561832 385676 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146434  0.2  0.0 561780 385352 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146435  0.2  0.0 561776 385128 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146436  0.2  0.0 561780 385396 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146437  0.2  0.0 561776 385036 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146438  0.2  0.0 561780 385632 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146439  0.2  0.0 561852 384828 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146440  0.2  0.0 561852 385324 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146441  0.2  0.0 561772 384892 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146442  0.2  0.0 561836 384956 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146443  0.2  0.0 561776 385220 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146444  0.2  0.0 561772 385848 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146445  0.2  0.0 561844 385072 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146446  0.2  0.0 561776 385124 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146447  0.2  0.0 561780 385824 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146448  0.2  0.0 561848 385700 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146449  0.2  0.0 561852 385032 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146450  0.2  0.0 561780 383824 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146451  0.2  0.0 561772 384908 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146452  0.2  0.0 561836 385800 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146453  0.2  0.0 561780 384684 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146454  0.2  0.0 561776 384848 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146455  0.2  0.0 561776 384940 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146456  0.2  0.0 561780 383788 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146457  0.2  0.0 561824 385224 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146458  0.2  0.0 561836 384940 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146459  0.2  0.0 561776 385060 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146460  0.2  0.0 561780 385828 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146461  0.2  0.0 561780 385568 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146462  0.2  0.0 561848 385532 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146463  0.2  0.0 561776 385376 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146464  0.2  0.0 561772 385080 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146465  0.2  0.0 561824 385144 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146466  0.2  0.0 561772 385880 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146467  0.2  0.0 561844 384908 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146468  0.2  0.0 561836 385488 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146469  0.2  0.0 561776 385376 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146470  0.2  0.0 561776 385124 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146472  0.3  0.0 561848 385688 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146473  0.2  0.0 561776 385136 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146474  0.2  0.0 561844 385008 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146475  0.2  0.0 561780 385340 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146476  0.2  0.0 561836 385436 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146477  0.2  0.0 561780 385036 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146478  0.2  0.0 561772 385220 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146479  0.2  0.0 561776 384924 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146480  0.2  0.0 561780 385028 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146481  0.2  0.0 561780 385512 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146482  0.2  0.0 561844 385072 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146483  0.2  0.0 561776 385784 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146484  0.2  0.0 561776 385160 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146485  0.2  0.0 561828 385024 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146486  0.2  0.0 561780 385500 ?       SN   11:48   0:05 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146487  0.2  0.0 561844 385044 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      146488  0.2  0.0 561780 384960 ?       SN   11:48   0:04 /opt/pyvenv/bin/python3 -c from multiprocessing.forkserver import main; main(135, 140, [], **{})
+root      150622  0.0  0.0   7544  3968 pts/0    Ss   12:07   0:00 bash
+root      153421  0.0  0.0   9244  2816 pts/0    R+   12:21   0:00 ps aux

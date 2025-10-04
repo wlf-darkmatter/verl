@@ -5,7 +5,7 @@ export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
 source /usr/local/Ascend/driver/bin/setenv.bash;
 source /usr/local/Ascend/ascend-toolkit/set_env.sh;
 source /usr/local/Ascend/nnal/atb/set_env.sh;
-source /usr/local/Ascend/nnal/asdsip/set_env.sh; 
+source /usr/local/Ascend/nnal/asdsip/set_env.sh;
 source /opt/pyvenv/bin/activate;
 source /etc/profile;
 LIB_PATH=/opt/python3.10/lib/
@@ -23,9 +23,9 @@ export NPU_PER_NODE=8  # A2 NPU Number
 export NNODES=32         # example is 4 Nodes
 
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
-export ASCEND_PROCESS_LOG_PATH=/opt/verl/logs/$MINDX_TASK_ID/plog # modify according to actual situation
+export ASCEND_PROCESS_LOG_PATH=/home/new_verl/plog/$(date +"%Y-%m-%d--%H-%M-%S")
 
- 
+
 ray stop --force
 rm -rf /tmp
 
