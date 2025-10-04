@@ -24,6 +24,7 @@ from codetiming import Timer
 
 from verl.utils.device import get_device_id, get_torch_device
 from verl.utils.logger import DecoratorLoggerBase
+from verl.utils.memory_utils import aggressive_empty_cache, log_memory_usage, get_logger
 
 
 def _get_current_mem_info(unit: str = "GB", precision: int = 2) -> tuple[str]:
@@ -80,6 +81,8 @@ def log_gpu_memory_usage(head: str, logger: logging.Logger = None, level=logging
             print(message)
         else:
             logger.log(msg=message, level=level)
+
+    get_logger().info(head + log_memory_usage())
 
 
 class GPUMemoryLogger(DecoratorLoggerBase):

@@ -33,7 +33,7 @@ from verl.third_party.vllm import parallel_state as vllm_ps
 from verl.utils.device import get_torch_device, set_expandable_segments
 from verl.utils.import_utils import deprecated
 from verl.utils.megatron_utils import load_megatron_model_to_gpu, offload_megatron_model_to_cpu, per_tensor_generator
-from verl.utils.memory_utils import aggressive_empty_cache
+from verl.utils.memory_utils import aggressive_empty_cache, log_memory_usage, get_logger
 from verl.utils.profiler import GPUMemoryLogger, log_gpu_memory_usage
 from verl.utils.profiler.performance import simple_timer
 from verl.utils.torch_functional import check_device_is_available
@@ -47,7 +47,7 @@ logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
 """
 Megatron Hybrid Engine:
 - During training, only the current pp stage holds the parameters
-- Before inference, broadcast the parameters of the current pp rank 
+- Before inference, broadcast the parameters of the current pp rank
    to all other pp ranks (all pp ranks holds all the parameters)
 - Bind the parameters to the inference engine
 - Do inference in tp. pp is treated as additional dp
