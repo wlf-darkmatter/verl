@@ -50,11 +50,11 @@ spec:
                   name: ray-dash-port
               resources:
                 limits:
-                  huawei.com/Ascend910: 16 #目前需要和requests保持一致
-                  memory: "800Gi"
+                  huawei.com/Ascend910: 16
+                  memory: "1500Gi"
                 requests:
-                  huawei.com/Ascend910: 16  #需要的NPU芯片个数为8
-                  memory: "800Gi"
+                  huawei.com/Ascend910: 16
+                  memory: "1500Gi"
 
               volumeMounts:
                 - name: npu-smi
@@ -114,11 +114,11 @@ spec:
                   name: ray-dash-port
               resources:
                 limits:
-                  huawei.com/Ascend910: 16 #目前需要和requests保持一致
-                  memory: "800Gi"
+                  huawei.com/Ascend910: 16
+                  memory: "1500Gi"
                 requests:
-                  huawei.com/Ascend910: 16  #需要的NPU芯片个数为8
-                  memory: "800Gi"
+                  huawei.com/Ascend910: 16
+                  memory: "1500Gi"
               volumeMounts:
                 - name: npu-smi
                   mountPath: /usr/local/bin/npu-smi
