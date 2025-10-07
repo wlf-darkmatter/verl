@@ -11,21 +11,21 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 #! 注意，自定义配置
 export VLLM_SLEEP_LEVEL=1
 export VERL_DEBUG_NOSHARDING=0
-export VERL_MEMORY_LOG_DIR="/home/new_verl/tmp/exp1"
+export VERL_MEMORY_LOG_DIR="/home/new_verl/tmp/512die_12k_instruct"
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
 export TASK_QUEUE_ENABLE=2
 #! 注意，1001 加了这 几个超时配置
-export HCCL_EXEC_TIMEOUT=86400
-export HCCL_EVENT_TIMEOUT=86400
+export HCCL_EXEC_TIMEOUT=7200
+export HCCL_EVENT_TIMEOUT=7200
 export HCCL_CONNECT_TIMEOUT=7200
-export ACL_DEVICE_SYNC_TIMEOUT=86400
+export ACL_DEVICE_SYNC_TIMEOUT=7200
 export HCCL_ASYNC_ERROR_HANDLING=0
 
 #! 注意，1003 加了这 几个超时配置
 export RAY_DEBUG_POST_MORTEM=0
-export ASCEND_LAUNCH_BLOCKING=1
+# export ASCEND_LAUNCH_BLOCKING=1
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
@@ -61,7 +61,7 @@ export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
 
-export ASCEND_PROCESS_LOG_PATH=/home/new_verl/plog/$(basename $(dirname $0))
+export ASCEND_PROCESS_LOG_PATH=/home/new_verl/plog/$(basename $(dirname $0))/$(date +"%Y-%m-%d--%H-%M-%S")
 
 ray stop --force
 rm -rf /tmp/ray

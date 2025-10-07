@@ -17,15 +17,15 @@ export VERL_MEMORY_LOG_DIR="/home/new_verl/tmp/exp1"
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
 export TASK_QUEUE_ENABLE=2
 #! 注意，1001 加了这 几个超时配置
-export HCCL_EXEC_TIMEOUT=86400
-export HCCL_EVENT_TIMEOUT=86400
+export HCCL_EXEC_TIMEOUT=7200
+export HCCL_EVENT_TIMEOUT=7200
 export HCCL_CONNECT_TIMEOUT=7200
-export ACL_DEVICE_SYNC_TIMEOUT=86400
+export ACL_DEVICE_SYNC_TIMEOUT=7200
 export HCCL_ASYNC_ERROR_HANDLING=0
 
 #! 注意，1003 加了这 几个超时配置
 export RAY_DEBUG_POST_MORTEM=0
-export ASCEND_LAUNCH_BLOCKING=1
+# export ASCEND_LAUNCH_BLOCKING=1
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 

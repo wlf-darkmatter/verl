@@ -209,14 +209,14 @@ class TestComm(BasrRay):
 
         print(f"\033[33mbackend={backend}\033[0m", flush=True)
         if not torch.distributed.is_initialized():
-            dist.init_process_group(backend)
+            # dist.init_process_group(backend)
 
-            # dist.init_process_group(
-            #     backend=backend,
-            #     rank=self.rank,
-            #     world_size=self.world_size,
-            #     timeout=datetime.timedelta(seconds=900),  # * 默认给一个 5min 的超时时间
-            # )
+            dist.init_process_group(
+                backend=backend,
+                rank=self.rank,
+                world_size=self.world_size,
+                timeout=datetime.timedelta(seconds=900),  # * 默认给一个 5min 的超时时间
+            )
 
         torch.npu.set_device(self.local_rank)
         print(f"\033[32m建链完成\033[0m", flush=True)

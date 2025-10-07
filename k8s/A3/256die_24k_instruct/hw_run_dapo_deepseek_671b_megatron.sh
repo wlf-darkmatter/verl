@@ -23,7 +23,7 @@ clip_ratio_low=0.2
 clip_ratio_high=0.28
 
 max_prompt_length=$((1024 * 2))
-max_response_length=$((1024 * 12))
+max_response_length=$((1024 * 1))
 enable_overlong_buffer=True
 overlong_buffer_len=$((1024 * 1))
 overlong_penalty_factor=0.3
@@ -35,7 +35,7 @@ n_resp_per_prompt=16
 train_prompt_mini_bsz=32  # mini_bsz * n >= micro_bsz * pp * dp
 
 #NNODES=${NNODES:-1}
-NNODES=32
+NNODES=16
 
 # 1. download the dist_ckpt format model from https://huggingface.co/BearBiscuit05/dpsk-v3-671B-BF16-dist_ckpt/tree/main
 # change the MODEL_PATH and MCORE_MODEL_PATH to your own path
@@ -43,7 +43,7 @@ NNODES=32
 MODEL_PATH="/mnt/hpfs_test/weights/dsv3-bf16"
 MCORE_MODEL_PATH="/mnt/hpfs_test/weights/dsv3_bf16_mcore_hs"
 RAY_DATA_HOME="/opt"
-CKPTS_DIR=/mnt/hpfs_test/ckpt/ckpt-DAPO-DeepSeek-671b-megatron-2k12k
+CKPTS_DIR=/mnt/hpfs_test/ckpt/ckpt-DAPO-DeepSeek-671b-megatron-2k24k
 
 TRAIN_FILE="/mnt/hpfs_test/data/data/dapo-math-17k.parquet"
 TEST_FILE="/mnt/hpfs_test/data/data/dapo-math-17k.parquet"
@@ -82,7 +82,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
     actor_rollout_ref.rollout.load_format=safetensors \
-    actor_rollout_ref.rollout.skip.enable=True \
+    actor_rollout_ref.rollout.skip.enable=False \
     actor_rollout_ref.rollout.skip.dump_dir="/mnt/hpfs_test/wlf/rollout_dump" \
     actor_rollout_ref.rollout.skip.dump_step=500 \
     data.train_files="${TRAIN_FILE}" \
@@ -168,13 +168,15 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.nnodes="${NNODES}" \
     trainer.val_before_train=False \
     trainer.test_freq=-1 \
-    trainer.save_freq=5 \
+    trainer.save_freq=10 \
     trainer.total_epochs=10 \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
     trainer.log_val_generations=10 \
     actor_rollout_ref.rollout.free_cache_engine=True \
     trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
+
+
 sleep 600
 ray_name=$(cat /tmp/ray.output | grep "submitted successfully" | awk -F "'" '{print $2}')
 ray_name=${ray_name//\'}

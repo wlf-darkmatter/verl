@@ -1,0 +1,439 @@
+(WorkerDict pid=1022, ip=172.16.2.66) [Rank 8 | Local Rank 0] 2025-10-05 20:24:23,095 INFO [megatron_vllm_8:85] => After offload actor params and grad during initMemory usage [current]: Total: 60.97 GB, Allocated: 5.69 GB, Reserved: 5.91 GB, Cached: 0.22 GB
+(WorkerDict pid=1022, ip=172.16.2.66) 2025-10-05 20:24:25 - megatron_vllm_8 - INFO - After offload actor optimizer during initMemory usage [current]: Total: 60.97 GB, Allocated: 0.00 GB, Reserved: 0.00 GB, Cached: 0.00 GB
+(WorkerDict pid=1022, ip=172.16.2.66) [Rank 8 | Local Rank 0] 2025-10-05 20:24:25,088 INFO [megatron_vllm_8:85] => After offload actor optimizer during initMemory usage [current]: Total: 60.97 GB, Allocated: 0.00 GB, Reserved: 0.00 GB, Cached: 0.00 GB
+(WorkerDict pid=1022, ip=172.16.2.66) /tmp/ray/session_2025-10-05_20-20-32_139131_98/runtime_resources/working_dir_files/_ray_pkg_efaa3f5209a1e00c/verl/utils/profiler/config.py:49: UserWarning: Torch profiler tool config is not fully supported now.
+(WorkerDict pid=1022, ip=172.16.2.66)   warnings.warn("Torch profiler tool config is not fully supported now.", stacklevel=1)
+(WorkerDict pid=1014, ip=172.16.2.66) MLATransformerConfig(tensor_model_parallel_size=16, pipeline_model_parallel_comm_backend=None, pipeline_model_parallel_size=8, virtual_pipeline_model_parallel_size=None, sequence_parallel=True, context_parallel_size=1, hierarchical_context_parallel_sizes=None, expert_model_parallel_size=32, expert_tensor_parallel_size=1, moe_extended_tp=False, perform_initialization=True, use_cpu_initialization=False, fp16=False, bf16=True, params_dtype=torch.bfloat16, timers=None, finalize_model_grads_func=None, grad_scale_func=None, no_sync_func=None, grad_sync_func=None, param_sync_func=None, deterministic_mode=False, enable_autocast=False, autocast_dtype=torch.bfloat16, num_microbatches_with_partial_activation_checkpoints=None, gradient_accumulation_fusion=False, async_tensor_model_parallel_allreduce=False, use_te_rng_tracker=False, tp_comm_overlap=False, tp_comm_bulk_wgrad=True, tp_comm_bulk_dgrad=True, tp_comm_overlap_ag=True, tp_comm_overlap_rs=True, tp_comm_overlap_rs_dgrad=False, tp_comm_split_ag=True, tp_comm_atomic_ag=False, tp_comm_split_rs=True, tp_comm_atomic_rs=False, cross_entropy_loss_fusion=False, cross_entropy_fusion_impl='native', tp_comm_overlap_disable_qkv=False, tp_comm_overlap_disable_fc1=False, tp_comm_bootstrap_backend='nccl', pipeline_dtype=torch.bfloat16, variable_seq_lengths=True, overlap_p2p_comm=False, batch_p2p_comm=False, batch_p2p_sync=True, use_ring_exchange_p2p=False, deallocate_pipeline_outputs=False, defer_embedding_wgrad_compute=False, wgrad_deferral_limit=0, pipeline_model_parallel_split_rank=None, overlap_p2p_comm_warmup_flush=False, microbatch_group_size_per_vp_stage=8, cpu_offloading=False, cpu_offloading_num_layers=0, _cpu_offloading_context=None, cpu_offloading_activations=True, cpu_offloading_weights=True, barrier_with_L1_time=True, num_layers=61, mtp_num_layers=0, mtp_loss_scaling_factor=0.1, num_layers_in_first_pipeline_stage=7, num_layers_in_last_pipeline_stage=6, account_for_embedding_in_pipeline_split=False, account_for_loss_in_pipeline_split=False, hidden_size=7168, num_attention_heads=128, attention_backend=<AttnBackend.fused: 2>, softmax_scale=None, num_query_groups=128, ffn_hidden_size=18432, kv_channels=64, hidden_dropout=0.0, attention_dropout=0.0, fp32_residual_connection=False, apply_residual_connection_post_layernorm=False, layernorm_epsilon=1e-06, layernorm_zero_centered_gamma=False, add_bias_linear=False, add_qkv_bias=False, gated_linear_unit=True, activation_func=<function silu at 0xffff34152320>, activation_func_fp8_input_store=False, num_moe_experts=256, rotary_interleaved=False, window_size=None, normalization='RMSNorm', qk_layernorm=True, test_mode=False, calculate_per_token_loss=False, multi_latent_attention=True, init_method=functools.partial(<function normal_ at 0xffff341cea70>, mean=0.0, std=0.02), output_layer_init_method=functools.partial(<function normal_ at 0xffff341cea70>, mean=0.0, std=0.0018107149208503705), init_method_std=0.02, init_model_with_meta_device=False, apply_query_key_layer_scaling=False, attention_softmax_in_fp32=True, disable_bf16_reduced_precision_matmul=True, bias_activation_fusion=True, masked_softmax_fusion=True, persist_layer_norm=True, memory_efficient_layer_norm=False, bias_dropout_fusion=True, apply_rope_fusion=False, recompute_granularity='full', recompute_method='uniform', recompute_num_layers=1, distribute_saved_activations=None, recompute_modules=['core_attn'], fp8=None, fp8_recipe='delayed', fp8_param=False, fp8_margin=0, fp8_interval=1, fp8_amax_history_len=1, fp8_amax_compute_algo='most_recent', fp8_wgrad=True, fp8_dot_product_attention=False, fp8_multi_head_attention=False, tp_only_amax_red=False, first_last_layers_bf16=False, num_layers_at_start_in_bf16=1, num_layers_at_end_in_bf16=1, moe_shared_expert_intermediate_size=2048, moe_shared_expert_overlap=True, moe_layer_freq=[0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], moe_ffn_hidden_size=2048, moe_router_load_balancing_type='seq_aux_loss', moe_router_topk=8, moe_router_topk_limited_devices=None, moe_router_num_groups=None, moe_router_group_topk=None, moe_router_pre_softmax=True, moe_router_topk_scaling_factor=2.5, moe_router_score_function='sigmoid', moe_router_dtype='fp64', moe_router_enable_expert_bias=True, moe_router_bias_update_rate=0.001, moe_grouped_gemm=True, moe_use_legacy_grouped_gemm=False, moe_aux_loss_coeff=0.001, moe_z_loss_coeff=None, moe_input_jitter_eps=None, moe_token_dropping=False, moe_token_dispatcher_type='alltoall', moe_enable_deepep=False, moe_per_layer_logging=False, moe_expert_capacity_factor=None, moe_pad_expert_input_to_capacity=False, moe_token_drop_policy='probs', moe_layer_recompute=False, moe_permute_fusion=False, moe_apply_probs_on_input=False, cp_comm_type=None, enable_cuda_graph=False, cuda_graph_use_single_mempool=False, cuda_graph_retain_backward_graph=False, cuda_graph_warmup_steps=3, external_cuda_graph=False, cuda_graph_scope='full', clone_scatter_output_in_embedding=True, disable_parameter_transpose_cache=False, config_logger_dir='', flash_decode=False, inference_rng_tracker=False, mrope_section=None, is_hybrid_model=False, mamba_state_dim=128, mamba_head_dim=64, mamba_num_groups=8, heterogeneous_block_specs=False, q_lora_rank=1536, kv_lora_rank=512, qk_head_dim=128, qk_pos_emb_head_dim=64, v_head_dim=128, rope_type='yarn', rotary_base=10000, rotary_percent=1.0, rotary_scaling_factor=40.0, max_position_embeddings=4096, beta_fast=32.0, beta_slow=1.0, mscale=1.0, mscale_all_dim=1.0, optimizer_selection='fused_adamw', optimization_level=2, use_fused_rmsnorm=True, use_fused_swiglu=False, context_parallel_algo='megatron_cp_algo', cp_window_size=1, attention_mask_type='causal', use_cp_send_recv_overlap=False, use_fused_ring_attention_update=False, megatron_cp_in_bnsd=False, ulysses_degree_in_cp=None, context_parallel_kv_cache_policy=None, context_parallel_cache_interval=0, use_ulysses_allgather_kv=False, attention_mask_on_cpu=False, adaptive_cp_without_coarse=False, adaptive_cp_dynamic_attn_mask=False, adaptive_cp_only_reschedule=False, adaptive_cp_manually_set_mask_list=False, async_log_allreduce=False, use_fused_rotary_pos_emb=False, use_fused_moe_token_permute_and_unpermute=False, npu_deterministic=False, op_cal_tflops=False, profile_level='level0', profile_with_cpu=False, profile_with_stack=False, profile_with_memory=False, profile_record_shapes=False, profile_save_path='./profile_dir', recompute_activation_function=False, recompute_activation_function_num_layers=None, recompute_norm=False, recompute_norm_num_layers=None, enable_recompute_layers_per_pp_rank=False, unaligned_linear=False, use_ascend_mc2=False, use_ascend_coc=False, coc_mode=-1, coc_parallel_num=1, coc_fused_kernel=False, tp_2d=False, tp_x=1, tp_y=1, enable_overlap_ag_with_matmul=False, enable_overlap_matmul_with_rs=False, enable_backward_overlap_ag_with_matmul=False, recompute_in_bubble=False, recompute_in_advance=False, noop_layers=None, use_multiparameter_pipeline_model_parallel=False, optimize_send_recv_comm=False, pipeline_num_transformer_layers=None, schedules_method=None, dualpipev_dw_detach=False, gemm_gradient_accumulation_fusion=False, moe_tp_extend_ep=False, moe_permutation_async_comm=False, n_shared_experts=None, moe_allgather_overlap_comm=False, moe_alltoall_overlap_comm=False, moe_zero_memory='disable', moe_zero_memory_num_layers=None, moe_fb_overlap=False, moe_unperm2_mem_optim_swap=False, hccl_group_buffer=None, hccl_group_buffer_adaptive=False, hccl_ep_group_buffer_adaptive_factor=-1.0, ema_decay=0.9999, virtual_optimizer=None, dist_train=False, tokenizer_name_or_path=None, tokenizer_not_use_fast=True, param_and_grad_buffer_pad=None, layerzero=False, layerzero_config=None, reuse_fp32_param=False, smart_swap=False, swap_attention=False, swap_modules='input_norm,self_attention,post_attention_norm', compress_dense='disable', disable_gloo_group=False, hccl_slice_size=10485760, swap_optimizer=False, swap_optimizer_times=16, pre_tockens=65536, next_tockens=0, sparse_mode=0, use_fusion_attn_v2=False, square_alibi_mask=False, fill_neg_inf=False, alibi_fusion_attn_type=None, alibi_diagonal_opposite=False, multi_head_latent_attention=False, qk_rope_head_dim=None, qk_nope_head_dim=None, node_ip_address='172.16.2.66', node_manager_port='42237', object_store_name='/tmp/ray/session_2025-10-05_20-20-32_139131_98/sockets/plasma_store', raylet_name='/tmp/ray/session_2025-10-05_20-20-32_139131_98/sockets/raylet', redis_address='None', metrics_agent_port='59791', logging_rotate_bytes='536870912', logging_rotate_backup_count='5', runtime_env_agent_port='37436', gcs_address='10.101.209.6:6666', session_name='session_2025-10-05_20-20-32_139131_98', temp_dir='/tmp/ray', webui='172.16.2.72:8888', cluster_id='3665b90c6664451ff8f840f5c7dbb07704618f6d029896b878e875ce', startup_token='2', worker_launch_time_ms='1759666928083', node_id='6ae8f9e99caf1f9834f8ab9f5448cc084f06d993d05ff51353062bd9', runtime_env_hash='-481876524', enable_resource_isolation='false', use_flash_attn=True)
+(WorkerDict pid=1039, ip=172.16.2.78) 模型权重加载完毕 [repeated 255x across cluster]
+(WorkerDict pid=1027, ip=172.16.2.68) 2025-10-05 20:24:25 - megatron_vllm_28 - INFO - After MegatronPPOActor initMemory usage [current]: Total: 60.97 GB, Allocated: 0.00 GB, Reserved: 0.00 GB, Cached: 0.00 GB [repeated 274x across cluster]
+(WorkerDict pid=1027, ip=172.16.2.68) [Rank 28 | Local Rank 0] 2025-10-05 20:24:25,610 INFO [megatron_vllm_28:85] => After MegatronPPOActor initMemory usage [current]: Total: 60.97 GB, Allocated: 0.00 GB, Reserved: 0.00 GB, Cached: 0.00 GB [repeated 274x across cluster]
+(WorkerDict pid=1023, ip=172.16.2.84) [Rank 201 | Local Rank 0] 2025-10-05 20:24:25,663 INFO [verl.utils.memory_utils:149] => Memory usage [current]: Total: 60.97 GB, Allocated: 10.75 GB, Reserved: 11.04 GB, Cached: 0.29 GB [repeated 777x across cluster]
+(WorkerDict pid=1039, ip=172.16.2.78) 2025-10-05 20:24:21 - megatron_vllm_105 - INFO - After actor optimizer initMemory usage [current]: Total: 60.97 GB, Allocated: 27.23 GB, Reserved: 29.44 GB, Cached: 2.21 GB [repeated 255x across cluster]
+(WorkerDict pid=1039, ip=172.16.2.78) [Rank 105 | Local Rank 0] 2025-10-05 20:24:21,120 INFO [megatron_vllm_105:85] => After actor optimizer initMemory usage [current]: Total: 60.97 GB, Allocated: 27.23 GB, Reserved: 29.44 GB, Cached: 2.21 GB [repeated 255x across cluster]
+(WorkerDict pid=1039, ip=172.16.2.78) /tmp/ray/session_2025-10-05_20-20-32_139131_98/runtime_resources/working_dir_files/_ray_pkg_efaa3f5209a1e00c/verl/utils/megatron_utils.py:336: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage() [repeated 255x across cluster]
+(WorkerDict pid=1039, ip=172.16.2.78)   if buffer.param_data.storage().size() > 0: [repeated 255x across cluster]
+(WorkerDict pid=1022, ip=172.16.2.66) 2025-10-05 20:24:25 - megatron_vllm_8 - INFO - Before building vllm rolloutMemory usage [current]: Total: 60.97 GB, Allocated: 0.00 GB, Reserved: 0.00 GB, Cached: 0.00 GB
+(WorkerDict pid=1022, ip=172.16.2.66) [Rank 8 | Local Rank 0] 2025-10-05 20:24:25,915 INFO [megatron_vllm_8:85] => Before building vllm rolloutMemory usage [current]: Total: 60.97 GB, Allocated: 0.00 GB, Reserved: 0.00 GB, Cached: 0.00 GB
+(WorkerDict pid=1022, ip=172.16.2.66) WARNING 10-05 20:24:26 [importing.py:29] Triton is not installed. Using dummy decorators. Install it via `pip install triton` to enable kernel compilation.
+(WorkerDict pid=1020, ip=172.16.2.66) WARNING 10-05 20:24:28 [_custom_ops.py:22] Failed to import from vllm._C with ModuleNotFoundError("No module named 'vllm._C'")
+(WorkerDict pid=1019, ip=172.16.2.73) 2025-10-05 20:24:26 - megatron_vllm_53 - INFO - After offload actor params and grad during initMemory usage [current]: Total: 60.97 GB, Allocated: 10.75 GB, Reserved: 11.04 GB, Cached: 0.29 GB [repeated 255x across cluster]
+(WorkerDict pid=1019, ip=172.16.2.73) [Rank 53 | Local Rank 0] 2025-10-05 20:24:26,391 INFO [megatron_vllm_53:85] => After offload actor params and grad during initMemory usage [current]: Total: 60.97 GB, Allocated: 10.75 GB, Reserved: 11.04 GB, Cached: 0.29 GB [repeated 255x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.66) [VLLM] VLLM_SLEEP_LEVEL is set to 1
+(WorkerDict pid=1019, ip=172.16.2.73) 2025-10-05 20:24:29 - megatron_vllm_53 - INFO - After offload actor optimizer during initMemory usage [current]: Total: 60.97 GB, Allocated: 0.00 GB, Reserved: 0.01 GB, Cached: 0.01 GB [repeated 255x across cluster]
+(WorkerDict pid=1019, ip=172.16.2.73) [Rank 53 | Local Rank 0] 2025-10-05 20:24:29,692 INFO [megatron_vllm_53:85] => After offload actor optimizer during initMemory usage [current]: Total: 60.97 GB, Allocated: 0.00 GB, Reserved: 0.01 GB, Cached: 0.01 GB [repeated 255x across cluster]
+(WorkerDict pid=1019, ip=172.16.2.73) 2025-10-05 20:24:29 - megatron_vllm_53 - INFO - After MegatronPPOActor initMemory usage [current]: Total: 60.97 GB, Allocated: 0.00 GB, Reserved: 0.01 GB, Cached: 0.01 GB [repeated 237x across cluster]
+(WorkerDict pid=1019, ip=172.16.2.73) [Rank 53 | Local Rank 0] 2025-10-05 20:24:29,765 INFO [megatron_vllm_53:85] => After MegatronPPOActor initMemory usage [current]: Total: 60.97 GB, Allocated: 0.00 GB, Reserved: 0.01 GB, Cached: 0.01 GB [repeated 237x across cluster]
+(WorkerDict pid=1021, ip=172.16.2.96) [Rank 247 | Local Rank 0] 2025-10-05 20:24:30,550 INFO [verl.utils.memory_utils:149] => Memory usage [current]: Total: 60.97 GB, Allocated: 0.00 GB, Reserved: 0.00 GB, Cached: 0.00 GB [repeated 811x across cluster]
+(WorkerDict pid=1015, ip=172.16.2.87) 2025-10-05 20:24:30 - megatron_vllm_225 - INFO - Before building vllm rolloutMemory usage [current]: Total: 60.97 GB, Allocated: 0.00 GB, Reserved: 0.00 GB, Cached: 0.00 GB [repeated 311x across cluster]
+(WorkerDict pid=1015, ip=172.16.2.87) [Rank 225 | Local Rank 0] 2025-10-05 20:24:30,835 INFO [megatron_vllm_225:85] => Before building vllm rolloutMemory usage [current]: Total: 60.97 GB, Allocated: 0.00 GB, Reserved: 0.00 GB, Cached: 0.00 GB [repeated 311x across cluster]
+(WorkerDict pid=1019, ip=172.16.2.73) WARNING 10-05 20:24:30 [importing.py:29] Triton is not installed. Using dummy decorators. Install it via `pip install triton` to enable kernel compilation. [repeated 255x across cluster]
+(WorkerDict pid=1019, ip=172.16.2.73) WARNING 10-05 20:24:32 [_custom_ops.py:22] Failed to import from vllm._C with ModuleNotFoundError("No module named 'vllm._C'") [repeated 255x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.86) [VLLM] using TP=8, DP=8
+(WorkerDict pid=1014, ip=172.16.2.66) WARNING 10-05 20:24:34 [registry.py:401] Model architecture DeepSeekMTPModel is already registered, and will be overwritten by the new model class vllm_ascend.models.deepseek_mtp:CustomDeepSeekMTP.
+(WorkerDict pid=1014, ip=172.16.2.66) WARNING 10-05 20:24:34 [registry.py:401] Model architecture Qwen2ForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen2:CustomQwen2ForCausalLM.
+(WorkerDict pid=1014, ip=172.16.2.66) WARNING 10-05 20:24:34 [registry.py:401] Model architecture Qwen2VLForConditionalGeneration is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen2_vl:AscendQwen2VLForConditionalGeneration.
+(WorkerDict pid=1014, ip=172.16.2.66) WARNING 10-05 20:24:34 [registry.py:401] Model architecture Qwen2_5_VLForConditionalGeneration is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen2_5_vl:AscendQwen2_5_VLForConditionalGeneration.
+(WorkerDict pid=1014, ip=172.16.2.66) WARNING 10-05 20:24:34 [registry.py:401] Model architecture DeepseekV2ForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.deepseek_v2:CustomDeepseekV2ForCausalLM.
+(WorkerDict pid=1014, ip=172.16.2.66) WARNING 10-05 20:24:34 [registry.py:401] Model architecture DeepseekV3ForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.deepseek_v2:CustomDeepseekV3ForCausalLM.
+(WorkerDict pid=1014, ip=172.16.2.66) WARNING 10-05 20:24:34 [registry.py:401] Model architecture Qwen3MoeForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen3_moe:CustomQwen3MoeForCausalLM.
+(WorkerDict pid=1014, ip=172.16.2.66) WARNING 10-05 20:24:34 [registry.py:401] Model architecture Qwen3ForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen3:CustomQwen3ForCausalLM.
+(WorkerDict pid=1019, ip=172.16.2.73) [VLLM] VLLM_SLEEP_LEVEL is set to 1 [repeated 255x across cluster]
+(WorkerDict pid=1017, ip=172.16.2.73) WARNING 10-05 20:24:44 [arg_utils.py:1647] Detected VLLM_USE_V1=1 with npu. Usage should be considered experimental. Please report any issues on Github.
+(WorkerDict pid=1019, ip=172.16.2.73) [Rank 53 | Local Rank 0] 2025-10-05 20:24:33,478 INFO [verl.utils.memory_utils:149] => Memory usage [current]: Total: 60.97 GB, Allocated: 0.00 GB, Reserved: 0.01 GB, Cached: 0.01 GB [repeated 202x across cluster]
+(WorkerDict pid=1019, ip=172.16.2.73) 2025-10-05 20:24:33 - megatron_vllm_53 - INFO - Before building vllm rolloutMemory usage [current]: Total: 60.97 GB, Allocated: 0.00 GB, Reserved: 0.01 GB, Cached: 0.01 GB [repeated 200x across cluster]
+(WorkerDict pid=1019, ip=172.16.2.73) [Rank 53 | Local Rank 0] 2025-10-05 20:24:33,478 INFO [megatron_vllm_53:85] => Before building vllm rolloutMemory usage [current]: Total: 60.97 GB, Allocated: 0.00 GB, Reserved: 0.01 GB, Cached: 0.01 GB [repeated 200x across cluster]
+(WorkerDict pid=1029, ip=172.16.2.73) [VLLM] using TP=8, DP=8 [repeated 255x across cluster]
+(WorkerDict pid=1032, ip=172.16.2.83) WARNING 10-05 20:24:34 [registry.py:401] Model architecture DeepSeekMTPModel is already registered, and will be overwritten by the new model class vllm_ascend.models.deepseek_mtp:CustomDeepSeekMTP. [repeated 255x across cluster]
+(WorkerDict pid=1032, ip=172.16.2.83) WARNING 10-05 20:24:34 [registry.py:401] Model architecture Qwen3ForCausalLM is already registered, and will be overwritten by the new model class vllm_ascend.models.qwen3:CustomQwen3ForCausalLM. [repeated 1785x across cluster]
+(WorkerDict pid=1015, ip=172.16.2.79) WARNING 10-05 20:24:46 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes not implemented in <vllm_ascend.worker.worker_v1.NPUWorker object at 0xffce08c205e0>
+(WorkerDict pid=1077, ip=172.16.2.78) WARNING 10-05 20:24:46 [arg_utils.py:1647] Detected VLLM_USE_V1=1 with npu. Usage should be considered experimental. Please report any issues on Github. [repeated 255x across cluster]
+(WorkerDict pid=1020, ip=172.16.2.73) WARNING 10-05 20:24:55 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes not implemented in <vllm_ascend.worker.worker_v1.NPUWorker object at 0xffce17166320> [repeated 192x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.79) ModelConfig(model='/mnt/hpfs_test/weights/dsv3-bf16', task='generate', tokenizer='/mnt/hpfs_test/weights/dsv3-bf16', tokenizer_mode='auto', trust_remote_code=False, dtype=torch.bfloat16, seed=0, hf_config_path=None, allowed_local_media_path='', revision=None, code_revision=None, rope_scaling={}, rope_theta=None, tokenizer_revision=None, max_model_len=3072, spec_target_max_model_len=None, quantization=None, enforce_eager=True, max_seq_len_to_capture=3072, max_logprobs=20, disable_sliding_window=False, disable_cascade_attn=False, skip_tokenizer_init=False, enable_prompt_embeds=False, served_model_name='/mnt/hpfs_test/weights/dsv3-bf16', limit_mm_per_prompt={}, use_async_output_proc=True, config_format=<ConfigFormat.AUTO: 'auto'>, hf_token=None, hf_overrides={}, mm_processor_kwargs=None, disable_mm_preprocessor_cache=False, override_neuron_config={}, pooler_config=None, override_pooler_config=None, logits_processor_pattern=None, generation_config='auto', override_generation_config={}, enable_sleep_mode=True, model_impl='auto')
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:   0% Completed | 0/163 [00:00<?, ?it/s]
+(WorkerDict pid=1019, ip=172.16.2.73) /tmp/ray/session_2025-10-05_20-20-32_139131_98/runtime_resources/working_dir_files/_ray_pkg_efaa3f5209a1e00c/verl/utils/profiler/config.py:49: UserWarning: Torch profiler tool config is not fully supported now. [repeated 255x across cluster]
+(WorkerDict pid=1019, ip=172.16.2.73)   warnings.warn("Torch profiler tool config is not fully supported now.", stacklevel=1) [repeated 255x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:   1% Completed | 2/163 [00:00<00:12, 13.34it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:   2% Completed | 4/163 [00:08<06:42,  2.53s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:   3% Completed | 5/163 [00:17<11:33,  4.39s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:   4% Completed | 6/163 [00:17<08:16,  3.16s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:   5% Completed | 8/163 [00:26<09:23,  3.63s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:   6% Completed | 9/163 [00:26<07:07,  2.77s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:   6% Completed | 10/163 [00:32<09:22,  3.68s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:   7% Completed | 11/163 [00:32<06:54,  2.72s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:   7% Completed | 12/163 [00:38<09:15,  3.68s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:   8% Completed | 13/163 [00:44<10:25,  4.17s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:   9% Completed | 14/163 [00:45<08:01,  3.23s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:   9% Completed | 15/163 [00:45<06:06,  2.48s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  10% Completed | 16/163 [00:46<04:52,  1.99s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  10% Completed | 17/163 [00:47<04:07,  1.69s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  11% Completed | 18/163 [00:48<03:44,  1.55s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  12% Completed | 20/163 [00:48<02:04,  1.15it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  13% Completed | 22/163 [00:49<01:40,  1.41it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  15% Completed | 24/163 [00:50<01:06,  2.10it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  17% Completed | 27/163 [00:50<00:38,  3.50it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  18% Completed | 29/163 [00:52<01:11,  1.87it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  18% Completed | 30/163 [00:59<03:40,  1.66s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  20% Completed | 32/163 [01:01<03:17,  1.51s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  20% Completed | 33/163 [01:02<02:43,  1.25s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  21% Completed | 34/163 [01:02<02:12,  1.03s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  22% Completed | 36/163 [01:02<01:25,  1.49it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  23% Completed | 38/163 [01:02<01:00,  2.07it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  24% Completed | 39/163 [01:02<00:51,  2.39it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  25% Completed | 40/163 [01:02<00:44,  2.75it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  25% Completed | 41/163 [01:03<00:38,  3.16it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  26% Completed | 42/163 [01:03<00:35,  3.40it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  27% Completed | 44/163 [01:07<01:59,  1.00s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  28% Completed | 45/163 [01:11<03:22,  1.71s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  29% Completed | 47/163 [01:18<04:38,  2.40s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  29% Completed | 48/163 [01:18<03:43,  1.95s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  30% Completed | 49/163 [01:18<02:53,  1.52s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  31% Completed | 51/163 [01:18<01:44,  1.07it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  32% Completed | 52/163 [01:28<05:17,  2.86s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  33% Completed | 53/163 [01:42<10:16,  5.61s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  33% Completed | 54/163 [01:42<07:44,  4.26s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  34% Completed | 55/163 [01:43<05:42,  3.17s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  34% Completed | 56/163 [01:48<06:31,  3.65s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  36% Completed | 58/163 [01:48<03:37,  2.07s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  37% Completed | 61/163 [01:50<02:28,  1.45s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  39% Completed | 63/163 [01:50<01:41,  1.01s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  39% Completed | 64/163 [01:55<02:46,  1.68s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  40% Completed | 66/163 [02:14<07:06,  4.40s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  41% Completed | 67/163 [02:23<08:22,  5.23s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  42% Completed | 68/163 [02:23<06:29,  4.10s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  43% Completed | 70/163 [02:23<03:56,  2.55s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  44% Completed | 72/163 [02:23<02:33,  1.68s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  45% Completed | 74/163 [02:23<01:41,  1.14s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  46% Completed | 75/163 [02:23<01:23,  1.05it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  47% Completed | 77/163 [02:24<00:55,  1.55it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  48% Completed | 79/163 [02:35<03:13,  2.31s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  49% Completed | 80/163 [02:44<04:57,  3.59s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  50% Completed | 81/163 [02:44<03:52,  2.84s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  50% Completed | 82/163 [02:45<03:21,  2.49s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  51% Completed | 83/163 [02:50<04:10,  3.13s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  52% Completed | 85/163 [02:52<02:44,  2.11s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  54% Completed | 88/163 [02:53<01:43,  1.37s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  55% Completed | 89/163 [02:57<02:12,  1.79s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  55% Completed | 90/163 [03:05<03:41,  3.04s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  56% Completed | 91/163 [03:05<02:50,  2.37s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  56% Completed | 92/163 [03:05<02:09,  1.82s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  57% Completed | 93/163 [03:05<01:38,  1.40s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  58% Completed | 95/163 [03:11<02:21,  2.08s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  59% Completed | 96/163 [03:18<03:38,  3.26s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  60% Completed | 97/163 [03:18<02:43,  2.48s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  61% Completed | 100/163 [03:19<01:16,  1.22s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  63% Completed | 103/163 [03:19<00:42,  1.40it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  64% Completed | 105/163 [03:22<00:56,  1.02it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  66% Completed | 107/163 [03:25<01:02,  1.12s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  67% Completed | 110/163 [03:25<00:37,  1.42it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  69% Completed | 112/163 [03:34<01:25,  1.67s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  69% Completed | 113/163 [03:40<02:05,  2.50s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  70% Completed | 114/163 [03:41<01:41,  2.07s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  71% Completed | 115/163 [03:46<02:11,  2.75s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  72% Completed | 117/163 [03:46<01:19,  1.74s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  73% Completed | 119/163 [03:49<01:16,  1.73s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  74% Completed | 121/163 [03:50<00:49,  1.17s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  75% Completed | 122/163 [03:52<01:00,  1.47s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  76% Completed | 124/163 [03:52<00:37,  1.03it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  77% Completed | 125/163 [03:55<00:47,  1.26s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  78% Completed | 127/163 [03:55<00:32,  1.10it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  79% Completed | 128/163 [03:56<00:26,  1.33it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  79% Completed | 129/163 [03:56<00:24,  1.40it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  80% Completed | 131/163 [03:56<00:14,  2.19it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  82% Completed | 133/163 [03:57<00:13,  2.21it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  83% Completed | 135/163 [03:59<00:15,  1.76it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  85% Completed | 138/163 [03:59<00:08,  2.89it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  87% Completed | 141/163 [03:59<00:05,  4.34it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  88% Completed | 144/163 [03:59<00:03,  6.10it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  90% Completed | 147/163 [04:05<00:11,  1.38it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  91% Completed | 149/163 [04:06<00:10,  1.35it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  92% Completed | 150/163 [04:08<00:11,  1.09it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  93% Completed | 151/163 [04:09<00:10,  1.16it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  94% Completed | 153/163 [04:10<00:07,  1.33it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  95% Completed | 155/163 [04:11<00:06,  1.30it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  96% Completed | 157/163 [04:12<00:03,  1.83it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  97% Completed | 158/163 [04:13<00:03,  1.40it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  98% Completed | 159/163 [04:13<00:02,  1.68it/s]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  99% Completed | 161/163 [05:16<00:24, 12.06s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards:  99% Completed | 162/163 [05:24<00:11, 11.33s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards: 100% Completed | 163/163 [05:30<00:00,  9.99s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+Loading safetensors checkpoint shards: 100% Completed | 163/163 [05:30<00:00,  2.03s/it]
+(WorkerDict pid=1014, ip=172.16.2.66) 
+(WorkerDict pid=1014, ip=172.16.2.66) [rank0]:[W1005 20:31:26.402315580 compiler_depend.ts:28] Warning: The oprator of MoeInitRouting will be removed from Pytorch and switch to AscendSpeed after 630. (function operator())
+(WorkerDict pid=1014, ip=172.16.2.66) [rank0]:[W1005 20:31:35.235786480 compiler_depend.ts:26] Warning: Warning: kernel [ArgSort] can not support dtype int32 or int64 on AiCore, Now this kernel is running on AiCpu.If you are more concerned about high-performance execution,please cast dtype to float32. (function operator())
+(WorkerDict pid=1017, ip=172.16.2.86) kwargs: {'n': 1, 'logprobs': 0, 'max_tokens': 1024, 'detokenize': False, 'temperature': 1.0, 'top_k': -1, 'top_p': 1.0, 'ignore_eos': False}
+(WorkerDict pid=1017, ip=172.16.2.86) [Rank 209 | Local Rank 0] 2025-10-05 20:31:47,374 INFO [verl.utils.memory_utils:149] => Memory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB
+(WorkerDict pid=1017, ip=172.16.2.86) 2025-10-05 20:31:47 - megatron_vllm_209 - INFO - After building vllm rolloutMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB
+(WorkerDict pid=1017, ip=172.16.2.86) [Rank 209 | Local Rank 0] 2025-10-05 20:31:47,375 INFO [megatron_vllm_209:85] => After building vllm rolloutMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB
+(WorkerDict pid=141457) WARNING 10-05 20:24:56 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes not implemented in <vllm_ascend.worker.worker_v1.NPUWorker object at 0xffce2832af80> [repeated 63x across cluster]
+(WorkerDict pid=1022, ip=172.16.2.83) ModelConfig(model='/mnt/hpfs_test/weights/dsv3-bf16', task='generate', tokenizer='/mnt/hpfs_test/weights/dsv3-bf16', tokenizer_mode='auto', trust_remote_code=False, dtype=torch.bfloat16, seed=0, hf_config_path=None, allowed_local_media_path='', revision=None, code_revision=None, rope_scaling={}, rope_theta=None, tokenizer_revision=None, max_model_len=3072, spec_target_max_model_len=None, quantization=None, enforce_eager=True, max_seq_len_to_capture=3072, max_logprobs=20, disable_sliding_window=False, disable_cascade_attn=False, skip_tokenizer_init=False, enable_prompt_embeds=False, served_model_name='/mnt/hpfs_test/weights/dsv3-bf16', limit_mm_per_prompt={}, use_async_output_proc=True, config_format=<ConfigFormat.AUTO: 'auto'>, hf_token=None, hf_overrides={}, mm_processor_kwargs=None, disable_mm_preprocessor_cache=False, override_neuron_config={}, pooler_config=None, override_pooler_config=None, logits_processor_pattern=None, generation_config='auto', override_generation_config={}, enable_sleep_mode=True, model_impl='auto') [repeated 255x across cluster]
+(WorkerDict pid=1017, ip=172.16.2.86) 由于verl不支持 MTP，自动将 num_nextn_predict_layers 改成 0.
+(WorkerDict pid=1041, ip=172.16.2.78) 2025-10-05 20:31:47 - megatron_vllm_108 - INFO - After building sharding managerMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB
+(WorkerDict pid=1041, ip=172.16.2.78) [Rank 108 | Local Rank 0] 2025-10-05 20:31:47,473 INFO [megatron_vllm_108:85] => After building sharding managerMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB
+(WorkerDict pid=1041, ip=172.16.2.78) rollout and sharding manager init done sharding_manager: <verl.workers.sharding_manager.megatron_vllm.MegatronVLLMShardingManager object at 0xffce3288fc10>
+(WorkerDict pid=1041, ip=172.16.2.78) 2025-10-05 20:31:47 - megatron_vllm_108 - INFO - After rollout initMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB
+(WorkerDict pid=1041, ip=172.16.2.78) [Rank 108 | Local Rank 0] 2025-10-05 20:31:47,475 INFO [megatron_vllm_108:85] => After rollout initMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB
+(WorkerDict pid=1041, ip=172.16.2.78) 2025-10-05 20:31:47 - megatron_vllm_108 - INFO - After init_model finishMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB
+(WorkerDict pid=1041, ip=172.16.2.78) [Rank 108 | Local Rank 0] 2025-10-05 20:31:47,481 INFO [megatron_vllm_108:85] => After init_model finishMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB
+(WorkerDict pid=1021, ip=172.16.2.74) 
+(WorkerDict pid=1014, ip=172.16.2.66) Overridden MLATransformerConfig init config: {'num_layers': 61, 'hidden_size': 7168, 'num_attention_heads': 128, 'num_query_groups': 128, 'ffn_hidden_size': 18432, 'attention_dropout': 0.0, 'hidden_dropout': 0.0, 'kv_channels': 64, 'layernorm_epsilon': 1e-06, 'add_bias_linear': False, 'activation_func': <function silu at 0xffff34152320>, 'normalization': 'RMSNorm', 'gated_linear_unit': True, 'pipeline_dtype': torch.bfloat16, 'params_dtype': torch.bfloat16, 'bf16': True, 'tensor_model_parallel_size': 16, 'pipeline_model_parallel_size': 8, 'expert_model_parallel_size': 32, 'expert_tensor_parallel_size': 1, 'virtual_pipeline_model_parallel_size': None, 'context_parallel_size': 1, 'overlap_p2p_comm': False, 'batch_p2p_comm': False, 'sequence_parallel': True, 'variable_seq_lengths': True, 'masked_softmax_fusion': True, 'moe_token_dispatcher_type': 'alltoall', 'use_cpu_initialization': False, 'attention_backend': <AttnBackend.fused: 2>, 'qk_layernorm': True, 'moe_ffn_hidden_size': 2048, 'moe_router_bias_update_rate': 0.001, 'moe_router_enable_expert_bias': True, 'moe_router_topk': 8, 'num_moe_experts': 256, 'moe_shared_expert_intermediate_size': 2048, 'moe_aux_loss_coeff': 0.001, 'moe_router_load_balancing_type': 'seq_aux_loss', 'moe_shared_expert_overlap': True, 'moe_grouped_gemm': True, 'moe_router_score_function': 'sigmoid', 'moe_router_pre_softmax': True, 'moe_router_topk_scaling_factor': 2.5, 'moe_layer_freq': [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 'moe_router_dtype': 'fp64', 'disable_bf16_reduced_precision_matmul': True, 'persist_layer_norm': True, 'bias_activation_fusion': True, 'bias_dropout_fusion': True, 'q_lora_rank': 1536, 'kv_lora_rank': 512, 'qk_head_dim': 128, 'qk_pos_emb_head_dim': 64, 'v_head_dim': 128, 'rotary_base': 10000, 'rotary_scaling_factor': 40.0, 'rope_type': 'yarn', 'max_position_embeddings': 4096, 'beta_fast': 32.0, 'beta_slow': 1.0, 'mscale': 1.0, 'mscale_all_dim': 1.0}
+(TaskRunner pid=38231) Checkpoint tracker file does not exist: /mnt/hpfs_test/ckpt/ckpt-DAPO-DeepSeek-671b-megatron-2k24k/latest_checkpointed_iteration.txt
+(TaskRunner pid=38231) Training from scratch
+(TaskRunner pid=38231) 
+Training Progress:   0%|          | 0/139970 [00:00<?, ?it/s]
+(WorkerDict pid=1029, ip=172.16.2.82) 2025-10-05 20:31:49 - megatron_vllm_173 - INFO - [before_reshard]Memory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB
+(WorkerDict pid=1029, ip=172.16.2.82) [Rank 173 | Local Rank 0] 2025-10-05 20:31:49,866 INFO [megatron_vllm_173:146] => [before_reshard]Memory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB
+(WorkerDict pid=1018, ip=172.16.2.66) [Rank 4 | Local Rank 0] 2025-10-05 20:31:50,309 INFO [verl.utils.memory_utils:99] => Memory cleanup attempt 1: Freed 0.00 GB reserved, 0.00 GB allocated
+(WorkerDict pid=1018, ip=172.16.2.66) 2025-10-05 20:31:50 - megatron_vllm_4 - INFO - [reshard]Memory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB
+(WorkerDict pid=1018, ip=172.16.2.66) [Rank 4 | Local Rank 0] 2025-10-05 20:31:50,311 INFO [megatron_vllm_4:151] => [reshard]Memory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB
+(WorkerDict pid=1018, ip=172.16.2.66) 2025-10-05 20:31:50 - megatron_vllm_4 - INFO - Before state_dict() in sharding manager memoryMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB
+(WorkerDict pid=1018, ip=172.16.2.66) [Rank 4 | Local Rank 0] 2025-10-05 20:31:50,312 INFO [megatron_vllm_4:85] => Before state_dict() in sharding manager memoryMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB
+(WorkerDict pid=141450) kwargs: {'n': 1, 'logprobs': 0, 'max_tokens': 1024, 'detokenize': False, 'temperature': 1.0, 'top_k': -1, 'top_p': 1.0, 'ignore_eos': False} [repeated 255x across cluster]
+(WorkerDict pid=141470) [Rank 44 | Local Rank 0] 2025-10-05 20:31:52,405 INFO [verl.utils.memory_utils:149] => Memory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB [repeated 1783x across cluster]
+(WorkerDict pid=1026, ip=172.16.2.74) 2025-10-05 20:31:47 - megatron_vllm_76 - INFO - After building vllm rolloutMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB [repeated 255x across cluster]
+(WorkerDict pid=1026, ip=172.16.2.74) [Rank 76 | Local Rank 0] 2025-10-05 20:31:47,813 INFO [megatron_vllm_76:85] => After building vllm rolloutMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB [repeated 255x across cluster]
+(WorkerDict pid=1026, ip=172.16.2.84) 由于verl不支持 MTP，自动将 num_nextn_predict_layers 改成 0. [repeated 255x across cluster]
+(WorkerDict pid=1026, ip=172.16.2.84) 2025-10-05 20:31:47 - megatron_vllm_204 - INFO - After building sharding managerMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB [repeated 255x across cluster]
+(WorkerDict pid=1026, ip=172.16.2.84) [Rank 204 | Local Rank 0] 2025-10-05 20:31:47,773 INFO [megatron_vllm_204:85] => After building sharding managerMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB [repeated 255x across cluster]
+(WorkerDict pid=1026, ip=172.16.2.84) rollout and sharding manager init done sharding_manager: <verl.workers.sharding_manager.megatron_vllm.MegatronVLLMShardingManager object at 0xffcf494341f0> [repeated 255x across cluster]
+(WorkerDict pid=1026, ip=172.16.2.84) 2025-10-05 20:31:47 - megatron_vllm_204 - INFO - After rollout initMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB [repeated 255x across cluster]
+(WorkerDict pid=1026, ip=172.16.2.84) [Rank 204 | Local Rank 0] 2025-10-05 20:31:47,775 INFO [megatron_vllm_204:85] => After rollout initMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB [repeated 255x across cluster]
+(WorkerDict pid=1026, ip=172.16.2.84) 2025-10-05 20:31:47 - megatron_vllm_204 - INFO - After init_model finishMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB [repeated 255x across cluster]
+(WorkerDict pid=1026, ip=172.16.2.84) [Rank 204 | Local Rank 0] 2025-10-05 20:31:47,777 INFO [megatron_vllm_204:85] => After init_model finishMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.31 GB, Cached: 0.77 GB [repeated 255x across cluster]
+(WorkerDict pid=1015, ip=172.16.2.66) 2025-10-05 20:32:38 - megatron_vllm_1 - INFO - [offload]Memory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB
+(WorkerDict pid=1015, ip=172.16.2.66) [Rank 1 | Local Rank 0] 2025-10-05 20:32:38,393 INFO [megatron_vllm_1:200] => [offload]Memory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB
+(WorkerDict pid=1016, ip=172.16.2.82) 2025-10-05 20:31:51 - megatron_vllm_162 - INFO - [before_reshard]Memory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB [repeated 255x across cluster]
+(WorkerDict pid=1016, ip=172.16.2.82) [Rank 162 | Local Rank 0] 2025-10-05 20:31:51,489 INFO [megatron_vllm_162:146] => [before_reshard]Memory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB [repeated 255x across cluster]
+(WorkerDict pid=1015, ip=172.16.2.66) [Rank 1 | Local Rank 0] 2025-10-05 20:32:38,391 INFO [verl.utils.memory_utils:99] => Memory cleanup attempt 1: Freed 0.00 GB reserved, 0.00 GB allocated [repeated 256x across cluster]
+(WorkerDict pid=1029, ip=172.16.2.76) 2025-10-05 20:31:52 - megatron_vllm_93 - INFO - [reshard]Memory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB [repeated 255x across cluster]
+(WorkerDict pid=1029, ip=172.16.2.76) [Rank 93 | Local Rank 0] 2025-10-05 20:31:52,487 INFO [megatron_vllm_93:151] => [reshard]Memory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB [repeated 255x across cluster]
+(WorkerDict pid=1029, ip=172.16.2.76) 2025-10-05 20:31:52 - megatron_vllm_93 - INFO - Before state_dict() in sharding manager memoryMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB [repeated 255x across cluster]
+(WorkerDict pid=1029, ip=172.16.2.76) [Rank 93 | Local Rank 0] 2025-10-05 20:31:52,488 INFO [megatron_vllm_93:85] => Before state_dict() in sharding manager memoryMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB [repeated 255x across cluster]
+(WorkerDict pid=1015, ip=172.16.2.66) [Rank 1 | Local Rank 0] 2025-10-05 20:32:38,393 INFO [verl.utils.memory_utils:149] => Memory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB [repeated 9x across cluster]
+(WorkerDict pid=1025, ip=172.16.2.68) 2025-10-05 20:32:38 - megatron_vllm_26 - INFO - After entering sharding managerMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB
+(WorkerDict pid=1025, ip=172.16.2.68) [Rank 26 | Local Rank 0] 2025-10-05 20:32:38,492 INFO [megatron_vllm_26:85] => After entering sharding managerMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB
+(WorkerDict pid=1025, ip=172.16.2.68) 
+Adding requests:   0%|          | 0/64 [00:00<?, ?it/s]
+Adding requests: 100%|██████████| 64/64 [00:00<00:00, 7586.99it/s]
+(WorkerDict pid=1025, ip=172.16.2.68) 
+Processed prompts:   0%|          | 0/64 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]
+(WorkerDict pid=1024, ip=172.16.2.68) 
+Adding requests:   0%|          | 0/64 [00:00<?, ?it/s]
+(WorkerDict pid=1024, ip=172.16.2.68) 
+Adding requests: 100%|██████████| 64/64 [00:00<00:00, 7965.21it/s]
+(WorkerDict pid=1027, ip=172.16.2.79) 2025-10-05 20:32:43 - megatron_vllm_125 - INFO - [offload]Memory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB [repeated 253x across cluster]
+(WorkerDict pid=1027, ip=172.16.2.79) [Rank 125 | Local Rank 0] 2025-10-05 20:32:43,394 INFO [megatron_vllm_125:200] => [offload]Memory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB [repeated 253x across cluster]
+(WorkerDict pid=1027, ip=172.16.2.79) [Rank 125 | Local Rank 0] 2025-10-05 20:32:43,392 INFO [verl.utils.memory_utils:99] => Memory cleanup attempt 1: Freed 0.00 GB reserved, 0.00 GB allocated [repeated 253x across cluster]
+(WorkerDict pid=1027, ip=172.16.2.79) [Rank 125 | Local Rank 0] 2025-10-05 20:32:43,431 INFO [verl.utils.memory_utils:149] => Memory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB [repeated 506x across cluster]
+(WorkerDict pid=1027, ip=172.16.2.79) 2025-10-05 20:32:43 - megatron_vllm_125 - INFO - After entering sharding managerMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB [repeated 252x across cluster]
+(WorkerDict pid=1027, ip=172.16.2.79) [Rank 125 | Local Rank 0] 2025-10-05 20:32:43,431 INFO [megatron_vllm_125:85] => After entering sharding managerMemory usage [current]: Total: 60.97 GB, Allocated: 39.54 GB, Reserved: 40.33 GB, Cached: 0.79 GB [repeated 252x across cluster]
+(WorkerDict pid=1027, ip=172.16.2.79) 
+Adding requests:   0%|          | 0/64 [00:00<?, ?it/s]
+Adding requests: 100%|██████████| 64/64 [00:00<00:00, 7123.89it/s] [repeated 224x across cluster]
+(WorkerDict pid=1027, ip=172.16.2.79) 
+Processed prompts:   0%|          | 0/64 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s] [repeated 252x across cluster]
+(WorkerDict pid=1027, ip=172.16.2.83) 
+Adding requests:   0%|          | 0/64 [00:00<?, ?it/s] [repeated 27x across cluster]
+(WorkerDict pid=1027, ip=172.16.2.83) 
+Adding requests: 100%|██████████| 64/64 [00:00<00:00, 7730.99it/s] [repeated 27x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.66) [rank0]:[W1005 20:32:53.165078390 compiler_depend.ts:4402] Warning: The current allgather operator has a defect in handling different tensor shape,         the work event forces a wait operation, and the allgather wait on the python side would be fake (function operator())
+(WorkerDict pid=1026, ip=172.16.2.84) 
+Adding requests:   0%|          | 0/64 [00:00<?, ?it/s]
+Adding requests: 100%|██████████| 64/64 [00:00<00:00, 7654.49it/s] [repeated 3x across cluster]
+(WorkerDict pid=1026, ip=172.16.2.84) 
+Processed prompts:   0%|          | 0/64 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s] [repeated 3x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.79) 
+Processed prompts:   2%|▏         | 1/64 [00:27<28:54, 27.53s/it, est. speed input: 5.30 toks/s, output: 1.09 toks/s]
+(WorkerDict pid=1015, ip=172.16.2.84) 
+Processed prompts:   2%|▏         | 1/64 [00:48<50:39, 48.24s/it, est. speed input: 3.63 toks/s, output: 4.17 toks/s] [repeated 8x across cluster]
+(WorkerDict pid=1022, ip=172.16.2.83) 
+Processed prompts:   2%|▏         | 1/64 [00:55<57:51, 55.10s/it, est. speed input: 2.07 toks/s, output: 4.56 toks/s] [repeated 40x across cluster]
+(WorkerDict pid=1022, ip=172.16.2.84) 
+Processed prompts:   2%|▏         | 1/64 [01:02<1:05:55, 62.78s/it, est. speed input: 1.82 toks/s, output: 4.38 toks/s] [repeated 40x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.73) 
+Processed prompts:   2%|▏         | 1/64 [01:08<1:12:10, 68.74s/it, est. speed input: 2.55 toks/s, output: 4.67 toks/s] [repeated 64x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.96) 
+Processed prompts:   3%|▎         | 2/64 [01:13<31:42, 30.68s/it, est. speed input: 4.39 toks/s, output: 8.52 toks/s]   [repeated 88x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.82) 
+Processed prompts:   5%|▍         | 3/64 [01:19<19:11, 18.88s/it, est. speed input: 5.61 toks/s, output: 12.86 toks/s] [repeated 72x across cluster]
+(WorkerDict pid=1018, ip=172.16.2.82) 
+Processed prompts:   3%|▎         | 2/64 [01:25<38:53, 37.64s/it, est. speed input: 2.82 toks/s, output: 8.19 toks/s]   [repeated 88x across cluster]
+(WorkerDict pid=1028, ip=172.16.2.76) 
+Processed prompts:   3%|▎         | 2/64 [01:30<43:34, 42.17s/it, est. speed input: 2.65 toks/s, output: 7.39 toks/s]   [repeated 96x across cluster]
+(WorkerDict pid=141442) 
+Processed prompts:   9%|▉         | 6/64 [01:32<10:04, 10.42s/it, est. speed input: 10.37 toks/s, output: 23.08 toks/s] [repeated 80x across cluster]
+(WorkerDict pid=1022, ip=172.16.2.86) 
+Processed prompts:   5%|▍         | 3/64 [01:40<27:20, 26.90s/it, est. speed input: 3.01 toks/s, output: 11.65 toks/s] [repeated 104x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.78) 
+Processed prompts:   6%|▋         | 4/64 [01:46<19:18, 19.30s/it, est. speed input: 5.12 toks/s, output: 15.48 toks/s] [repeated 96x across cluster]
+(WorkerDict pid=1015, ip=172.16.2.84) 
+Processed prompts:   6%|▋         | 4/64 [01:48<20:55, 20.93s/it, est. speed input: 4.60 toks/s, output: 14.66 toks/s] [repeated 120x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.96) 
+Processed prompts:   9%|▉         | 6/64 [01:56<13:57, 14.43s/it, est. speed input: 6.98 toks/s, output: 20.24 toks/s] [repeated 136x across cluster]
+(WorkerDict pid=141442) 
+Processed prompts:  17%|█▋        | 11/64 [01:59<05:49,  6.59s/it, est. speed input: 12.70 toks/s, output: 38.94 toks/s] [repeated 168x across cluster]
+(WorkerDict pid=1022, ip=172.16.2.80) 
+Processed prompts:   5%|▍         | 3/64 [02:08<32:19, 31.79s/it, est. speed input: 3.88 toks/s, output: 12.46 toks/s] [repeated 152x across cluster]
+(WorkerDict pid=1015, ip=172.16.2.84) 
+Processed prompts:  11%|█         | 7/64 [02:09<10:45, 11.33s/it, est. speed input: 6.17 toks/s, output: 24.89 toks/s] [repeated 144x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.73) 
+Processed prompts:  14%|█▍        | 9/64 [02:18<06:33,  7.15s/it, est. speed input: 7.99 toks/s, output: 31.80 toks/s] [repeated 136x across cluster]
+(WorkerDict pid=1022, ip=172.16.2.96) 
+Processed prompts:  11%|█         | 7/64 [02:23<09:46, 10.29s/it, est. speed input: 5.65 toks/s, output: 26.35 toks/s] [repeated 152x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.96) 
+Processed prompts:  16%|█▌        | 10/64 [02:28<07:56,  8.82s/it, est. speed input: 8.93 toks/s, output: 31.92 toks/s] [repeated 144x across cluster]
+(WorkerDict pid=1022, ip=172.16.2.84) 
+Processed prompts:  11%|█         | 7/64 [02:33<19:54, 20.95s/it, est. speed input: 5.73 toks/s, output: 20.09 toks/s] [repeated 120x across cluster]
+(WorkerDict pid=1022, ip=172.16.2.81) 
+Processed prompts:  16%|█▌        | 10/64 [02:39<06:22,  7.09s/it, est. speed input: 8.47 toks/s, output: 33.56 toks/s] [repeated 120x across cluster]
+(WorkerDict pid=141457) 
+Processed prompts:  14%|█▍        | 9/64 [02:42<09:25, 10.27s/it, est. speed input: 7.23 toks/s, output: 30.10 toks/s] [repeated 152x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.76) 
+Processed prompts:  20%|██        | 13/64 [02:49<06:57,  8.19s/it, est. speed input: 13.95 toks/s, output: 38.95 toks/s] [repeated 160x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.79) 
+Processed prompts:  25%|██▌       | 16/64 [02:54<03:58,  4.98s/it, est. speed input: 12.23 toks/s, output: 48.91 toks/s] [repeated 144x across cluster]
+(WorkerDict pid=1038, ip=172.16.2.78) 
+Processed prompts:  12%|█▎        | 8/64 [03:01<15:45, 16.88s/it, est. speed input: 5.55 toks/s, output: 20.38 toks/s] [repeated 144x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.83) 
+Processed prompts:  22%|██▏       | 14/64 [03:06<05:34,  6.70s/it, est. speed input: 11.76 toks/s, output: 44.42 toks/s] [repeated 136x across cluster]
+(WorkerDict pid=1018, ip=172.16.2.82) 
+Processed prompts:  22%|██▏       | 14/64 [03:11<05:20,  6.41s/it, est. speed input: 9.63 toks/s, output: 41.38 toks/s] [repeated 112x across cluster]
+(WorkerDict pid=1022, ip=172.16.2.84) 
+Processed prompts:  22%|██▏       | 14/64 [03:15<07:35,  9.11s/it, est. speed input: 9.42 toks/s, output: 39.74 toks/s] [repeated 152x across cluster]
+(WorkerDict pid=1022, ip=172.16.2.83) 
+Processed prompts:  22%|██▏       | 14/64 [03:18<06:32,  7.85s/it, est. speed input: 8.73 toks/s, output: 39.85 toks/s] [repeated 144x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.86) 
+Processed prompts:  23%|██▎       | 15/64 [03:26<08:15, 10.12s/it, est. speed input: 12.33 toks/s, output: 43.83 toks/s] [repeated 160x across cluster]
+(WorkerDict pid=1022, ip=172.16.2.81) 
+Processed prompts:  23%|██▎       | 15/64 [03:32<09:49, 12.03s/it, est. speed input: 9.08 toks/s, output: 41.68 toks/s] [repeated 144x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.73) 
+Processed prompts:  27%|██▋       | 17/64 [03:37<06:28,  8.27s/it, est. speed input: 11.60 toks/s, output: 48.29 toks/s] [repeated 128x across cluster]
+(WorkerDict pid=1022, ip=172.16.2.76) 
+Processed prompts:  23%|██▎       | 15/64 [03:42<08:49, 10.80s/it, est. speed input: 8.48 toks/s, output: 34.88 toks/s] [repeated 120x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.74) 
+Processed prompts:  28%|██▊       | 18/64 [03:46<05:55,  7.74s/it, est. speed input: 9.68 toks/s, output: 48.91 toks/s] [repeated 128x across cluster]
+(WorkerDict pid=1022, ip=172.16.2.79) 
+Processed prompts:  19%|█▉        | 12/64 [03:53<10:23, 12.00s/it, est. speed input: 7.56 toks/s, output: 33.44 toks/s] [repeated 136x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.76) 
+Processed prompts:  30%|██▉       | 19/64 [03:59<08:01, 10.71s/it, est. speed input: 13.35 toks/s, output: 46.21 toks/s] [repeated 120x across cluster]
+(WorkerDict pid=1022, ip=172.16.2.84) 
+Processed prompts:  33%|███▎      | 21/64 [04:03<05:18,  7.41s/it, est. speed input: 11.16 toks/s, output: 53.68 toks/s] [repeated 120x across cluster]
+(WorkerDict pid=1018, ip=172.16.2.76) 
+Processed prompts:  36%|███▌      | 23/64 [04:08<02:56,  4.31s/it, est. speed input: 14.76 toks/s, output: 59.83 toks/s] [repeated 132x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.76) 
+Processed prompts:  38%|███▊      | 24/64 [04:14<03:09,  4.73s/it, est. speed input: 14.72 toks/s, output: 62.31 toks/s] [repeated 156x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.78) 
+Processed prompts:  34%|███▍      | 22/64 [04:20<06:21,  9.08s/it, est. speed input: 12.98 toks/s, output: 54.59 toks/s] [repeated 96x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.76) 
+Processed prompts:  55%|█████▍    | 35/64 [04:25<00:32,  1.11s/it, est. speed input: 19.38 toks/s, output: 101.31 toks/s] [repeated 312x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.73) 
+Processed prompts:  53%|█████▎    | 34/64 [04:30<00:56,  1.89s/it, est. speed input: 18.33 toks/s, output: 99.74 toks/s] [repeated 96x across cluster]
+(WorkerDict pid=1014, ip=172.16.2.74) 
+Processed prompts:  55%|█████▍    | 35/64 [04:34<01:08,  2.37s/it, est. speed input: 18.26 toks/s, output: 99.10 toks/s] [repeated 160x across cluster]
+(WorkerDict pid=1022, ip=172.16.2.86) 
+Processed prompts:  59%|█████▉    | 38/64 [04:40<00:55,  2.14s/it, est. speed input: 18.41 toks/s, output: 110.74 toks/s] [repeated 176x across cluster]
