@@ -54,7 +54,7 @@ if [ "$RANK" = "0" ]; then
       break
     fi
 
-    echo "Waiting for Ray to allocate $((NNODES*NPU_PER_NODE)) devices. Current device count: $$npu_count_int"
+    echo "Waiting for Ray to allocate $((NNODES*NPU_PER_NODE)) devices. Current device count: $npu_count_int"
     cnt=$((cnt+1))
     sleep 5
   done
