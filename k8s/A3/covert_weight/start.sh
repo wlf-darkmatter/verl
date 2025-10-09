@@ -34,6 +34,6 @@ export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
 cd /opt/verl
 torchrun --nproc_per_node 16 --nnodes 2 --node_rank $RANK --master_addr $MASTER_ADDR --master_port $MASTER_PORT \
     /opt/verl/scripts/converter_hf_to_mcore_n_node.py \
-    --hf_model_path /mnt/hpfs_test/weights/dsv3-bf16 \
-    --output_path /mnt/hpfs_test/weights/dsv3_bf16_mcore_hs \
+    --hf_model_path /mnt/hpfs_test/weights/dsv3-base-fp8-zy-bf16 \
+    --output_path /mnt/hpfs_test/weights/dsv3_base_bf16_mcore_zy_hs_mtp0 \
     --pp_size 4 --ep_size 8

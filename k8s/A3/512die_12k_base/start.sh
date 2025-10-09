@@ -11,7 +11,7 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 #! 注意，自定义配置
 export VLLM_SLEEP_LEVEL=1
 export VERL_DEBUG_NOSHARDING=0
-export VERL_MEMORY_LOG_DIR="/home/new_verl/tmp/512die_12k_instruct"
+export VERL_MEMORY_LOG_DIR="/home/new_verl/tmp/512die_12k_base"
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
@@ -93,17 +93,14 @@ if [ "$RANK" = "0" ]; then
       break
     fi
 
-    echo "Waiting for Ray to allocate $((NNODES*NPU_PER_NODE)) devices. Current device count: $(npu_count_int)"
+    echo "Waiting for Ray to allocate $((NNODES*NPU_PER_NODE)) devices. Current device count: $$npu_count_int"
     cnt=$((cnt+1))
-    sleep 60
+    sleep 50
   done
 
 else
-  sleep 10
   echo "This is worker node"
   ray start --address="$MASTER_ADDR:$ServerPort" --disable-usage-stats
-  Worker_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
-  echo $worker_IP
 fi
 
 cnt=0

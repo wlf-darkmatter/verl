@@ -15,38 +15,38 @@ exp_name='DAPO-DeepSeek-671b-megatron-INSTRUCT-64NNODES'
 adv_estimator=grpo
 
 use_kl_in_reward=False
+kl_penalty="kl"
 kl_coef=0.0
-use_kl_loss=False
-kl_loss_coef=0.0
+
+use_kl_loss=True
+kl_loss_coef=0.001
 
 clip_ratio_low=0.2
 clip_ratio_high=0.28
-
 max_prompt_length=$((1024 * 2))
 max_response_length=$((1024 * 12))
 enable_overlong_buffer=True
 overlong_buffer_len=$((1024 * 1))
-overlong_penalty_factor=0.3
+overlong_penalty_factor=1.0
 
 loss_agg_mode="token-mean"
-
-train_prompt_bsz=128 # must be > n_gpus. need to fix
-n_resp_per_prompt=16
-train_prompt_mini_bsz=32  # mini_bsz * n >= micro_bsz * pp * dp
+train_prompt_bsz=64
+n_resp_per_prompt=8
+train_prompt_mini_bsz=32
 
 #NNODES=${NNODES:-1}
-NNODES=32
+NNODES=64
 
 # 1. download the dist_ckpt format model from https://huggingface.co/BearBiscuit05/dpsk-v3-671B-BF16-dist_ckpt/tree/main
 # change the MODEL_PATH and MCORE_MODEL_PATH to your own path
 # Paths
-MODEL_PATH="/mnt/hpfs_test/weights/dsv3-bf16"
-MCORE_MODEL_PATH="/mnt/hpfs_test/weights/dsv3_bf16_mcore_hs"
+MODEL_PATH="/mnt/hpfs_test/weights/dsv3-base-fp8-zy-bf16"
+MCORE_MODEL_PATH=""
 RAY_DATA_HOME="/opt"
-CKPTS_DIR=/mnt/hpfs_test/ckpt/ckpt-DAPO-DeepSeek-671b-megatron-2k12k
+CKPTS_DIR=/mnt/hpfs_test/weights/CKPT/ckpt-DAPO-DeepSeek-671b-megatron-base-2k12k-gpu
 
-TRAIN_FILE="/mnt/hpfs_test/data/data/dapo-math-17k.parquet"
-TEST_FILE="/mnt/hpfs_test/data/data/dapo-math-17k.parquet"
+TRAIN_FILE="/mnt/hpfs_test/data/rl_data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
+TEST_FILE="/mnt/hpfs_test/data/rl_data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
 
 #TEST_FILE="['$aime24_test_path']"
 
@@ -58,8 +58,8 @@ val_top_p=0.7
 
 # Performance Related Parameter
 use_dynamic_bsz=True
-actor_ppo_max_token_len=$(((max_prompt_length + max_response_length)/2))
-infer_ppo_max_token_len=$(((max_prompt_length + max_response_length)/2))
+actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) / 2))
+infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) / 2))
 
 max_num_batched_tokens=$((6*1024))
 
@@ -67,13 +67,12 @@ offload=True
 gen_tp=8
 gen_dp=8
 # gen_world_size=$((NNODES*8))
-train_tp=16
-train_ep=32
+train_tp=8
+train_ep=64
 train_pp=8
 enable_filter_group=False
+train_cp=2
 ETP=1
-
-load_weight=True
 
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 cd /opt/verl
@@ -82,12 +81,12 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
     actor_rollout_ref.rollout.load_format=safetensors \
-    actor_rollout_ref.rollout.skip.enable=False \
-    actor_rollout_ref.rollout.skip.dump_dir="/mnt/hpfs_test/wlf/rollout_dump" \
+    actor_rollout_ref.rollout.skip.enable=True \
+    actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/wlf/rollout_dump/baseline_gpu" \
     actor_rollout_ref.rollout.skip.dump_step=500 \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
-    data.prompt_key=prompt \
+    data.prompt_key=messages \
     data.truncation='left' \
     data.max_prompt_length=${max_prompt_length} \
     data.max_response_length=${max_response_length} \
@@ -95,19 +94,20 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.rollout.n=${n_resp_per_prompt} \
     algorithm.adv_estimator=${adv_estimator} \
     algorithm.use_kl_in_reward=${use_kl_in_reward} \
+    algorithm.kl_penalty=${kl_penalty} \
     algorithm.kl_ctrl.kl_coef=${kl_coef} \
     algorithm.filter_groups.enable=${enable_filter_group} \
     actor_rollout_ref.actor.use_kl_loss=${use_kl_loss} \
     actor_rollout_ref.actor.kl_loss_coef=${kl_loss_coef} \
+    actor_rollout_ref.actor.policy_loss.loss_mode=vanilla \
     actor_rollout_ref.actor.clip_ratio_low=${clip_ratio_low} \
     actor_rollout_ref.actor.clip_ratio_high=${clip_ratio_high} \
     actor_rollout_ref.actor.clip_ratio_c=10.0 \
-    actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 \
-    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
-    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
+    actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1 \
+    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1 \
     actor_rollout_ref.model.path="${MODEL_PATH}" \
-    actor_rollout_ref.actor.optim.lr=1e-6 \
-    actor_rollout_ref.actor.optim.lr_warmup_steps=5 \
+    actor_rollout_ref.actor.optim.lr=3e-6 \
     actor_rollout_ref.actor.optim.weight_decay=0.1 \
     actor_rollout_ref.actor.ppo_mini_batch_size=${train_prompt_mini_bsz} \
     actor_rollout_ref.actor.megatron.param_offload=${offload} \
@@ -116,6 +116,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.megatron.pipeline_model_parallel_size=${train_pp} \
     actor_rollout_ref.actor.megatron.tensor_model_parallel_size=${train_tp} \
     actor_rollout_ref.actor.megatron.expert_model_parallel_size=${train_ep} \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.context_parallel_size=${train_cp} \
     actor_rollout_ref.actor.megatron.dist_checkpointing_path=${MCORE_MODEL_PATH} \
     actor_rollout_ref.actor.megatron.use_dist_checkpointing=Ture \
     +actor_rollout_ref.ref.megatron.override_transformer_config.use_flash_attn=True \
@@ -130,7 +131,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.optim.clip_grad=1.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.70 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.65 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=${gen_tp} \
     actor_rollout_ref.rollout.dp_model_parallel_size=${gen_dp} \
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
@@ -145,8 +146,9 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.rollout.val_kwargs.top_k=${top_k} \
     actor_rollout_ref.rollout.val_kwargs.do_sample=True \
     actor_rollout_ref.rollout.val_kwargs.n=1 \
-    actor_rollout_ref.rollout.enforce_eager=True \
     actor_rollout_ref.rollout.name=vllm \
+    actor_rollout_ref.rollout.enforce_eager=True \
+    actor_rollout_ref.rollout.free_cache_engine=True \
     actor_rollout_ref.ref.megatron.pipeline_model_parallel_size=${train_pp} \
     actor_rollout_ref.ref.megatron.tensor_model_parallel_size=${train_tp} \
     actor_rollout_ref.ref.megatron.expert_model_parallel_size=${train_ep} \
@@ -160,21 +162,22 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +reward_model.reward_kwargs.overlong_buffer_cfg.log=False \
     +reward_model.reward_kwargs.max_resp_len=${max_response_length} \
     trainer.logger='["console"]' \
-    actor_rollout_ref.actor.load_weight=${load_weight} \
-    actor_rollout_ref.ref.load_weight=${load_weight} \
+    actor_rollout_ref.actor.load_weight=True \
+    actor_rollout_ref.ref.load_weight=True \
     trainer.project_name="${project_name}" \
     trainer.experiment_name="${exp_name}" \
-    trainer.n_gpus_per_node=16 \
+    trainer.n_gpus_per_node=8 \
     trainer.nnodes="${NNODES}" \
     trainer.val_before_train=False \
     trainer.test_freq=-1 \
-    trainer.save_freq=5 \
+    trainer.save_freq=2 \
     trainer.total_epochs=10 \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
     trainer.log_val_generations=10 \
-    actor_rollout_ref.rollout.free_cache_engine=True \
     trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
+
+
 sleep 600
 ray_name=$(cat /tmp/ray.output | grep "submitted successfully" | awk -F "'" '{print $2}')
 ray_name=${ray_name//\'}

@@ -17,6 +17,7 @@ from enum import Enum
 from pathlib import Path
 
 from verl.protocol import DataProto
+from verl.workers.config.rollout import RolloutConfig
 
 
 class PostDumpAction(Enum):
@@ -46,7 +47,7 @@ class RolloutSkip:
     print_mark = "[RolloutSkip()] "
 
     def __init__(self, config):
-        self.rollout_config = config.actor_rollout_ref.rollout
+        self.rollout_config: RolloutConfig = config.actor_rollout_ref.rollout
         self.skip_config = self.rollout_config.skip
         self.is_enable = self.skip_config.get("enable", False)
         self._rollout_wg = None
@@ -130,7 +131,7 @@ class RolloutSkip:
             flush=True,
         )
 
-    def record(self, new_batch: DataProto, *args, **kwargs):
+    def record(self, new_batch: DataProto, global_steps=-1, gen_steps=-1, *args, **kwargs):
         """Record the current training step based on the new batch.
 
         Args:
@@ -143,7 +144,7 @@ class RolloutSkip:
             self._flag_record = True
             self._new_batch = new_batch
         else:
-            print(f"{self.print_mark}Warning, duplicate record new_batch.", flush=True)
+            print(f"{self.print_mark}Warning, duplicate record new_batch, it was not a problem if acc/reward is not cared.", flush=True)
 
     def wrap_generate_sequences(self, rollout_wg):
         if self.is_enable:

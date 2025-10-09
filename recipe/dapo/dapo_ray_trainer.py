@@ -139,7 +139,8 @@ class RayDAPOTrainer(RayPPOTrainer):
                 with marked_timer("step", timing_raw):
                     # generate a batch
                     with marked_timer("gen", timing_raw, "red"):
-                        rollout_skip.record(new_batch)
+                        if rollout_skip.is_enable:
+                            rollout_skip.record(new_batch, self.global_steps, self.gen_steps)
                         gen_batch_output = self.actor_rollout_wg.generate_sequences(gen_batch)
                         timing_raw.update(gen_batch_output.meta_info["timing"])
                         gen_batch_output.meta_info.pop("timing", None)
