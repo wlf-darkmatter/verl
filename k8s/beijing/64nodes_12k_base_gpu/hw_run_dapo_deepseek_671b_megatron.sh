@@ -30,8 +30,8 @@ overlong_buffer_len=$((1024 * 1))
 overlong_penalty_factor=1.0
 
 loss_agg_mode="token-mean"
-train_prompt_bsz=64
-n_resp_per_prompt=8
+train_prompt_bsz=32
+n_resp_per_prompt=16
 train_prompt_mini_bsz=32
 
 #NNODES=${NNODES:-1}
