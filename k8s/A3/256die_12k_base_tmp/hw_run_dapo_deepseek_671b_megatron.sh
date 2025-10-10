@@ -34,8 +34,6 @@ train_prompt_bsz=32
 n_resp_per_prompt=16
 train_prompt_mini_bsz=32
 
-#NNODES=${NNODES:-1}
-NNODES=32
 
 # 1. download the dist_ckpt format model from https://huggingface.co/BearBiscuit05/dpsk-v3-671B-BF16-dist_ckpt/tree/main
 # change the MODEL_PATH and MCORE_MODEL_PATH to your own path
