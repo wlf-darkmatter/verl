@@ -163,6 +163,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +reward_model.reward_kwargs.overlong_buffer_cfg.log=False \
     +reward_model.reward_kwargs.max_resp_len=${max_response_length} \
     trainer.logger='["console"]' \
+    trainer.balance_batch=False \
     actor_rollout_ref.actor.load_weight=True \
     actor_rollout_ref.ref.load_weight=True \
     trainer.project_name="${project_name}" \
