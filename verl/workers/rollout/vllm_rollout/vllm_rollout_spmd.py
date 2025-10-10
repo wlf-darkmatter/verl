@@ -300,7 +300,6 @@ class vLLMRollout(BaseRollout):
             if hasattr(SamplingParams(), str(k)) and k != "seed":
                 kwargs[k] = config.get(k)
         kwargs["n"] = 1  # already repeat in ray_trainer
-        kwargs['stop'] = "</answer>" #!! 1009客户改动
         print(f"kwargs: {kwargs}", flush=True)
         self.sampling_params = SamplingParams(**kwargs)
 
