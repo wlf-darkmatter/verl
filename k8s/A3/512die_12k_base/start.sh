@@ -12,6 +12,7 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 export VLLM_SLEEP_LEVEL=1
 export VERL_DEBUG_NOSHARDING=0
 export VERL_MEMORY_LOG_DIR="/home/new_verl/tmp/512die_12k_base"
+export VERL_CUSTOM_REWARD_RULE="1"
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
