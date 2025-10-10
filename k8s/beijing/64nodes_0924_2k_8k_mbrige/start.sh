@@ -37,7 +37,8 @@ export NPU_PER_NODE=8  # A2 NPU Number
 export NNODES=64         # example is 4 Nodes
 
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
-export ASCEND_PROCESS_LOG_PATH=/home/new_verl/plog/$(date +"%Y-%m-%d--%H-%M-%S")
+export ASCEND_PROCESS_LOG_PATH=/home/new_verl/plog/$(basename $(dirname $0))/${RANK}
+
 # pip install /data01/huawei-2025/wlf/verl/k8s/mbridge-0.13.0-py3-none-any.whl
 
 ray stop --force

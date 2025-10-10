@@ -14,9 +14,9 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
 export TASK_QUEUE_ENABLE=2
 #! 注意，1001 加了这 几个超时配置
-export HCCL_EXEC_TIMEOUT=86400
-export HCCL_EVENT_TIMEOUT=86400
-export ACL_DEVICE_SYNC_TIMEOUT=86400
+export HCCL_EXEC_TIMEOUT=7200
+export HCCL_EVENT_TIMEOUT=7200
+export ACL_DEVICE_SYNC_TIMEOUT=7200
 export HCCL_ASYNC_ERROR_HANDLING=0
 export P2P_HCCL_BUFFSIZE=20
 export HCCL_BUFFSIZE=300
@@ -62,7 +62,8 @@ export NPU_PER_NODE=8  # A2 NPU Number
 export NNODES=64         # example is 4 Nodes
 
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
-export ASCEND_PROCESS_LOG_PATH=/home/new_verl/plog/$(date +"%Y-%m-%d--%H-%M-%S")
+export ASCEND_PROCESS_LOG_PATH=/home/new_verl/plog/$(basename $(dirname $0))/${RANK}
+
 
 ray stop --force
 rm -rf /tmp/ray

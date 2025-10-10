@@ -16,7 +16,7 @@ source /etc/profile;
 
 LIB_PATH=/opt/python3.10/lib/
 export LD_LIBRARY_PATH=${LIB_PATH}:${LD_LIBRARY_PATH}
-export ASCEND_PROCESS_LOG_PATH=/home/new_verl/plog/$(date +"%Y-%m-%d--%H-%M-%S")
+
 
 export NPU_PER_NODE=16  # A3 NPU Number
 export ServerPort=6666     # modify according to actual situation

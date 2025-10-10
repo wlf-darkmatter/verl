@@ -54,7 +54,8 @@ export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
-export ASCEND_PROCESS_LOG_PATH=/home/new_verl/plog/$(date +"%Y-%m-%d--%H-%M-%S")
+export ASCEND_PROCESS_LOG_PATH=/home/new_verl/plog/$(basename $(dirname $0))/${RANK}
+
 
 ray stop --force
 rm -rf /tmp/ray
