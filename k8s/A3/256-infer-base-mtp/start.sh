@@ -83,7 +83,7 @@ python3 tests/verl_offline_infer.py \
     -dp $gen_dp \
     --enable_expert_parallel \
     -n $n_resp_per_prompt \
-    --gen_bs $traisn_prompt_bsz \
+    --gen_bs $train_prompt_bsz \
     --max_prompt_length $((2*1024)) \
     --max_response_length $((4*1024)) \
     --max_num_batched_tokens $((4*1024)) \

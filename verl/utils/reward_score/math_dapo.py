@@ -181,7 +181,7 @@ def is_correct_minerva(
     #!! 1009客户修改
     if os.getenv("VERL_CUSTOM_REWARD_RULE") == "1":
         answer_pattern = r'<think>\s*(.*?)\s*</think>.*?<answer>\s*(.*?)(?:\s*</answer>|$)'
-        print(f"\033[32mVERL_CUSTOM_REWARD_RULE=1, \n{answer_pattern=}")
+        print(f"\033[32mVERL_CUSTOM_REWARD_RULE=1, \n{answer_pattern=}\033[0m")
         match = re.search(answer_pattern, solution_str, re.DOTALL)
         extracted_answer = "[INVALID]"
         if match:
