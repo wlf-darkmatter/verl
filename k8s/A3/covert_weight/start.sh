@@ -1,6 +1,6 @@
-export HCCL_SOCKET_IFNAME=ens45 # modify according to actual situation
-export TP_SOCKET_IFNAME=ens45   # modify according to actual situation
-export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
+export HCCL_SOCKET_IFNAME="bond1"
+export TP_SOCKET_IFNAME="bond1"
+export GLOO_SOCKET_IFNAME="bond1"
 # export HYDRA_FULL_ERROR=1
 export RAY_DEDUP_LOGS=0
 
@@ -19,7 +19,7 @@ cd $(dirname $0)
 #NODE_RANK=$1
 export WORLD_SIZE=2
 #export RANK=0
-#export MASTER_ADDR=10.127.18.192
+#export MASTER_ADDR=10.106.129.207
 MASTER_PORT=${MASTER_PORT:-6000}
 export HCCL_SOCKET_IFNAME="bond1"
 export TP_SOCKET_IFNAME="bond1"
