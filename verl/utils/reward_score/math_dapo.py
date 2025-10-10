@@ -177,8 +177,18 @@ def is_correct_minerva(
         Tuple of (is_correct, normalized_prediction)
     """
     # Extract answer from solution
-    match = re.findall(answer_pattern, solution_str)
-    extracted_answer = match[-1] if match else "[INVALID]"
+    #!! 1009客户修改
+    answer_pattern = r'<think>\s*(.*?)\s*</think>.*?<answer>\s*(.*?)(?:\s*</answer>|$)'
+    match = re.search(answer_pattern, solution_str, re.DOTALL)
+    extracted_answer = "[INVALID]"
+    if match:
+        think = match.group(1).strip()
+        current_answer = match.group(2).strip()
+        # If the think part is too short, we consider the answer as invalid
+        if current_answer is not None and think is not None and len(think) > 10:
+            extracted_answer = current_answer
+    # match = re.findall(answer_pattern, solution_str)
+    # extracted_answer = match[-1] if match else "[INVALID]"
     pred = normalize_final_answer(extracted_answer)
 
     # Process ground truth
