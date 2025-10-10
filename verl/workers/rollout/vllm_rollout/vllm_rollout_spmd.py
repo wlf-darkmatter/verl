@@ -293,13 +293,14 @@ class vLLMRollout(BaseRollout):
             max_tokens=config.response_length,
         )
 
-        kwargs["detokenize"] = False
+        kwargs["detokenize"] = True
 
         # supporting adding any sampling params from the config file
         for k in config.keys():
             if hasattr(SamplingParams(), str(k)) and k != "seed":
                 kwargs[k] = config.get(k)
         kwargs["n"] = 1  # already repeat in ray_trainer
+        kwargs['stop'] = "</answer>"
         print(f"kwargs: {kwargs}", flush=True)
         self.sampling_params = SamplingParams(**kwargs)
 
