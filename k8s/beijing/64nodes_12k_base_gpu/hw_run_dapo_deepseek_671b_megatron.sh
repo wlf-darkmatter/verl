@@ -72,7 +72,7 @@ train_tp=8
 train_ep=64
 train_pp=8
 enable_filter_group=False
-train_cp=2
+train_cp=1
 ETP=1
 
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
