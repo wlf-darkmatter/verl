@@ -130,6 +130,8 @@ class RolloutConfig(BaseConfig):
     data_parallel_size: int = 1
     expert_parallel_size: int = 1
     tensor_model_parallel_size: int = 2
+    dp_model_parallel_size: int = 1
+
     max_num_batched_tokens: int = 8192
 
     # TODO: enable train_kwargs

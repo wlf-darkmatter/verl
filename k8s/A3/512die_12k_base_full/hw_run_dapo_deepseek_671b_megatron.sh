@@ -135,7 +135,6 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +actor_rollout_ref.actor.megatron.override_transformer_config.use_flash_attn=True \
     actor_rollout_ref.actor.megatron.expert_tensor_parallel_size=$ETP \
     actor_rollout_ref.ref.megatron.expert_tensor_parallel_size=$ETP \
-
     actor_rollout_ref.actor.megatron.expert_tensor_parallel_size=${ETP} \
     +actor_rollout_ref.actor.megatron.override_transformer_config.apply_rope_fusion=False \
     +actor_rollout_ref.actor.megatron.override_transformer_config.masked_softmax_fusion=True \
