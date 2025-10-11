@@ -130,8 +130,8 @@ def _get_current_node_ip() -> str:
 def _init_dp_envs(config):
     import vllm.envs as envs
     rank = torch.distributed.get_rank()
-    world_size = int(config.get("rollout_world_size", 1))
-    # world_size = int(os.getenv("WORLD_SIZE", "-1"))
+    # world_size = int(config.get("rollout_world_size", 1))
+    world_size = int(os.getenv("WORLD_SIZE", "-1"))
     tp_size = int(config.get("tensor_model_parallel_size", 1))
     dp_size = int(config.get("dp_model_parallel_size", 1))
 
@@ -288,7 +288,7 @@ class vLLMRollout(BaseRollout):
             repetition_penalty=config.get("repetition_penalty", 1.0),
         )
 
-        kwargs["detokenize"] = False
+        kwargs["detokenize"] = True
 
         # supporting adding any sampling params from the config file
         for k in config.keys():
