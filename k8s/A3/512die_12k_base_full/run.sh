@@ -2,12 +2,10 @@ set -x
 
 echo ">>Starting script at: $(date), path = $(pwd)"
 
-NNODES=${NNODES:-1}
-export NNODES=16
-NGPUS_PER_NODES=${NGPUS_PER_NODES:-8}
-cd /afs/chatrl/users/lyy/npu/verl
-project_name='dpsk_v3_base_zero'
-exp_name='dist_pp8_ep16_tp8_offload1_2k_12k_flex'
+NNODES=32
+NGPUS_PER_NODES=16
+project_name='DAPO'
+exp_name='DAPO-DeepSeek-671b-megatron-INSTRUCT-64NNODES'
 
 adv_estimator=grpo
 
@@ -33,12 +31,12 @@ train_prompt_mini_bsz=32
 train_ppo_micro_batch_size_per_gpu=2
 infer_ppo_micro_batch_size_per_gpu=2
 # Paths
-MODEL_PATH=/afs/chatrl/public/models/DeepSeek-V3-Base-bf16
-DIST_CKPT_PATH=/afs/chatrl/public/models/DeepSeek-V3-Base-bf16-dist
-
-RAY_DATA_HOME=${RAY_DATA_HOME:-"${HOME}/verl"}
-TRAIN_FILE=/afs/chatrl/users/lyy/npu/data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet
-TEST_FILE=/afs/chatrl/users/lyy/npu/data/aime24.parquet
+MODEL_PATH="/mnt/hpfs_test/weights/dsv3-base-fp8-zy-bf16"
+DIST_CKPT_PATH="/mnt/hpfs_test/weights/dsv3_base_bf16_mcore_zy_hs_mtp0"
+RAY_DATA_HOME="/opt"
+CKPTS_DIR=/mnt/hpfs_test/weights/CKPT/ckpt-DAPO-DeepSeek-671b-megatron-base-2k12k-1010
+TRAIN_FILE="/mnt/hpfs_test/data/rl_data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
+TEST_FILE="/mnt/hpfs_test/data/rl_data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
 # TEST_FILE="['$aime24_test_path']"
 
 # Algorithm
@@ -54,41 +52,6 @@ infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
 
 optimizer_offload_fraction=1
 
-COMMON_PP=${COMMON_PP:-16}
-COMMON_VPP=${COMMON_VPP:-null}
-COMMON_CP=${COMMON_CP:-1}
-COMMON_TP=${COMMON_TP:-8}
-COMMON_EP=${COMMON_EP:-8}
-COMMON_ETP=${COMMON_ETP:-1}
-
-TRAIN_TP=${TRAIN_TP:-$COMMON_TP}
-INFER_TP=${INFER_TP:-32}
-
-ACTOR_PP=${ACTOR_PP:-$COMMON_PP}
-ACTOR_VPP=${ACTOR_VPP:-$COMMON_VPP}
-ACTOR_CP=${ACTOR_CP:-$COMMON_CP}
-ACTOR_TP=${ACTOR_TP:-$TRAIN_TP}
-ACTOR_EP=${ACTOR_EP:-$COMMON_EP}
-ACTOR_ETP=${ACTOR_ETP:-$COMMON_ETP}
-ROLLOUT_TP=${ROLLOUT_TP:-$INFER_TP}
-REF_PP=${REF_PP:-$COMMON_PP}
-REF_VPP=${REF_VPP:-$COMMON_VPP}
-REF_CP=${REF_CP:-$COMMON_CP}
-REF_TP=${REF_TP:-$TRAIN_TP}
-REF_EP=${REF_EP:-$COMMON_EP}
-REF_ETP=${REF_ETP:-$COMMON_ETP}
-CRITIC_PP=${CRITIC_PP:-$COMMON_PP}
-CRITIC_VPP=${CRITIC_VPP:-$COMMON_VPP}
-CRITIC_CP=${CRITIC_CP:-$COMMON_CP}
-CRITIC_TP=${CRITIC_TP:-$TRAIN_TP}
-CRITIC_EP=${CRITIC_EP:-$COMMON_EP}
-CRITIC_ETP=${CRITIC_ETP:-$COMMON_ETP}
-RM_PP=${RM_PP:-$COMMON_PP}
-RM_VPP=${RM_VPP:-$COMMON_VPP}
-RM_CP=${RM_CP:-$COMMON_CP}
-RM_TP=${RM_TP:-$TRAIN_TP}
-RM_EP=${RM_EP:-$COMMON_EP}
-RM_ETP=${RM_ETP:-$COMMON_ETP}
 
 # install mbridge
 # pip3 install git+https://github.com/ISEEKYAN/mbridge
@@ -99,14 +62,30 @@ USE_DIST_CKPT=False
 # first_layer=6
 # last_layer=7
 # pipeline_num_transformer_layers="[[6],[8],[8],[8],[8],[8],[8],[7]]"
-first_layer=3
-last_layer=2
+first_layer=6
+last_layer=7
 # pipeline_num_transformer_layers="[[3],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[2]]"
-
-python3 -m recipe.dapo.main_dapo \
+offload=True
+gen_tp=8
+gen_dp=8
+# gen_world_size=$((NNODES*8))
+train_tp=8
+train_ep=64
+train_pp=8
+enable_filter_group=False
+train_cp=1
+#    +actor_rollout_ref.actor.megatron.override_transformer_config.context_parallel_size=${train_cp} \
+ETP=1
+RUNTIME_ENV=verl/trainer/mc2_env.yaml
+cd /opt/verl
+ray job submit --runtime-env="${RUNTIME_ENV}" \
+    -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
-    actor_rollout_ref.nccl_timeout=7200 \
+    actor_rollout_ref.rollout.load_format=safetensors \
+    actor_rollout_ref.rollout.skip.enable=True \
+    actor_rollout_ref.rollout.skip.dump_dir="/mnt/hpfs_test/data/wlf/rollout_dump/baseline_gpu" \
+    actor_rollout_ref.rollout.skip.dump_step=500 \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
     data.prompt_key=messages \
@@ -147,12 +126,10 @@ python3 -m recipe.dapo.main_dapo \
     actor_rollout_ref.actor.megatron.use_mbridge=$USE_MBRIDGE \
     actor_rollout_ref.actor.megatron.use_dist_checkpointing=$USE_DIST_CKPT \
     actor_rollout_ref.actor.megatron.dist_checkpointing_path=${DIST_CKPT_PATH} \
-    actor_rollout_ref.actor.megatron.tensor_model_parallel_size=${ACTOR_TP} \
-    actor_rollout_ref.actor.megatron.pipeline_model_parallel_size=${ACTOR_PP} \
-    actor_rollout_ref.actor.megatron.virtual_pipeline_model_parallel_size=${ACTOR_VPP} \
-    actor_rollout_ref.actor.megatron.context_parallel_size=${ACTOR_CP} \
-    actor_rollout_ref.actor.megatron.expert_model_parallel_size=${ACTOR_EP} \
-    actor_rollout_ref.actor.megatron.expert_tensor_parallel_size=${ACTOR_ETP} \
+    actor_rollout_ref.actor.megatron.tensor_model_parallel_size=${train_tp} \
+    actor_rollout_ref.actor.megatron.pipeline_model_parallel_size=${train_pp} \
+    actor_rollout_ref.actor.megatron.expert_model_parallel_size=${train_ep} \
+    actor_rollout_ref.actor.megatron.expert_tensor_parallel_size=${ETP} \
     +actor_rollout_ref.actor.megatron.override_transformer_config.apply_rope_fusion=False \
     +actor_rollout_ref.actor.megatron.override_transformer_config.masked_softmax_fusion=True \
     +actor_rollout_ref.actor.megatron.override_transformer_config.bias_activation_fusion=True \
@@ -171,11 +148,12 @@ python3 -m recipe.dapo.main_dapo \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=1 \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
-    actor_rollout_ref.rollout.load_format=dummy \
+    actor_rollout_ref.rollout.load_format=safetensors \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=${infer_ppo_micro_batch_size_per_gpu} \
     actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu=${infer_ppo_max_token_len} \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.65 \
-    actor_rollout_ref.rollout.tensor_model_parallel_size=${INFER_TP} \
+    actor_rollout_ref.rollout.tensor_model_parallel_size=${gen_tp} \
+    actor_rollout_ref.rollout.dp_model_parallel_size=${gen_dp} \
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
     actor_rollout_ref.rollout.max_num_batched_tokens=$((max_prompt_length + max_response_length)) \
     actor_rollout_ref.rollout.temperature=${temperature} \
@@ -193,19 +171,17 @@ python3 -m recipe.dapo.main_dapo \
     actor_rollout_ref.ref.log_prob_max_token_len_per_gpu=${infer_ppo_max_token_len} \
     actor_rollout_ref.ref.megatron.use_dist_checkpointing=${USE_DIST_CKPT} \
     actor_rollout_ref.ref.megatron.param_offload=${offload} \
-    actor_rollout_ref.ref.megatron.tensor_model_parallel_size=${REF_TP} \
-    actor_rollout_ref.ref.megatron.pipeline_model_parallel_size=${REF_PP} \
-    actor_rollout_ref.ref.megatron.virtual_pipeline_model_parallel_size=${REF_VPP} \
-    actor_rollout_ref.ref.megatron.context_parallel_size=${REF_CP} \
-    actor_rollout_ref.ref.megatron.expert_model_parallel_size=${REF_EP} \
-    actor_rollout_ref.ref.megatron.expert_tensor_parallel_size=${REF_ETP} \
+    actor_rollout_ref.ref.megatron.tensor_model_parallel_size=${train_tp} \
+    actor_rollout_ref.ref.megatron.pipeline_model_parallel_size=${train_pp} \
+    actor_rollout_ref.ref.megatron.expert_model_parallel_size=${train_ep} \
+    actor_rollout_ref.ref.megatron.expert_tensor_parallel_size=${ETP} \
     reward_model.reward_manager=dapo \
     +reward_model.reward_kwargs.overlong_buffer_cfg.enable=${enable_overlong_buffer} \
     +reward_model.reward_kwargs.overlong_buffer_cfg.len=${overlong_buffer_len} \
     +reward_model.reward_kwargs.overlong_buffer_cfg.penalty_factor=${overlong_penalty_factor} \
     +reward_model.reward_kwargs.overlong_buffer_cfg.log=False \
     +reward_model.reward_kwargs.max_resp_len=${max_response_length} \
-    trainer.logger=['tensorboard'] \
+    trainer.logger=['console'] \
     trainer.project_name="${project_name}" \
     trainer.experiment_name="${exp_name}" \
     trainer.n_gpus_per_node="${NGPUS_PER_NODES}" \
@@ -214,7 +190,15 @@ python3 -m recipe.dapo.main_dapo \
     trainer.test_freq=-1 \
     trainer.save_freq=-1 \
     trainer.total_epochs=10 \
-    trainer.default_local_dir=$EXP_DIR \
+    trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
-    trainer.rollout_data_dir=$EXP_DIR/rollout \
-    trainer.log_val_generations=10 2>&1 | tee $EXP_DIR/run_$(date +%Y%m%d%H%M%S).log
+    trainer.rollout_data_dir=/mnt/hpfs_test/wlf/${exp_name}/rollout \
+    trainer.log_val_generations=10 \
+    trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
+
+
+sleep 600
+ray_name=$(cat /tmp/ray.output | grep "submitted successfully" | awk -F "'" '{print $2}')
+ray_name=${ray_name//\'}
+echo "ray_name: $ray_name"
+ray job logs $ray_name --follow | tee $(dirname $0)/ray.log
