@@ -1,0 +1,181 @@
+apiVersion: mindxdl.gitee.com/v1
+kind: AscendJob
+metadata:
+  name: deepseek671-32-verl-moe-reduce  #sp-64-train-3b-moe-msrun #需要修改
+  labels:
+    framework: pytorch
+    fault-scheduling: "force"
+    fault-retry-times: "0"
+    ring-controller.atlas: ascend-910b
+    subHealthyStrategy: "ignore"
+spec:
+  schedulerName: volcano    #需要修改 work when enableGangScheduling is true
+  runPolicy:
+    schedulingPolicy:
+      minAvailable: 32    #需要修改， work when enableGangScheduling is true
+      queue: default
+  successPolicy: AllWorkers
+  replicaSpecs:
+    Master:
+      replicas: 1  #Master can only be 1
+      restartPolicy: Never
+      template:
+        metadata:
+          labels:
+            ring-controller.atlas: ascend-910b
+        spec:
+          priorityClassName: system-cluster-critical
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: zone
+                    operator: In
+                    values:
+                    - nlp48
+          terminationGracePeriodSeconds: 60
+          automountServiceAccountToken: false
+          hostNetwork: true
+          nodeSelector:                        # modify according to the actual situation
+            accelerator-type: module-910b-8
+            host-arch: huawei-arm
+          containers:
+            - name: ascend # do not modify
+              image: harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
+              imagePullPolicy: IfNotPresent
+              command: ["/bin/bash", "-c"]
+
+              args:
+                - "cd /opt/verl ;GLOO_SOCKET_IFNAME=ens45 ;CURRENT_IP=$(ifconfig $GLOO_SOCKET_IFNAME | grep -Eo 'inet .*' | awk '{print $2}'); bash /home/new_verl/k8s/32nodes_hi_4_3/start.sh 2>&1 | tee /data01/huawei-2025/wlf/logs/${CURRENT_IP}_32h.log; sleep 7d"
+
+              ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
+                - containerPort: 60350        # determined by user
+                  name: ascendjob-port        # do not modify
+                - containerPort: 6666 #modify according to actual situation
+                  name: ray-port
+                - containerPort: 8888 #modify according to actual situation
+                  name: ray-dash-port
+              resources:
+                limits:
+                  huawei.com/Ascend910: 8 #目前需要和requests保持一致
+                  memory: "800Gi"
+                requests:
+                  huawei.com/Ascend910: 8  #需要的NPU芯片个数为8
+                  memory: "800Gi"
+
+              volumeMounts:
+                - name: ascend-driver
+                  mountPath: /usr/local/Ascend/driver
+                - name: dshm
+                  mountPath: /dev/shm
+                - name: localtime
+                  mountPath: /etc/localtime
+                - name: start-path
+                  mountPath: /home/new_verl/
+                - name: data-path
+                  mountPath: /data01
+          volumes:
+            - name: dshm
+              emptyDir:
+                medium: Memory
+                sizeLimit: 500Gi
+            - name: ascend-driver
+              hostPath:
+                path: /usr/local/Ascend/driver                     # Configure the NPU driver and mount it to Docker.
+            - name: localtime
+              hostPath:
+                path: /etc/localtime                               # Configure the Docker time.
+            - name: start-path
+              hostPath:
+                 path: /data01/huawei-2025/wlf/verl/
+            - name: data-path
+              hostPath:
+                 path: /data01
+
+    Worker:
+      replicas: 31  #Master can only be 1
+      restartPolicy: Never
+      template:
+        metadata:
+          labels:
+            ring-controller.atlas: ascend-910b
+        spec:
+          priorityClassName: system-cluster-critical
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: job-name
+                        operator: In
+                        values:
+                          -  deepseek671-32-verl-moe-reduce  #train-32x7b-256-moe-o0   #train-64x28b-256-moe-o1 #需要修改, 必须与metadata.name一致
+                      - key: replica-type
+                        operator: In
+                        values:
+                          - worker
+                  topologyKey: kubernetes.io/hostname
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: zone
+                    operator: In
+                    values:
+                    - nlp48
+          terminationGracePeriodSeconds: 60
+          automountServiceAccountToken: false
+          hostNetwork: true
+          nodeSelector:                        # modify according to the actual situation
+            accelerator-type: module-910b-8
+            host-arch: huawei-arm
+          containers:
+            - name: ascend # do not modify
+              image: harbor.telecom-ai.com.cn/ai-nlp/verl:verl_0912  ##image
+              imagePullPolicy: IfNotPresent
+              command: ["/bin/bash", "-c"]
+              args:
+                - "cd /opt/verl ;GLOO_SOCKET_IFNAME=ens45 ;CURRENT_IP=$(ifconfig $GLOO_SOCKET_IFNAME | grep -Eo 'inet .*' | awk '{print $2}'); bash /home/new_verl/k8s/32nodes_hi_4_3/start.sh 2>&1 | tee /data01/huawei-2025/wlf/logs/${CURRENT_IP}_32h.log; sleep 7d"
+              ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
+                - containerPort: 60350        # determined by user
+                  name: ascendjob-port        # do not modify
+                - containerPort: 6666 #modify according to actual situation
+                  name: ray-port
+                - containerPort: 8888 #modify according to actual situation
+                  name: ray-dash-port
+              resources:
+                limits:
+                  huawei.com/Ascend910: 8 #目前需要和requests保持一致
+                  memory: "800Gi"
+                requests:
+                  huawei.com/Ascend910: 8  #需要的NPU芯片个数为8
+                  memory: "800Gi"
+              volumeMounts:
+                - name: ascend-driver
+                  mountPath: /usr/local/Ascend/driver
+                - name: dshm
+                  mountPath: /dev/shm
+                - name: localtime
+                  mountPath: /etc/localtime
+                - name: start-path
+                  mountPath: /home/new_verl/
+                - name: data-path
+                  mountPath: /data01
+          volumes:
+            - name: dshm
+              emptyDir:
+                medium: Memory
+                sizeLimit: 500Gi
+            - name: ascend-driver
+              hostPath:
+                path: /usr/local/Ascend/driver                     # Configure the NPU driver and mount it to Docker.
+            - name: localtime
+              hostPath:
+                path: /etc/localtime                               # Configure the Docker time.
+            - name: start-path
+              hostPath:
+                 path: /data01/huawei-2025/wlf/verl/
+            - name: data-path
+              hostPath:
+                 path: /data01
