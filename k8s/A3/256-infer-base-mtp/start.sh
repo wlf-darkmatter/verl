@@ -56,7 +56,7 @@ else
 fi
 
 #! ------------------------------------------------------------
-#TRAIN_FILE="/mnt/hpfs_test/data/rl_data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
+# TRAIN_FILE="/mnt/hpfs_test/data/rl_data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
 # MODEL_PATH="/data01/huawei-2025/weight/dpsk-v3-671B-BF16-dist_ckpt"
 MODEL_PATH="/mnt/hpfs_test/weights/dsv3-base-fp8-zy-bf16"
 TRAIN_FILE="/mnt/hpfs_test/data/data/dapo-math-17k.parquet"
@@ -64,8 +64,8 @@ TRAIN_FILE="/mnt/hpfs_test/data/data/dapo-math-17k.parquet"
 n_resp_per_prompt=1
 train_prompt_bsz=16
 
-gen_tp=8
-gen_dp=8
+gen_tp=32
+gen_dp=1
 
 
 rm -f /opt/vllm/vllm/model_executor/model_loader/base_loader.py
