@@ -2,8 +2,8 @@ set -x
 
 echo ">>Starting script at: $(date), path = $(pwd)"
 
-NNODES=32
 NGPUS_PER_NODES=16
+export NNODES=$((WORLD_SIZE/NGPUS_PER_NODES))
 project_name='DAPO'
 exp_name='DAPO-DeepSeek-671b-megatron-INSTRUCT-64NNODES'
 

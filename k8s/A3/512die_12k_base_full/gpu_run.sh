@@ -2,6 +2,7 @@ set -x
 
 echo ">>Starting script at: $(date), path = $(pwd)"
 
+NGPUS_PER_NODES=16
 project_name='DAPO'
 exp_name='DAPO-DeepSeek-671b-megatron-INSTRUCT-64NNODES'
 
@@ -30,10 +31,9 @@ train_ppo_micro_batch_size_per_gpu=2
 infer_ppo_micro_batch_size_per_gpu=2
 # Paths
 MODEL_PATH="/mnt/hpfs_test/weights/dsv3-base-fp8-zy-bf16"
-MCORE_MODEL_PATH="/mnt/hpfs_test/weights/dsv3_base_bf16_mcore_zy_hs_mtp0"
 DIST_CKPT_PATH="/mnt/hpfs_test/weights/dsv3_base_bf16_mcore_zy_hs_mtp0"
 RAY_DATA_HOME="/opt"
-CKPTS_DIR=/mnt/hpfs_test/weights/CKPT/ckpt-DAPO-DeepSeek-671b-megatron-base-2k12k-1011
+CKPTS_DIR=/mnt/hpfs_test/weights/CKPT/ckpt-DAPO-DeepSeek-671b-megatron-base-2k12k-1010
 TRAIN_FILE="/mnt/hpfs_test/data/rl_data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
 TEST_FILE="/mnt/hpfs_test/data/rl_data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
 # TEST_FILE="['$aime24_test_path']"
@@ -54,8 +54,8 @@ optimizer_offload_fraction=1
 
 # install mbridge
 # pip3 install git+https://github.com/ISEEKYAN/mbridge
-USE_MBRIDGE=False
-USE_DIST_CKPT=True
+USE_MBRIDGE=True
+USE_DIST_CKPT=False
 
 
 # first_layer=6
@@ -82,7 +82,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
     actor_rollout_ref.rollout.load_format=safetensors \
-    actor_rollout_ref.rollout.skip.enable=False \
+    actor_rollout_ref.rollout.skip.enable=True \
     actor_rollout_ref.rollout.skip.dump_dir="/mnt/hpfs_test/data/wlf/rollout_dump/baseline_gpu" \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
     data.train_files="${TRAIN_FILE}" \
@@ -124,15 +124,24 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     ++actor_rollout_ref.actor.megatron.override_transformer_config.attention_backend=fused \
     actor_rollout_ref.actor.megatron.use_mbridge=$USE_MBRIDGE \
     actor_rollout_ref.actor.megatron.use_dist_checkpointing=$USE_DIST_CKPT \
+    actor_rollout_ref.actor.megatron.dist_checkpointing_path=${DIST_CKPT_PATH} \
     actor_rollout_ref.actor.megatron.tensor_model_parallel_size=${train_tp} \
     actor_rollout_ref.actor.megatron.pipeline_model_parallel_size=${train_pp} \
     actor_rollout_ref.actor.megatron.expert_model_parallel_size=${train_ep} \
-    actor_rollout_ref.actor.megatron.dist_checkpointing_path=${MCORE_MODEL_PATH} \
-    +actor_rollout_ref.ref.megatron.override_transformer_config.use_flash_attn=True \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.use_flash_attn=True \
-    actor_rollout_ref.actor.megatron.expert_tensor_parallel_size=$ETP \
-    actor_rollout_ref.ref.megatron.expert_tensor_parallel_size=$ETP \
+    actor_rollout_ref.actor.megatron.expert_tensor_parallel_size=${ETP} \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.apply_rope_fusion=False \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.masked_softmax_fusion=True \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.bias_activation_fusion=True \
     +actor_rollout_ref.actor.megatron.override_transformer_config.bias_dropout_fusion=True \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.gradient_accumulation_fusion=True \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.deallocate_pipeline_outputs=True \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.persist_layer_norm=True \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.moe_grouped_gemm=True \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.moe_permute_fusion=True \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.moe_shared_expert_overlap=True \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.moe_token_dispatcher_type="alltoall" \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.moe_router_dtype=fp32 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.moe_enable_deepep=False \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_method=uniform \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_granularity=full \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=1 \
@@ -159,7 +168,6 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.rollout.free_cache_engine=True \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=${infer_ppo_micro_batch_size_per_gpu} \
     actor_rollout_ref.ref.log_prob_max_token_len_per_gpu=${infer_ppo_max_token_len} \
-    actor_rollout_ref.ref.megatron.dist_checkpointing_path=${MCORE_MODEL_PATH} \
     actor_rollout_ref.ref.megatron.use_dist_checkpointing=${USE_DIST_CKPT} \
     actor_rollout_ref.ref.megatron.param_offload=${offload} \
     actor_rollout_ref.ref.megatron.tensor_model_parallel_size=${train_tp} \
@@ -175,7 +183,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.logger=['console'] \
     trainer.project_name="${project_name}" \
     trainer.experiment_name="${exp_name}" \
-    trainer.n_gpus_per_node="${NPU_PER_NODE}" \
+    trainer.n_gpus_per_node="${NGPUS_PER_NODES}" \
     trainer.nnodes="${NNODES}" \
     trainer.val_before_train=False \
     trainer.test_freq=-1 \
