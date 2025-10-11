@@ -3,7 +3,7 @@ set -x
 echo ">>Starting script at: $(date), path = $(pwd)"
 
 project_name='DAPO'
-exp_name='DAPO-DeepSeek-671b-megatron-INSTRUCT-64NNODES'
+exp_name='DAPO-DeepSeek-671b-megatron-BASE-64NNODES'
 
 adv_estimator=grpo
 
