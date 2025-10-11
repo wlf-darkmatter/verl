@@ -89,6 +89,71 @@ if is_version_ge(pkg="vllm", minver="0.7.3"):
     VLLMHijack.hijack()
 
 
+def get_cluster_info():
+    import torch.distributed as dist
+    # 确保分布式环境已初始化
+    if not dist.is_initialized():
+        raise RuntimeError("Distributed environment not initialized")
+
+    world_size = dist.get_world_size()
+
+    # 获取当前节点的IP地址
+    ip_address = _get_current_node_ip()
+
+    # 收集所有rank的IP地址
+    ip_list = [None] * world_size
+    dist.all_gather_object(ip_list, ip_address)
+
+    return ip_list
+
+
+def _get_current_node_ip() -> str:
+    try:
+        # 创建一个 UDP 套接字（仅用于获取接口信息）
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            # 连接到一个外部地址（无需真实通信）
+            s.connect(("8.8.8.8", 80))  # Google DNS 服务器
+            local_ip = s.getsockname()[0]
+    except Exception:
+        local_ip = _get_ip_by_ifname()
+        if not local_ip:
+            # 如果失败，回退到遍历接口
+            local_ip = "127.0.0.1"
+            hostname = socket.gethostname()
+            for addr in socket.getaddrinfo(hostname, None):
+                ip = addr[4][0]
+                if not ip.startswith("::"):
+                    local_ip = ip
+                    break
+    return local_ip
+
+def _init_dp_envs(config):
+    import vllm.envs as envs
+    rank = torch.distributed.get_rank()
+    world_size = int(config.get("rollout_world_size", 1))
+    # world_size = int(os.getenv("WORLD_SIZE", "-1"))
+    tp_size = int(config.get("tensor_model_parallel_size", 1))
+    dp_size = int(config.get("dp_model_parallel_size", 1))
+
+    all_ranks = torch.arange(world_size).reshape(-1, dp_size, 1, tp_size)  # noqa
+    group_ranks = all_ranks.transpose(1, 3).reshape(-1, dp_size).unbind(0)
+    group_ranks = [x.tolist() for x in group_ranks]
+    ip_list = get_cluster_info()
+    for index, group_rank in enumerate(group_ranks):
+        if torch.distributed.get_rank() in group_rank:
+            os.environ["VLLM_DP_MASTER_PORT"] = str(int(os.environ.get("MASTER_PORT")) + 1 + index)
+            os.environ["VLLM_DP_MASTER_IP"] = ip_list[group_rank[0]]
+    local_dp_rank = rank // tp_size % dp_size
+    os.environ["VLLM_DP_RANK"] = str(local_dp_rank)
+    os.environ["VLLM_DP_SIZE"] = str(dp_size)
+    os.environ["VLLM_PORT"] = os.environ["VLLM_DP_MASTER_PORT"]
+    envs.VLLM_DP_RANK = int(os.environ["VLLM_DP_RANK"])
+    envs.VLLM_DP_MASTER_IP = os.environ["VLLM_DP_MASTER_IP"]
+    envs.VLLM_DP_MASTER_PORT = int(os.environ["VLLM_DP_MASTER_PORT"])
+
+    print(f"[VLLM] using TP={tp_size}, DP={dp_size}", flush=True)
+
+
 class vLLMRollout(BaseRollout):
     def __init__(
         self,
@@ -185,6 +250,12 @@ class vLLMRollout(BaseRollout):
             else:
                 logger.warning(f"cudagraph_capture_sizes must be a list, but got {cudagraph_capture_sizes}")
 
+        #! patch this for npu
+        enable_infer_ep = False
+        if hasattr(config, "dp_model_parallel_size") and config.dp_model_parallel_size > 1:
+            _init_dp_envs(config)
+            enable_infer_ep = True
+
         self.inference_engine = LLM(
             model=model_path,
             enable_sleep_mode=config.free_cache_engine,
@@ -193,7 +264,7 @@ class vLLMRollout(BaseRollout):
             dtype=config.dtype,
             enforce_eager=config.enforce_eager,
             gpu_memory_utilization=config.gpu_memory_utilization,
-            disable_custom_all_reduce=True,
+            disable_custom_all_reduce=True, #todo 这里可能需要改成 False
             skip_tokenizer_init=False,
             max_model_len=max_model_len,
             max_num_seqs=config.max_num_seqs,
@@ -203,6 +274,7 @@ class vLLMRollout(BaseRollout):
             enable_chunked_prefill=config.enable_chunked_prefill,
             enable_prefix_caching=config.enable_prefix_caching,
             trust_remote_code=trust_remote_code,
+            enable_expert_parallel=enable_infer_ep,
             seed=config.get("seed", 0),
             **compilation_config,
             **self.lora_kwargs,
@@ -223,6 +295,11 @@ class vLLMRollout(BaseRollout):
             if hasattr(SamplingParams(), str(k)) and k != "seed":
                 kwargs[k] = config.get(k)
         kwargs["n"] = 1  # already repeat in ray_trainer
+
+        import os
+        if os.getenv("VERL_CUSTOM_REWARD_RULE") == "1":
+            kwargs['stop'] = "</answer>" #!! 1009客户改动
+
         print(f"kwargs: {kwargs}")
         self.sampling_params = SamplingParams(**kwargs)
 
@@ -337,12 +414,36 @@ class vLLMRollout(BaseRollout):
 
         # users can customize different sampling_params at different run
         with self.update_sampling_params(**kwargs):
+            self.sampling_params.detokenize = True
             outputs = self.inference_engine.generate(
                 prompts=vllm_inputs,  # because we have already convert it to prompt token id
                 sampling_params=self.sampling_params,
                 lora_request=lora_requests,
-                use_tqdm=False,
+                use_tqdm=True,
             )
+
+            #! 打印推理结果信息
+            try:
+                rank = torch.distributed.get_rank()
+                if rank == 0: #* 只打印 rank0 的
+                    for output in outputs:
+                        #* 写死的，只打印 1 份
+                        #* 只打印部分
+                        print_n_gen = 1 # len(output.outputs)
+                        for sample_id in range(print_n_gen):
+                            response_text = output.outputs[sample_id].text
+                            print(f"===>Output===>", flush=True)
+                            if len(response_text) <= 820:
+                                print(response_text, flush=True)
+                            else:
+                                print(response_text[:400], flush=True)
+                                print("\n...\n...\n", flush=True)
+                                print(response_text[-400:], flush=True)
+
+                            print(f"<===END, 生成结束原因: {output.outputs[sample_id].finish_reason}", flush=True)
+
+            except Exception as e:
+                print(f"Print generation failed! \nreason is {e.__repr__()}")
 
             # TODO(sgm): disable logprob when recompute_log_prob is enable
             # if n = 1: (bs, response_length) ; if n > 1: (bs * n, response_length)

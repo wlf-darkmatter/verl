@@ -13,6 +13,7 @@
 # limitations under the License.
 # Adapted from https://github.com/EleutherAI/lm-evaluation-harness/blob/main/lm_eval/tasks/hendrycks_math/utils.py
 
+import os
 import re
 from typing import Optional
 
@@ -177,8 +178,25 @@ def is_correct_minerva(
         Tuple of (is_correct, normalized_prediction)
     """
     # Extract answer from solution
-    match = re.findall(answer_pattern, solution_str)
-    extracted_answer = match[-1] if match else "[INVALID]"
+
+    #!! ↓↓ 1009客户修改
+    if os.getenv("VERL_CUSTOM_REWARD_RULE") == "1":
+        answer_pattern = r'<think>\s*(.*?)\s*</think>.*?<answer>\s*(.*?)(?:\s*</answer>|$)'
+        print(f"\033[32mVERL_CUSTOM_REWARD_RULE=1, \n{answer_pattern=}")
+        match = re.search(answer_pattern, solution_str, re.DOTALL)
+        extracted_answer = "[INVALID]"
+        if match:
+            think = match.group(1).strip()
+            current_answer = match.group(2).strip()
+            # If the think part is too short, we consider the answer as invalid
+            if current_answer is not None and think is not None and len(think) > 10:
+                extracted_answer = current_answer
+    else:
+        match = re.findall(answer_pattern, solution_str)
+        extracted_answer = match[-1] if match else "[INVALID]"
+    #!! ↑↑ 1009客户修改
+
+
     pred = normalize_final_answer(extracted_answer)
 
     # Process ground truth
