@@ -127,18 +127,17 @@ class Qwen2_5VLSelfAttention(SelfAttention):
             output, bias = self.linear_proj(context_layer)
             return output, bias
 
-        query, key, value, rotary_pos_emb, attn_mask_type = (
-            self._adjust_key_value_for_inference(
-                inference_context,
-                query,
-                key,
-                value,
-                rotary_pos_emb,
-                rotary_pos_cos,
-                rotary_pos_sin,
-                sequence_len_offset,
-            )
+        adjusted_outputs = self._adjust_key_value_for_inference(
+            inference_context,
+            query,
+            key,
+            value,
+            rotary_pos_emb,
+            rotary_pos_cos,
+            rotary_pos_sin,
+            sequence_len_offset,
         )
+        query, key, value, rotary_pos_emb, attn_mask_type = adjusted_outputs[:5]
 
         if packed_seq_params is not None:
             query = query.squeeze(1)
