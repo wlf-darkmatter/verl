@@ -1,6 +1,6 @@
-export HCCL_SOCKET_IFNAME=bond1 # modify according to actual situation
-export TP_SOCKET_IFNAME=bond1   # modify according to actual situation
-export GLOO_SOCKET_IFNAME=bond1 # modify according to actual situation
+export HCCL_SOCKET_IFNAME=ens45 # modify according to actual situation
+export TP_SOCKET_IFNAME=ens45   # modify according to actual situation
+export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
 # export HYDRA_FULL_ERROR=1
 export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
