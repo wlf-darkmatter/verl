@@ -13,7 +13,7 @@ source /opt/pyvenv/bin/activate;
 # cp /data01/huawei-2025/lq/convert/4nodes/converter_hf_to_mcore_n_node.py /home/code/scripts/
 # cd /home/code/scripts/
 rm -rf /opt/verl
-cp -r /home/new_verl /opt/verl
+cp -r /home/code/verl /opt/verl
 cd $(dirname $0)
 
 #NODE_RANK=$1

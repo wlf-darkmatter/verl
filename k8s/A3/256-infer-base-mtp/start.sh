@@ -29,14 +29,14 @@ unset LOCAL_RANK
 export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=8         # example is 4 Nodes
 
-export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
+
 export ASCEND_PROCESS_LOG_PATH=/home/code/plog/$(basename $(dirname $0))/${RANK}
 
 
 ray stop --force
 rm -rf /tmp/ray
 rm -rf /opt/verl
-cp -r /home/new_verl /opt/verl
+cp -r /home/code/verl /opt/verl
 cd $(dirname $0)
 
 

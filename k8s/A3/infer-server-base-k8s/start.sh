@@ -53,14 +53,14 @@ unset LOCAL_RANK
 export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
-export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
+
 export ASCEND_PROCESS_LOG_PATH=/home/code/plog/$(basename $(dirname $0))/${RANK}
 
 
 ray stop --force
 rm -rf /tmp/ray
 rm -rf /opt/verl
-cp -r /home/new_verl /opt/verl
+cp -r /home/code/verl /opt/verl
 cd $(dirname $0)
 
 export ServerPort=6666     # modify according to actual situation
@@ -74,7 +74,7 @@ if [ "$RANK" = "0" ]; then
 
   ray start --head --ray-debugger-external --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 
-  while [[ $cnt -lt 10 ]]; do
+  while [[ $cnt -lt 100 ]]; do
     ray_status_output=$(ray status)
     npu_count=$(echo "$ray_status_output" | grep -oP '(?<=/)\d+\.\d+(?=\s*NPU)' | head -n 1)
     npu_count_int=$(echo "$npu_count" | awk '{print int($1)}')
@@ -88,7 +88,7 @@ if [ "$RANK" = "0" ]; then
 
     echo "Waiting for Ray to allocate $((NNODES*NPU_PER_NODE)) devices. Current device count: $npu_count_int"
     cnt=$((cnt+1))
-    sleep 50
+    sleep 10
   done
 
 else
@@ -105,7 +105,7 @@ while true; do
   fi
 
   cnt=$((cnt+1))
-  if [[ $cnt -gt 10 ]]; then
+  if [[ $cnt -gt 100 ]]; then
     echo "Job $ray_name start failed"
     ray stop --force
     rm -rf /tmp

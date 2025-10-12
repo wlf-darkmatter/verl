@@ -9,9 +9,9 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 
 
 #! 注意，自定义配置
-export VLLM_SLEEP_LEVEL=2
+export VLLM_SLEEP_LEVEL=1
 export VERL_DEBUG_NOSHARDING=0
-export VERL_MEMORY_LOG_DIR="/home/code/logs/memory/512die_12k_base_sleep2"
+export VERL_MEMORY_LOG_DIR="/home/code/tmp/512die_12k_base_1012_tp8dp8_new"
 export VERL_CUSTOM_REWARD_RULE="1"
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
@@ -25,24 +25,22 @@ export ACL_DEVICE_SYNC_TIMEOUT=7200
 export HCCL_ASYNC_ERROR_HANDLING=0
 
 #! 注意，1003 加了这 几个超时配置
-export RAY_DEBUG_POST_MORTEM=1
+# export RAY_DEBUG_POST_MORTEM=1
 # export ASCEND_LAUNCH_BLOCKING=1
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
-#######################################
+#! #################  【0928】  #####################
 #! 规避模型加载时 权重读取错误的问题
-rm -f /opt/vllm/vllm/model_executor/model_loader/base_loader.py
-cp -f /home/code/verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/model_loader/base_loader.py
 
+#! [VLLM]
+#* 规避直接读 hf 权重的报错（出现减层或者带有MTP）
 rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
-cp -f /home/code/verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+cp -f /home/code/verl/k8s/patch/0928/vllm/vllm/model_executor/models/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 
-rm -f /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
-cp -f /home/code/verl/k8s/patch/vllm_ascend/ops/fused_moe.py /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
-
+#! [Megatron]
 rm -f /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
-cp -f /home/code/verl/k8s/patch/megatron/dot_product_attention.py /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
+cp -f /home/code/verl/k8s/patch/0928/Megatron-LM/megatron/dot_product_attention.py /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
 
 #######################################
 
@@ -60,15 +58,15 @@ unset LOCAL_RANK
 export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
-export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
-export ASCEND_PROCESS_LOG_PATH=/home/code/plog/$(basename $(dirname $0))/1009/${RANK}
+
+export ASCEND_PROCESS_LOG_PATH=/home/code/plog/$(basename $(dirname $0))/NODE_${RANK}
 
 
 
 ray stop --force
 rm -rf /tmp/ray
 rm -rf /opt/verl
-cp -r /home/new_verl /opt/verl
+cp -r /home/code/verl /opt/verl
 rm -f /opt/verl/.gitignore
 cd $(dirname $0)
 
@@ -83,7 +81,7 @@ if [ "$RANK" = "0" ]; then
 
   ray start --head --ray-debugger-external --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 
-  while [[ $cnt -lt 10 ]]; do
+  while [[ $cnt -lt 100 ]]; do
     ray_status_output=$(ray status)
     npu_count=$(echo "$ray_status_output" | grep -oP '(?<=/)\d+\.\d+(?=\s*NPU)' | head -n 1)
     npu_count_int=$(echo "$npu_count" | awk '{print int($1)}')
@@ -97,7 +95,7 @@ if [ "$RANK" = "0" ]; then
 
     echo "Waiting for Ray to allocate $((NNODES*NPU_PER_NODE)) devices. Current device count: $npu_count_int"
     cnt=$((cnt+1))
-    sleep 50
+    sleep 10
   done
 
 else
@@ -114,7 +112,7 @@ while true; do
   fi
 
   cnt=$((cnt+1))
-  if [[ $cnt -gt 10 ]]; then
+  if [[ $cnt -gt 100 ]]; then
     echo "Job $ray_name start failed"
     ray stop --force
     rm -rf /tmp
