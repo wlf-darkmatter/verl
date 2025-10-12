@@ -24,13 +24,13 @@ CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){
 #######################################
 #! 规避模型加载时 权重读取错误的问题
 rm -f /opt/vllm/vllm/model_executor/model_loader/base_loader.py
-cp -f /home/new_verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/model_loader/base_loader.py
+cp -f /home/code/verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/model_loader/base_loader.py
 
 rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
-cp -f /home/new_verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+cp -f /home/code/verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 
 rm -f /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
-cp -f /home/new_verl/k8s/patch/vllm_ascend/ops/fused_moe.py /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
+cp -f /home/code/verl/k8s/patch/vllm_ascend/ops/fused_moe.py /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
 
 
 
@@ -54,7 +54,7 @@ export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
-export ASCEND_PROCESS_LOG_PATH=/home/new_verl/plog/$(basename $(dirname $0))/${RANK}
+export ASCEND_PROCESS_LOG_PATH=/home/code/plog/$(basename $(dirname $0))/${RANK}
 
 
 ray stop --force

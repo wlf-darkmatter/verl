@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: ./Dockerfile.A3.83rc1.cann
       network: host
-
+  # swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.5.1-cann_8.2.rc1-py_3.10-aarch64_0827a
   # harbor.ai-bj.cn/library/verl:verl_0928
   # docker build -f ./Dockerfile.verl0928 --network=host -t=swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.7.1-cann_8.2.rc1-py_3.10-aarch64_0928 .
   A3_0928:

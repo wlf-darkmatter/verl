@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek671-infer-12k-base  #sp-64-train-3b-moe-msrun #需要修改
+  name: deepseek671-verl-moe-infer-base-8nodes  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -9,7 +9,7 @@ metadata:
     ring-controller.atlas: ascend-910b
     subHealthyStrategy: "ignore"
   annotations:
-    sp-block: "128"
+    sp-block: "64"
 spec:
   schedulerName: volcano    #需要修改 work when enableGangScheduling is true
   runPolicy:
@@ -34,12 +34,12 @@ spec:
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.5.1-cann_8.2.rc1-py_3.10-aarch64_0827a  ##image
+              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.7.1-cann_8.2.rc1-py_3.10-aarch64_0928  ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
 
               args:
-                - "bash /home/code/verl/k8s/A3/256-infer-base-mtp/start.sh ;sleep 7d"
+                - "bash /home/code/verl/k8s/A3/infer-base-8nodes/start.sh ;sleep 7d"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
@@ -106,11 +106,11 @@ spec:
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.5.1-cann_8.2.rc1-py_3.10-aarch64_0827a  ##image
+              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.7.1-cann_8.2.rc1-py_3.10-aarch64_0928  ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "bash /home/code/verl/k8s/A3/256-infer-base-mtp/start.sh ;sleep 7d"
+                - "bash /home/code/verl/k8s/A3/infer-base-8nodes/start.sh ;sleep 7d"
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify

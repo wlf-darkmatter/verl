@@ -39,7 +39,7 @@ spec:
               command: ["/bin/bash", "-c"]
 
               args:
-                - "bash /home/new_verl/k8s/A3/test/test_1.sh ; sleep 7d;"
+                - "bash /home/code/verl/k8s/A3/test/test_1.sh ; sleep 7d;"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
@@ -66,7 +66,7 @@ spec:
                 - name: localtime
                   mountPath: /etc/localtime
                 - name: start-path
-                  mountPath: /home/new_verl/
+                  mountPath: /home/code/
                 - name: data-path
                   mountPath: /mnt
 
@@ -86,7 +86,7 @@ spec:
                 path: /etc/localtime                               # Configure the Docker time.
             - name: start-path
               hostPath:
-                path: /mnt/hpfs_test/wlf/verl
+                path: /mnt/hpfs_test/wlf/
             - name: data-path
               hostPath:
                 path: /mnt
@@ -110,7 +110,7 @@ spec:
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "bash /home/new_verl/k8s/A3/test/test_1.sh ; sleep 7d;"
+                - "bash /home/code/verl/k8s/A3/test/test_1.sh ; sleep 7d;"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #
                 - containerPort: 60350        # determined by user
@@ -136,7 +136,7 @@ spec:
                 - name: localtime
                   mountPath: /etc/localtime
                 - name: start-path
-                  mountPath: /home/new_verl/
+                  mountPath: /home/code/
                 - name: data-path
                   mountPath: /mnt
           volumes:
@@ -155,7 +155,7 @@ spec:
                 path: /etc/localtime                               # Configure the Docker time.
             - name: start-path
               hostPath:
-                path: /mnt/hpfs_test/wlf/verl
+                path: /mnt/hpfs_test/wlf/
             - name: data-path
               hostPath:
                 path: /mnt

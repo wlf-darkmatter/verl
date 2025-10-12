@@ -11,7 +11,7 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 #! 注意，自定义配置
 export VLLM_SLEEP_LEVEL=2
 export VERL_DEBUG_NOSHARDING=0
-export VERL_MEMORY_LOG_DIR="/home/new_verl/logs/memory/512die_12k_base_sleep2"
+export VERL_MEMORY_LOG_DIR="/home/code/logs/memory/512die_12k_base_sleep2"
 export VERL_CUSTOM_REWARD_RULE="1"
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
@@ -30,19 +30,17 @@ export RAY_DEBUG_POST_MORTEM=1
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
-#######################################
+#! #################  【0928】  #####################
 #! 规避模型加载时 权重读取错误的问题
-rm -f /opt/vllm/vllm/model_executor/model_loader/base_loader.py
-cp -f /home/new_verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/model_loader/base_loader.py
 
+#! [VLLM]
+#* 规避直接读 hf 权重的报错（出现减层或者带有MTP）
 rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
-cp -f /home/new_verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+cp -f /home/code/verl/k8s/patch/0928/vllm/vllm/model_executor/models/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 
-rm -f /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
-cp -f /home/new_verl/k8s/patch/vllm_ascend/ops/fused_moe.py /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
-
+#! [Megatron]
 rm -f /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
-cp -f /home/new_verl/k8s/patch/megatron/dot_product_attention.py /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
+cp -f /home/code/verl/k8s/patch/0928/Megatron-LM/megatron/dot_product_attention.py /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
 
 #######################################
 
@@ -61,7 +59,7 @@ export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
-export ASCEND_PROCESS_LOG_PATH=/home/new_verl/plog/$(basename $(dirname $0))/1009/${RANK}
+export ASCEND_PROCESS_LOG_PATH=/home/code/plog/$(basename $(dirname $0))/1009/${RANK}
 
 
 
