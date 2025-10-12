@@ -1,6 +1,6 @@
-export HCCL_SOCKET_IFNAME=bond1 # modify according to actual situation
-export TP_SOCKET_IFNAME=bond1   # modify according to actual situation
-export GLOO_SOCKET_IFNAME=bond1 # modify according to actual situation
+export HCCL_SOCKET_IFNAME=ens45 # modify according to actual situation
+export TP_SOCKET_IFNAME=ens45   # modify according to actual situation
+export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
 # export HYDRA_FULL_ERROR=1
 export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
@@ -25,7 +25,7 @@ export ACL_DEVICE_SYNC_TIMEOUT=7200
 export HCCL_ASYNC_ERROR_HANDLING=0
 
 #! 注意，1003 加了这 几个超时配置
-export RAY_DEBUG_POST_MORTEM=1
+# export RAY_DEBUG_POST_MORTEM=1
 # export ASCEND_LAUNCH_BLOCKING=1
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')

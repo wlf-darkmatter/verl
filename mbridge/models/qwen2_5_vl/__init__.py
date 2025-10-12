@@ -1,7 +1,9 @@
+import re
 from copy import deepcopy
 from typing import Callable, Generator, Optional
 
 import torch
+from transformers import AutoConfig
 
 from ...core import VLMBridge, register_model
 from ...core.util import unwrap_model
@@ -104,6 +106,17 @@ class Qwen2_5VLBridge(VLMBridge):
         ],
     }
 
+    def _adjust_mapping_for_shared_weights(self, hf_config: AutoConfig):
+        if getattr(hf_config, "tie_word_embeddings", False):
+            self._DIRECT_MAPPING["language_model.output_layer.weight"] = (
+                "model.embed_tokens.weight"
+            )
+
+    def _get_hf_shared_weight_keys(self):
+        if getattr(hf_config, "tie_word_embeddings", False):
+            return ["model.embed_tokens.weight"]
+        return []
+
     def _weight_name_mapping_attention(self, name: str) -> list[str]:
         split_name = name.split(".")
         layer_number = split_name[3]
@@ -153,6 +166,52 @@ class Qwen2_5VLBridge(VLMBridge):
         """
         hf_names = self._weight_name_mapping_mcore_to_hf(mcore_weights_name)
         if len(hf_names) == 1:
+            if re.match(
+                r"vision_model.decoder.layers.\d+.self_attention.linear_qkv.[weight|bias]",
+                mcore_weights_name,
+            ):
+                vision_num_query_groups = self.hf_config.vision_config.num_heads
+                vision_attention_heads = vision_num_query_groups
+                vision_hidden_size = self.hf_config.vision_config.hidden_size
+                vision_head_dim = vision_hidden_size // vision_attention_heads
+                out_shape = (
+                    [vision_num_query_groups, -1, vision_hidden_size]
+                    if ".bias" not in mcore_weights_name
+                    else [vision_num_query_groups, -1]
+                )
+                qkv = mcore_weights.view(*out_shape)
+                q_len = (
+                    vision_head_dim * vision_attention_heads // vision_num_query_groups
+                )
+                k_len = vision_head_dim
+                v_len = vision_head_dim
+                single_out_shape = (
+                    [-1, vision_hidden_size]
+                    if ".bias" not in mcore_weights_name
+                    else [-1]
+                )
+                q = qkv[:, :q_len].reshape(*single_out_shape)
+                k = qkv[:, q_len : q_len + k_len].reshape(*single_out_shape)
+                v = qkv[:, q_len + k_len :].reshape(*single_out_shape)
+                in_shape = (
+                    [
+                        3,
+                        vision_num_query_groups,
+                        -1,
+                        vision_head_dim,
+                        vision_hidden_size,
+                    ]
+                    if "bias" not in mcore_weights_name
+                    else [3, vision_num_query_groups, -1]
+                )
+                qkv = torch.cat([q, k, v], dim=0).view(*in_shape).contiguous()
+                original_shape = (
+                    [-1, vision_hidden_size]
+                    if ".bias" not in mcore_weights_name
+                    else [-1]
+                )
+                qkv = qkv.view(*original_shape)
+                return [hf_names[0]], [qkv]
             return [hf_names[0]], [mcore_weights]
         if (
             "self_attention.linear_qkv." in mcore_weights_name
@@ -218,6 +277,38 @@ class Qwen2_5VLBridge(VLMBridge):
             NotImplementedError: If the parameter name is unsupported
         """
         if len(hf_weights) == 1:
+            if re.match(
+                r"vision_model.decoder.layers.\d+.self_attention.linear_qkv.[weight|bias]",
+                mcore_weights_name,
+            ):
+                vision_num_query_groups = self.hf_config.vision_config.num_heads
+                vision_attention_heads = vision_num_query_groups
+                vision_hidden_size = self.hf_config.vision_config.hidden_size
+                vision_head_dim = vision_hidden_size // vision_attention_heads
+                in_shape = (
+                    [
+                        3,
+                        vision_num_query_groups,
+                        -1,
+                        vision_head_dim,
+                        vision_hidden_size,
+                    ]
+                    if "bias" not in mcore_weights_name
+                    else [3, vision_num_query_groups, -1]
+                )
+                q, k, v = hf_weights[0].view(*in_shape)
+                q = q.view([vision_num_query_groups, vision_head_dim, -1])
+                k = k.view([vision_num_query_groups, vision_head_dim, -1])
+                v = v.view([vision_num_query_groups, vision_head_dim, -1])
+
+                out_shape = (
+                    [-1, vision_hidden_size]
+                    if ".bias" not in mcore_weights_name
+                    else [-1]
+                )
+                qkv = torch.cat([q, k, v], dim=1).view(*out_shape).contiguous()
+                return qkv
+
             return hf_weights[0]
         if (
             "self_attention.linear_qkv." in mcore_weights_name
