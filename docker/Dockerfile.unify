@@ -1,0 +1,217 @@
+# 基础镜像
+FROM swr.cn-north-9.myhuaweicloud.com/atelier/pytorch_ascend:pytorch_2.5.1-cann_8.2.rc1-py_3.11-hce_2.0.2503-aarch64-snt9b23-20250729103313-3a25129
+
+# 指定默认用户
+USER root
+RUN sed -i 's/.*HISTSIZE.*//g' /etc/profile
+#
+SHELL [ "/usr/bin/bash", "-c", "-l" ]
+WORKDIR /root
+
+
+#* 修改 yum 源
+RUN target=openEuler-22.03-LTS-SP4 ;\
+    sed -i "/gpgkey.*/d" /etc/yum.repos.d/EulerOS.repo ;\
+    sed -i "s/gpgcheck=1/gpgcheck=0/g" /etc/yum.repos.d/EulerOS.repo ;\
+    sed -i "s@/os@/OS@g" /etc/yum.repos.d/EulerOS.repo ;\
+    sed -i "s@/updates@/update@g" /etc/yum.repos.d/EulerOS.repo ;\
+    sed -i "s@debuginfo@everything@g" /etc/yum.repos.d/EulerOS.repo ;\
+    sed -i "s@mirrors.myhuaweicloud.com/hce/\$releasever@mirrors.aliyun.com/openeuler/${target}@g" /etc/yum.repos.d/EulerOS.repo
+
+RUN sed -i '/activate/d' /root/.bashrc ;\
+    sed -i '/conda.sh/d' /root/.bashrc ;\
+    echo "export HISTFILESIZE=99999" >> /root/.bashrc ;\
+    echo "export HISTSIZE=99999" >> /root/.bashrc ;\
+    echo "export HISTFILE=/root/.bash_history" >> /root/.bashrc
+
+#* 清理掉令人困扰的其他torch环境
+RUN rm -rf /home/ma-user/anaconda3/envs/PyTorch-2.5.1 ;\
+    rm -rf /home/ma-user/anaconda3/envs/python-3.11.10
+
+#* 先用源码编译安装吧，后续再看看怎么样 yum 安装
+# wget -q https://www.python.org/ftp/python/3.10.12/Python-3.10.12.tgz ;\
+# COPY ./Python-3.10.12.tgz /tmp/Python-3.10.12.tgz
+
+RUN wget -q https://127.0.0.1:1111/Python-3.10.12.tgz ;\
+    cd /tmp ;\
+    tar -xvf Python-3.10.12.tgz ;\
+    cd /tmp/Python-3.10.12 ;\
+    ./configure --prefix=/opt/python3.10 --enable-optimizations --enable-shared ;\
+    make -j32 ;\
+    make install
+
+# 编译安装多线程优化工具
+# https://github.com/jemalloc/jemalloc.git 54eaed1d8b56b1aa528be3bdd1877e59c56fa90c
+# COPY ./code/jemalloc.tar.gz /opt/jemalloc.tar.gz
+RUN cd /opt ;\
+    wget -q https://127.0.0.1:1111/jemalloc.tar.gz ;\
+    tar -zxvf jemalloc.tar.gz ;\
+    cd jemalloc ;\
+    ./autogen.sh ;\
+    ./configure --prefix=/usr/local ;\
+    make -j 64 ;\
+    make install
+
+ENV PIP_DEFAULT_TIMEOUT=100 \
+    PIP_RETRIES=5 \
+    PIP_INDEX_URL=https://mirrors.aliyun.com/pypi/simple/ \
+    PIP_TRUSTED_HOST=mirrors.aliyun.com \
+    LD_LIBRARY_PATH=/opt/python3.10/lib/:$LD_LIBRARY_PATH
+
+#* 安装 flash-attn 修复
+COPY ./CANN-custom_ops-8.2.0.0-linux.aarch64.run /tmp/
+RUN target=openEuler-22.03-LTS-SP4 ;\
+    bash /tmp/CANN-custom_ops-8.2.0.0-linux.aarch64.run --install-path=/usr/local/Ascend/
+
+RUN /opt/python3.10/bin/python3 -m venv /opt/pyvenv ;\
+    echo "source /usr/local/Ascend/vendors/customize/bin/set_env.bash" >> /etc/profile ;\
+    echo "source /opt/pyvenv/bin/activate" >> /root/.bashrc ;\
+    echo "source /opt/pyvenv/bin/activate" >> /etc/profile
+
+#* =========================================================
+#* 开始搭建 Verl 环境
+#! 这里需要下载，由于我们不能下载，所以只能本地拷贝
+RUN --mount=type=cache,target=/root/.cache/pip,id=pip \
+    pip install -U pip ;\
+    pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1
+
+COPY ./torch_npu-2.5.1.post1+gitc0cf6bb-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl /tmp/torch_npu-2.5.1.post1+gitc0cf6bb-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl
+RUN --mount=type=cache,target=/root/.cache/pip,id=pip \
+    pip install /tmp/torch_npu-2.5.1.post1+gitc0cf6bb-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl
+
+# vllm b6553be1bc75f046b00046a4ad7576364d03c835 origin/releases/v0.9.1
+COPY ./code/vllm.tar.gz /opt/vllm.tar.gz
+RUN --mount=type=cache,target=/root/.cache/pip,id=pip \
+    cd /opt ;\
+    tar -zxvf /opt/vllm.tar.gz ;\
+    cd /opt/vllm ;\
+    git config --global --add safe.directory /opt/vllm ;\
+    VLLM_TARGET_DEVICE=empty pip install -e . --no-deps
+
+#! 用于解决 vllm-ascend 编译的问题，需要用到宿主机的 hal.so
+RUN mkdir -p /usr/local/Ascend/driver/lib64/driver
+
+RUN --mount=type=cache,target=/root/.cache/pip,id=pip \
+    pip install "hydra-core" "peft" pytest_mock "pyarrow>=15.0.0" "codetiming==1.4.0" "pylatexenc" "tensordict==0.8.3" "transformers==4.52.4" "ray==2.46.0" "wandb" "mathruler" "torchdata" "qwen_vl_utils" "torchvision==0.20.1" "regex" "cachetools" "psutil" "sentencepiece" "numpy" "requests >= 2.26.0" "tqdm" "blake3" "py-cpuinfo" "huggingface-hub[hf_xet] >= 0.32.0" "tokenizers >= 0.21.1" "protobuf" "fastapi[standard] >= 0.115.0" "aiohttp" "openai >= 1.52.0" "pydantic >= 2.10" "prometheus_client >= 0.18.0" "pillow" "prometheus-fastapi-instrumentator >= 7.0.0" "tiktoken >= 0.6.0" "lm-format-enforcer >= 0.10.11, < 0.11" "llguidance >= 0.7.11, < 0.8.0" "outlines == 0.1.11" "lark == 1.2.2" "xgrammar == 0.1.19" "typing_extensions >= 4.10" "filelock >= 3.16.1" "partial-json-parser" "pyzmq >= 25.0.0" "msgspec" "gguf >= 0.13.0" "mistral_common[opencv] >= 1.5.4" "opencv-python-headless >= 4.11.0" "pyyaml" "einops" "compressed-tensors == 0.10.1" "depyf==0.18.0" "cloudpickle" "watchfiles" "python-json-logger" "scipy" "ninja" "opentelemetry-sdk>=1.26.0" "opentelemetry-api>=1.26.0" "opentelemetry-exporter-otlp>=1.26.0" "opentelemetry-semantic-conventions-ai>=0.4.1" "cmake>=3.26" "decorator" "numpy<2.0.0" "packaging" "pybind11" "scipy" "setuptools>=64" "setuptools-scm>=8" "wheel" "msgpack" "quart" "tensorstore!=0.1.46,!=0.1.72" "numba" "nltk" "flask-restful"
+
+# vllm-ascend e3636c7ebc6988654d0b7cb80d668fee2ab64b23
+COPY ./code/vllm-ascend.tar.gz /opt/vllm-ascend.tar.gz
+COPY ./code/file/libascend_hal.so /usr/local/Ascend/driver/lib64/driver/
+RUN --mount=type=cache,target=/root/.cache/pip,id=pip \
+    cd /opt ;\
+    tar -zxvf /opt/vllm-ascend.tar.gz ;\
+    cd /opt/vllm-ascend ;\
+    git config --global --add safe.directory /opt/vllm-ascend ;\
+    source /usr/local/Ascend/nnal/atb/set_env.sh ;\
+    export Torch_DIR=/opt/pyvenv/lib/python3.10/site-packages/torch/share/cmake ;\
+    python setup.py develop
+
+# Megatron-LM a845aa7e12b3a117e24c2352b9e3e60bad2e3a17
+COPY ./code/Megatron-LM.tar.gz /opt/Megatron-LM.tar.gz
+RUN --mount=type=cache,target=/root/.cache/pip,id=pip \
+    cd /opt ;\
+    tar -zxvf /opt/Megatron-LM.tar.gz ;\
+    cd /opt/Megatron-LM ;\
+    git config --global --add safe.directory /opt/Megatron-LM ;\
+    pip install -e . --no-deps
+
+# MindSpeed ab90bbce894603b502a09025bcdf306f16b7a89f
+COPY ./code/MindSpeed.tar.gz /opt/MindSpeed.tar.gz
+RUN --mount=type=cache,target=/root/.cache/pip,id=pip \
+    cd /opt ;\
+    tar -zxvf /opt/MindSpeed.tar.gz ;\
+    git config --global --add safe.directory /opt/MindSpeed ;\
+    cd /opt/MindSpeed ;\
+    pip install -e .
+
+# verl 796871d7d092f7cbc6a64e7f4a3796f7a2217f5e
+COPY ./code/verl.tar.gz /opt/verl.tar.gz
+RUN --mount=type=cache,target=/root/.cache/pip,id=pip \
+    cd /opt ;\
+    tar -zxvf /opt/verl.tar.gz ;\
+    cd /opt/verl ;\
+    git config --global --add safe.directory /opt/verl ;\
+    pip install -e . --no-deps
+
+# # https://github.com/ji-huazhong/mindspeed-rl.git 9b4442759748bec8cbd8186128fef31b343dc869
+# COPY ./code/mindspeed-rl.tar.gz /opt/mindspeed-rl.tar.gz
+# RUN --mount=type=cache,target=/root/.cache/pip,id=pip \
+#     cd /opt ;\
+#     tar -zxvf /opt/mindspeed-rl.tar.gz ;\
+#     cd /opt/mindspeed-rl ;\
+#     git config --global --add safe.directory /opt/mindspeed-rl ;\
+#     pip install -e .
+
+RUN --mount=type=cache,target=/root/.cache/pip,id=pip \
+    pip install accelerate datasets dill hydra-core "numpy==1.26.4" pandas peft "pyarrow>=15.0.0" pybind11 pylatexenc "tensordict<=0.6.2" "transformers>=4.52.4" ray==2.46.0 wandb mathruler torchdata einops qwen_vl_utils torchvision==0.20.1
+
+#* 最终统一环境
+RUN --mount=type=cache,target=/root/.cache/pip,id=pip \
+    pip install -U setuptools setuptools_scm ;\
+    pip install "scipy==1.15.3" ipython pystack --no-deps ;\
+    pip install "tokenizers>=0.21.1" "transformers==4.52.4" "torch==2.5.1" numba pylatexenc tensorboard mathruler tensordict==0.8.2 orjson hf ;\
+    pip install "cmake>=3.26" decorator einops "numpy<2.0.0" packaging pybind11 pyyaml quart ;\
+    pip install numpy==1.26.4 torchdata mathruler pyzmq==27.0.0 msgspec==0.19.0 blake3==1.0.5 fastapi
+
+#* 客户提出的需要
+RUN  --mount=type=cache,target=/root/.cache/pip,id=pip \
+    pip install "ray[default]" debugpy ;\
+    pip install jieba==0.42.1 omegaconf==2.3.0 langdetect==1.0.9 immutabledict==4.2.1
+
+#! 修复 attn_mask 的精度问题
+COPY ./code/patch/vllm-ascend.patch /tmp/vllm-ascend.patch
+RUN cd /opt/vllm-ascend ;\
+    git apply /tmp/vllm-ascend.patch | tee /root/build_vllm_ascend.log
+
+#! 修改torch，使得megatron后端加载能变快
+RUN torch_path=$(pip show torch | grep Location | awk '{print $2}')/torch ;\
+    path_1=$torch_path/distributed/_shard/sharding_spec/_internals.py ;\
+    #* 修改点：我们发现/home/ma-user/anaconda3/envs/PyTorch-2.1.0/lib/python3.10/site-packages/torch/distributed/_shard/sharding_spec/_internals.py 72行 validate_non_overlapping_shards_metadata 方法执行的特别慢，但从名字看这个方法只是做个校验，把这个方法直接return后，任务拉起变快了非常多
+    sed -i 's/def validate_non_overlapping_shards_metadata.*/def validate_non_overlapping_shards_metadata(shards: List[ShardMetadata]):\n    return/g' $path_1 ;\
+    path_2=$torch_path/distributed/checkpoint/default_planner.py ;\
+    #* 把这个地方直接return True了，可以把保存权重从1个小时缩短到2分钟
+    sed -i '502i\    return True' $path_2
+
+#! 修复 Mindspeed 加载权重问题 (已合入主线，但当前分支落后于主线，需要手动合入)
+COPY ./code/patch/mindspeed.patch /tmp/mindspeed.patch
+RUN cd /opt/MindSpeed ;\
+    git apply /tmp/mindspeed.patch | tee /root/build.log
+
+#* 0815:
+#* 1. 避免计时器超时 —— 注释了 verl/utils/profiler/performance.py:215 # torch.distributed.all_reduce(timing_list, op=torch.distributed.ReduceOp.AVG)
+#* 2. 添加 math_dapo_reasoning 数据校验
+#* 3. vllm enable_prefix_caching 现在可以通过配置修改
+#* 4. vllm max_num_seqs 现在可以通过配置修改
+#* 5. vLLMRollout 中的 vllm 实例默认添加进度条
+#* 6. 添加output输出打印功能
+#* 0827:
+#* 1. torch 源码进行了修改，避免加载保存权重时过慢
+#* 2. 修改数据repeat堆叠方式为 按组重复（torch.repeat() 而非 torch.repeat_interleave() )
+#* 3. 修复 tensordict to() 方法的 blocking 问题
+#* 0905:
+#* 1. 修复 vllm-ascend mask inplace操作精度问题
+#* 2. 添加蚂蚁平台ray相关节点调度功能
+#* 0912:
+#* 1. 使用内源的verl，不再进行verl的patch
+#* 2. mc2.yaml 已经提交到内源的 verl
+#* 3. dapo_trainer-megatron.yaml 已经提交到内源的 verl
+#*
+#*
+
+# COPY ./code/patch/verl_0905.patch /tmp/verl_0905.patch
+# RUN cd /opt/verl ;\
+#     git apply /tmp/verl_0905.patch | tee /root/build_verl.log
+
+# cd /opt/pyvenv/lib/python3.10/site-packages
+# diff -uNr tensordict /sfs_turbo/hw/wanglingfeng/VerlCode/dev/forpatch/tensordict > /sfs_turbo/hw/wanglingfeng/VerlCode/docker/verl-npu/code/patch/tensordict.patch
+COPY ./code/patch/tensordict.patch /tmp/tensordict.patch
+RUN cd /opt/pyvenv/lib/python3.10/site-packages ;\
+    patch -p0 < /tmp/tensordict.patch | tee /root/build_tensordict.log
+
+# COPY ./code/file/mc2_env.yaml /opt/verl/verl/trainer/
+# COPY ./code/file/dapo_trainer-megatron.yaml /opt/verl/recipe/dapo/config/
+
+RUN echo "PS1='\${debian_chroot:+(\$debian_chroot)}\[\033[01;32m\]\u@\[\033[00m\]\[\033[01;33m\]Verl-Unify@\[\033[00m\]\[\033[01;35m\]\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\\\$ '" >> ~/.bashrc
+
+
+

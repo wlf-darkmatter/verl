@@ -1,11 +1,4 @@
 # services:
-#   A3_83RC1:
-#     image: harbor.ai-bj.cn/library/verl:verl_CANN83RC1
-#     build:
-#       args: [BUILDKIT_PROGRESS=plain]
-#       context: .
-#       dockerfile: ./Dockerfile.83rc1.cann
-#       network: host
 services:
   A3_83RC1:
     image: verl:verl_CANN83RC1_A3
@@ -15,4 +8,12 @@ services:
       dockerfile: ./Dockerfile.A3.83rc1.cann
       network: host
 
-      
+  # harbor.ai-bj.cn/library/verl:verl_0928
+  # docker build -f ./Dockerfile.verl0928 --network=host -t=swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.7.1-cann_8.2.rc1-py_3.10-aarch64_0928 .
+  A3_0928:
+    image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.7.1-cann_8.2.rc1-py_3.10-aarch64_0928
+    build:
+      args: [BUILDKIT_PROGRESS=plain DOCKER_BUILDKIT=1]
+      context: .
+      dockerfile: ./Dockerfile.verl0928
+      network: host
