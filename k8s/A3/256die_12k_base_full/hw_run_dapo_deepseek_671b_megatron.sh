@@ -3,7 +3,7 @@ set -x
 echo ">>Starting script at: $(date), path = $(pwd)"
 
 project_name='DAPO'
-exp_name='DAPO-DeepSeek-671b-megatron-INSTRUCT-64NNODES'
+exp_name='DAPO-DeepSeek-671b-megatron-BASE-64NNODES'
 
 adv_estimator=grpo
 
@@ -75,6 +75,9 @@ enable_filter_group=False
 train_cp=1
 #    +actor_rollout_ref.actor.megatron.override_transformer_config.context_parallel_size=${train_cp} \
 ETP=1
+#    +actor_rollout_ref.actor.megatron.override_transformer_config.moe_router_dtype=fp32 \
+#   +actor_rollout_ref.actor.megatron.override_transformer_config.moe_grouped_gemm=True \
+#   +actor_rollout_ref.actor.megatron.override_transformer_config.moe_token_dispatcher_type="alltoall" \
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 cd /opt/verl
 ray job submit --runtime-env="${RUNTIME_ENV}" \
@@ -133,10 +136,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.megatron.expert_tensor_parallel_size=$ETP \
     actor_rollout_ref.ref.megatron.expert_tensor_parallel_size=$ETP \
     +actor_rollout_ref.actor.megatron.override_transformer_config.bias_dropout_fusion=True \
-    actor_rollout_ref.actor.megatron.override_transformer_config.moe_router_dtype=fp32 \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.moe_grouped_gemm=True \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.moe_token_dispatcher_type="alltoall" \
-    actor_rollout_ref.actor.megatron.override_transformer_config.persist_layer_norm=True \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.persist_layer_norm=True \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_method=uniform \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_granularity=full \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=1 \
@@ -187,7 +187,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.total_epochs=10 \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
-    trainer.rollout_data_dir=/mnt/hpfs_test/wlf/${exp_name}/rollout \
+    trainer.rollout_data_dir=/mnt/hpfs_test/wlf/${exp_name}/1/rollout \
     trainer.log_val_generations=10 \
     trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
 

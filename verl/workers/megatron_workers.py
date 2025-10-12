@@ -73,7 +73,6 @@ from verl.workers.actor.megatron_actor import MegatronPPOActor
 from verl.workers.config import HFModelConfig, McoreCriticConfig, RolloutConfig
 from verl.workers.critic.megatron_critic import MegatronPPOCritic
 from verl.workers.reward_model.megatron.reward_model import MegatronRewardModel
-from verl.workers.rollout.rollout_worker import RolloutWorker
 from verl.utils.memory_utils import aggressive_empty_cache, log_memory_usage, get_logger
 from verl.workers.rollout import get_rollout_class
 

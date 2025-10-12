@@ -141,14 +141,14 @@ def log_memory_usage(stage: str = "current") -> None:
         return
 
     info = get_memory_info()
-    logger.info(
-        f"Memory usage [{stage}]: "
-        f"Total: {info['total_memory_gb']:.2f} GB, "
-        f"Allocated: {info['allocated_memory_gb']:.2f} GB, "
-        f"Reserved: {info['reserved_memory_gb']:.2f} GB, "
+    str_info = f"Memory usage [{stage}]: " +\
+        f"Total: {info['total_memory_gb']:.2f} GB, " +\
+        f"Allocated: {info['allocated_memory_gb']:.2f} GB, " +\
+        f"Reserved: {info['reserved_memory_gb']:.2f} GB, " +\
         f"Cached: {info['cached_memory_gb']:.2f} GB"
-    )
 
+    logger.info(str_info)
+    return str_info
 
 def optimize_memory_for_inference() -> None:
     """Optimize GPU memory usage for inference"""
