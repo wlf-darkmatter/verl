@@ -16,6 +16,12 @@ export VERL_MEMORY_LOG_DIR="/home/new_verl/logs/memory/512die_12k_base_sleep2"
 ["Total:", "Allocated:", "Reserved:", "Cached:"]
 ```
 
+## 观测指标
+
+```python
+["critic/rewards/mean:","actor/grad_norm:", "actor/kl_loss", "response_length/mean:", "response_length/clip_ratio:"]
+```
+
 # 正式执行部分
 
 ## start

@@ -10,7 +10,7 @@ from safetensors import safe_open
 
 from mbridge.core.safetensor_io import SafeTensorIO
 
-# from .kernel import weight_dequant
+from .kernel import weight_dequant
 
 
 class DequantFP8SafeTensorIO(SafeTensorIO):
@@ -31,7 +31,7 @@ class DequantFP8SafeTensorIO(SafeTensorIO):
             file_to_weight_map[filename].append(name)
         for filename, weight_names in file_to_weight_map.items():
             safetensor_file = os.path.join(hf_dir, filename)
-            with safe_open(safetensor_file, framework="pt", device="npu") as f:
+            with safe_open(safetensor_file, framework="pt", device="cuda") as f:
                 for name in weight_names:
                     weight = f.get_tensor(name)
                     scale_inv_name = f"{name}_scale_inv"
@@ -48,7 +48,7 @@ class DequantFP8SafeTensorIO(SafeTensorIO):
                                         hf_dir, weight_to_file_map[scale_inv_name]
                                     ),
                                     framework="pt",
-                                    device="npu",
+                                    device="cuda",
                                 ) as f2:
                                     scale_inv = f2.get_tensor(scale_inv_name)
                             ret[name] = weight_dequant(weight, scale_inv)
