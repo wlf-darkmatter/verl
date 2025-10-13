@@ -1,6 +1,6 @@
 
 docker run -itd \
-    -v /mnt/hpfs_test/wlf/:/home/new_verl \
+    -v /mnt/hpfs_test/wlf/:/home/ \
     -v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
     -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
     -v /mnt/hpfs_test/:/mnt/hpfs_test/ \

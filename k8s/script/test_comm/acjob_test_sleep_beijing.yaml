@@ -74,7 +74,7 @@ spec:
                 - name: localtime
                   mountPath: /etc/localtime
                 - name: start-path
-                  mountPath: /home/new_verl/
+                  mountPath: /home/code
                 - name: data-path
                   mountPath: /data01
           volumes:
@@ -93,7 +93,7 @@ spec:
                 path: /etc/localtime                               # Configure the Docker time.
             - name: start-path
               hostPath:
-                path: /data01/huawei-2025/wlf/verl/
+                path: /data01/huawei-2025/wlf/
             - name: data-path
               hostPath:
                 path: /data01
@@ -166,7 +166,7 @@ spec:
                 - name: localtime
                   mountPath: /etc/localtime
                 - name: start-path
-                  mountPath: /home/new_verl/
+                  mountPath: /home/code
                 - name: data-path
                   mountPath: /data01
           volumes:
@@ -185,7 +185,7 @@ spec:
                 path: /etc/localtime                               # Configure the Docker time.
             - name: start-path
               hostPath:
-                path: /data01/huawei-2025/wlf/verl/
+                path: /data01/huawei-2025/wlf/
             - name: data-path
               hostPath:
                 path: /data01

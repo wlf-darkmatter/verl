@@ -9,10 +9,10 @@ source /usr/local/Ascend/nnal/atb/set_env.sh;
 source /opt/pyvenv/bin/activate;
 
 
-# cp /data01/huawei-2025/lq/convert/4nodes/bash_dpsk_v3_4nodes.sh /home/new_verl/scripts/
-# cp /data01/huawei-2025/lq/convert/4nodes/converter_hf_to_mcore_n_node.py /home/new_verl/scripts/
-# cd /home/new_verl/scripts/
+# cp /data01/huawei-2025/lq/convert/4nodes/bash_dpsk_v3_4nodes.sh /home/code/verl/scripts/
+# cp /data01/huawei-2025/lq/convert/4nodes/converter_hf_to_mcore_n_node.py /home/code/verl/scripts/
+# cd /home/code/verl/scripts/
 rm -rf /opt/verl
-cp -r /home/new_verl /opt/verl
+cp -r /home/code/verl /opt/verl
 cd $(dirname $0)
 bash bash_dpsk_v3_4nodes.sh

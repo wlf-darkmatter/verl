@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek671-verl-moe-infer-base-8nodes-2  #sp-64-train-3b-moe-msrun #需要修改
+  name: deepseek671-verl-moe-64die-12k-base-cut-mbridge2 #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -14,7 +14,7 @@ spec:
   schedulerName: volcano    #需要修改 work when enableGangScheduling is true
   runPolicy:
     schedulingPolicy:
-      minAvailable: 8    #需要修改， work when enableGangScheduling is true
+      minAvailable: 4    #需要修改， work when enableGangScheduling is true
       queue: default
   successPolicy: AllWorkers
   replicaSpecs:
@@ -39,7 +39,7 @@ spec:
               command: ["/bin/bash", "-c"]
 
               args:
-                - "bash /home/code/verl/k8s/A3/infer-base-8nodes-2/start.sh ;sleep 7d"
+                - "bash /home/code/verl/k8s/A3/64die_12k_base_cut_mbridge/start.sh ;sleep 7d"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
@@ -91,7 +91,7 @@ spec:
               hostPath:
                 path: /mnt
     Worker:
-      replicas: 7  #Master can only be 1
+      replicas: 3  #Master can only be 1
       restartPolicy: Never
       template:
         metadata:
@@ -110,7 +110,7 @@ spec:
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "bash /home/code/verl/k8s/A3/infer-base-8nodes-2/start.sh ;sleep 7d"
+                - "bash /home/code/verl/k8s/A3/64die_12k_base_cut_mbridge/start.sh ;sleep 7d"
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify

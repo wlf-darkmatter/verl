@@ -11,7 +11,7 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 #! 注意，自定义配置
 export VLLM_SLEEP_LEVEL=1
 export VERL_DEBUG_NOSHARDING=0
-export VERL_MEMORY_LOG_DIR="/home/code/tmp/512die_12k_base_1012_tp8dp8_new"
+export VERL_MEMORY_LOG_DIR="/home/code/tmp/64die_12k_base_cut_mbridge2"
 export VERL_CUSTOM_REWARD_RULE="1"
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
@@ -64,7 +64,7 @@ export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 
-export ASCEND_PROCESS_LOG_PATH=/home/code/plog/$(basename $(dirname $0))/NODE_${RANK}
+export ASCEND_PROCESS_LOG_PATH=/home/code/plog/$(basename $(dirname $0))/1009/${RANK}
 
 
 
@@ -108,6 +108,7 @@ else
   ray start --address="$MASTER_ADDR:$ServerPort" --disable-usage-stats
 fi
 
+#* 判断RAY的任务是否持续运行中，如果是，则不断sleep
 cnt=0
 while true; do
   ray_name=$(ray job list | grep -o "raysubmit_[a-zA-Z0-9]*")
@@ -119,35 +120,36 @@ while true; do
   cnt=$((cnt+1))
   if [[ $cnt -gt 100 ]]; then
     echo "Job $ray_name start failed"
-    ray stop --force
-    rm -rf /tmp
+    # ray stop --force
+    # rm -rf /tmp
     exit 1
   fi
 
   sleep 50
 done
+#! 下面涉及到 ray stop的逻辑都注释掉
 
-ray_name=$(ray job list | grep -o "raysubmit_[a-zA-Z0-9]*")
-while true; do
-  output=$(ray job status $ray_name)
-  failed=$(echo $output | grep $ray_name | grep -i failed)
-  succeeded=$(echo $output | grep $ray_name | grep -i succeeded)
-  gcs_error=$(echo $output | grep -i 'Failed to get cluster ID from GCS server')
+# ray_name=$(ray job list | grep -o "raysubmit_[a-zA-Z0-9]*")
+# while true; do
+#   output=$(ray job status $ray_name)
+#   failed=$(echo $output | grep $ray_name | grep -i failed)
+#   succeeded=$(echo $output | grep $ray_name | grep -i succeeded)
+#   gcs_error=$(echo $output | grep -i 'Failed to get cluster ID from GCS server')
 
-  if [[ -n $gcs_error ]]; then
-    echo "ray cannot connect，Job $ray_name exit with exception"
-    ray stop --force
-   # rm -rf /tmp
-    exit 1
-  fi
+#   if [[ -n $gcs_error ]]; then
+#     echo "ray cannot connect，Job $ray_name exit with exception"
+#     ray stop --force
+#    # rm -rf /tmp
+#     exit 1
+#   fi
 
 
-  if [[ -n $succeeded ]]; then
-    ray stop --force
- #   rm -rf /tmp
-    echo "Job $ray_name exit without exception"
-    exit 0
-  fi
+#   if [[ -n $succeeded ]]; then
+#     ray stop --force
+#  #   rm -rf /tmp
+#     echo "Job $ray_name exit without exception"
+#     exit 0
+#   fi
 
 #   if [[ -n $failed ]]; then
 #     echo "Job $ray_name exit with exception"
@@ -156,5 +158,5 @@ while true; do
 #     exit 1
 #   fi
 
-  sleep 10
-done
+#   sleep 10
+# done

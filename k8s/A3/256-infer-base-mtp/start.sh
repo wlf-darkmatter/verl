@@ -44,7 +44,7 @@ export ServerPort=6666     # modify according to actual situation
 export DashboardPort=8888  # modify according to actual situation
 
 
-cd /home/new_verl
+cd /home/code/verl
 if [[ "$RANK" = "0" ]]; then
   # head start
   echo "This is head node"

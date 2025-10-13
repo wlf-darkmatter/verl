@@ -21,21 +21,28 @@ export ACL_DEVICE_SYNC_TIMEOUT=7200
 export HCCL_ASYNC_ERROR_HANDLING=0
 
 #内存打印
-#export VERL_MEMORY_LOG_DIR="/home/new_verl/tmp/exp_12k_base_gpu"
+#export VERL_MEMORY_LOG_DIR="/home/code/verl/tmp/exp_12k_base_gpu"
 unset VERL_MEMORY_LOG_DIR
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
 #######################################
 #! 规避模型加载时 权重读取错误的问题
-rm -f /opt/vllm/vllm/model_executor/model_loader/base_loader.py
-cp -f /home/new_verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/model_loader/base_loader.py
-
+#! [VLLM]
+#* 规避直接读 hf 权重的报错（出现减层或者带有MTP）
 rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
-cp -f /home/new_verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+cp -f /home/code/verl/k8s/patch/0928/vllm/vllm/model_executor/models/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 
-rm -f /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
-cp -f /home/new_verl/k8s/patch/vllm_ascend/ops/fused_moe.py /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
+
+#! [VLLM-ASCEND]
+
+rm -f /opt/vllm-ascend/vllm_ascend/models/deepseek_v2.py
+cp -f /home/code/verl/k8s/patch/0928/vllm-ascend/vllm_ascend/models/deepseek_v2.py /opt/vllm-ascend/vllm_ascend/models/deepseek_v2.py
+
+
+#! [Megatron]
+rm -f /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
+cp -f /home/code/verl/k8s/patch/0928/Megatron-LM/megatron/dot_product_attention.py /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
 
 
 
@@ -64,12 +71,12 @@ export NPU_PER_NODE=8  # A2 NPU Number
 export NNODES=64         # example is 4 Nodes
 
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
-export ASCEND_PROCESS_LOG_PATH=/home/new_verl/plog/64nodes_12k_base_gpu/$(date +"%Y-%m-%d--%H-%M-%S")
+export ASCEND_PROCESS_LOG_PATH=/home/code/verl/plog/64nodes_12k_base_gpu/$(date +"%Y-%m-%d--%H-%M-%S")
 
 ray stop --force
 rm -rf /tmp/ray
 rm -rf /opt/verl
-cp -r /home/new_verl /opt/verl
+cp -r /home/code/verl /opt/verl
 cp -rf /data01/huawei-2025/wlf/dot_product_attention.py /opt/MindSpeed/mindspeed/core/context_parallel/dot_product_attention.py
 cd $(dirname $0)
 

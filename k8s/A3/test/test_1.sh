@@ -29,7 +29,7 @@ unset LOCAL_WORLD_SIZE
 unset WORLD_SIZE
 unset LOCAL_RANK
 
-cd /home/new_verl
+cd /home/code/verl
 if [ "$RANK" = "0" ]; then
   # head start
   echo "This is head node"

@@ -47,7 +47,7 @@ spec:
               command: ["/bin/bash", "-c"]
 
               args:
-                - "bash /home/new_verl/k8s/beijing/32nodes_bigEp_dummy/start.sh; sleep 7d"
+                - "bash /home/code/verl/k8s/beijing/32nodes_bigEp_dummy/start.sh; sleep 7d"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
@@ -74,7 +74,7 @@ spec:
                 - name: localtime
                   mountPath: /etc/localtime
                 - name: start-path
-                  mountPath: /home/new_verl/
+                  mountPath: /home/code
                 - name: data-path
                   mountPath: /data01
           volumes:
@@ -93,7 +93,7 @@ spec:
                 path: /etc/localtime                               # Configure the Docker time.
             - name: start-path
               hostPath:
-                path: /data01/huawei-2025/wlf/verl/
+                path: /data01/huawei-2025/wlf/
             - name: data-path
               hostPath:
                 path: /data01
@@ -140,7 +140,7 @@ spec:
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "bash /home/new_verl/k8s/beijing/32nodes_bigEp_dummy/start.sh; sleep 7d"
+                - "bash /home/code/verl/k8s/beijing/32nodes_bigEp_dummy/start.sh; sleep 7d"
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify
@@ -165,7 +165,7 @@ spec:
                 - name: localtime
                   mountPath: /etc/localtime
                 - name: start-path
-                  mountPath: /home/new_verl/
+                  mountPath: /home/code
                 - name: data-path
                   mountPath: /data01
           volumes:
@@ -184,7 +184,7 @@ spec:
                 path: /etc/localtime                               # Configure the Docker time.
             - name: start-path
               hostPath:
-                path: /data01/huawei-2025/wlf/verl/
+                path: /data01/huawei-2025/wlf/
             - name: data-path
               hostPath:
                 path: /data01

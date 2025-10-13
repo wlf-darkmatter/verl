@@ -82,7 +82,7 @@ else
 fi
 
 
-cd /home/new_verl; python k8s/test_comm.py --ray_init --nnodes=2 --ray_master_ip=${MASTER_ADDR} --ray_master_port=${ServerPort} --device=npu ${kwargs[@]}
+cd /home/code/verl; python k8s/test_comm.py --ray_init --nnodes=2 --ray_master_ip=${MASTER_ADDR} --ray_master_port=${ServerPort} --device=npu ${kwargs[@]}
 
 ```
 
