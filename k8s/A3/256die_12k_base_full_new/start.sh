@@ -64,7 +64,7 @@ export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 
-export ASCEND_PROCESS_LOG_PATH=/home/code/plog/$(basename $(dirname $0))/1009/${RANK}
+export ASCEND_PROCESS_LOG_PATH=/home/code/logs/$(basename $(dirname $0))/plog/1009/${RANK}
 
 
 
@@ -120,8 +120,8 @@ while true; do
   cnt=$((cnt+1))
   if [[ $cnt -gt 100 ]]; then
     echo "Job $ray_name start failed"
-    # ray stop --force
-    # rm -rf /tmp
+    ray stop --force
+    rm -rf /tmp
     exit 1
   fi
 
@@ -129,27 +129,27 @@ while true; do
 done
 #! 下面涉及到 ray stop的逻辑都注释掉
 
-# ray_name=$(ray job list | grep -o "raysubmit_[a-zA-Z0-9]*")
-# while true; do
-#   output=$(ray job status $ray_name)
-#   failed=$(echo $output | grep $ray_name | grep -i failed)
-#   succeeded=$(echo $output | grep $ray_name | grep -i succeeded)
-#   gcs_error=$(echo $output | grep -i 'Failed to get cluster ID from GCS server')
+ray_name=$(ray job list | grep -o "raysubmit_[a-zA-Z0-9]*")
+while true; do
+  output=$(ray job status $ray_name)
+  failed=$(echo $output | grep $ray_name | grep -i failed)
+  succeeded=$(echo $output | grep $ray_name | grep -i succeeded)
+  gcs_error=$(echo $output | grep -i 'Failed to get cluster ID from GCS server')
 
-#   if [[ -n $gcs_error ]]; then
-#     echo "ray cannot connect，Job $ray_name exit with exception"
-#     ray stop --force
-#    # rm -rf /tmp
-#     exit 1
-#   fi
+  if [[ -n $gcs_error ]]; then
+    echo "ray cannot connect，Job $ray_name exit with exception"
+    ray stop --force
+   # rm -rf /tmp
+    exit 1
+  fi
 
 
-#   if [[ -n $succeeded ]]; then
-#     ray stop --force
-#  #   rm -rf /tmp
-#     echo "Job $ray_name exit without exception"
-#     exit 0
-#   fi
+  if [[ -n $succeeded ]]; then
+    ray stop --force
+ #   rm -rf /tmp
+    echo "Job $ray_name exit without exception"
+    exit 0
+  fi
 
 #   if [[ -n $failed ]]; then
 #     echo "Job $ray_name exit with exception"
@@ -158,5 +158,5 @@ done
 #     exit 1
 #   fi
 
-#   sleep 10
-# done
+  sleep 10
+done

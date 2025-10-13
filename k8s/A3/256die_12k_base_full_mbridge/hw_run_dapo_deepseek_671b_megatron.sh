@@ -3,7 +3,7 @@ set -x
 echo ">>Starting script at: $(date), path = $(pwd)"
 
 project_name='DAPO'
-exp_name='DAPO-DeepSeek-671b-megatron-INSTRUCT-64NNODES'
+exp_name='DAPO-DeepSeek-671b-megatron-mbridge'
 
 adv_estimator=grpo
 
@@ -183,7 +183,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.total_epochs=10 \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
-    trainer.rollout_data_dir=/mnt/hpfs_test/wlf/${exp_name}/rollout \
+    trainer.rollout_data_dir=/home/code/logs/$(basename $(dirname $0))/rollout \
     trainer.log_val_generations=10 \
     trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
 

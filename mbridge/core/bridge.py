@@ -335,6 +335,8 @@ class Bridge(ABC):
             self._weight_name_mapping_mcore_local_to_global(model, consider_ep=False)
             for model in models
         ]
+        print(f"{local_to_global_maps=}", flush=True)
+        print(f"{weights_names_all_pp=}", flush=True)
         for iter_pp_rank, iter_vpp_rank, iter_name in weights_names_all_pp:
             local_to_global_map = local_to_global_maps[iter_vpp_rank]
             if iter_pp_rank == self.mpu.pp_rank:
@@ -342,7 +344,10 @@ class Bridge(ABC):
                     name, param = next(model_chunk_generator)
                 except StopIteration:
                     name, param = None, None
-                name = local_to_global_map[iter_name]
+                if iter_name not in local_to_global_map:
+                    name = iter_name
+                else:
+                    name = local_to_global_map[iter_name]
             else:
                 name, param = None, None
 
@@ -479,6 +484,7 @@ class Bridge(ABC):
         all_param_names = [
             k for k in model.state_dict().keys() if "_extra_state" not in k
         ]
+        print(f"{all_param_names=}", flush=True)
         ret = {}
         for param_name in all_param_names:
             keyword = "decoder.layers."
