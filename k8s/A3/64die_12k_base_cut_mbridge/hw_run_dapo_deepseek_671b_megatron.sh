@@ -29,7 +29,7 @@ train_prompt_mini_bsz=32
 train_ppo_micro_batch_size_per_gpu=2
 infer_ppo_micro_batch_size_per_gpu=2
 # Paths
-MODEL_PATH="/mnt/hpfs_test/weights/dsv3-base-fp8-zy-bf16"
+MODEL_PATH="/mnt/hpfs_test/weights/dsv3-base-fp8-wlf-bf16"
 MCORE_MODEL_PATH="/mnt/hpfs_test/weights/dsv3_base_bf16_mcore_zy_hs_mtp0"
 # DIST_CKPT_PATH="/mnt/hpfs_test/weights/dsv3_base_bf16_mcore_zy_hs_mtp0"
 RAY_DATA_HOME="/opt"

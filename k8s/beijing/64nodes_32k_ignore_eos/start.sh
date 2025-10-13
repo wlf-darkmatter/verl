@@ -33,8 +33,7 @@ cp -f /home/code/verl/k8s/patch/0928/Megatron-LM/megatron/dot_product_attention.
 
 #######################################
 
-mkdir -p /data01/huawei-2025/wlf/watch
-bash /data01/huawei-2025/wlf/verl/k8s/script/watch_stats.sh > /data01/huawei-2025/wlf/watch/rank${RANK}_${CURRENT_IP}.log &
+
 
 source /usr/local/Ascend/ascend-toolkit/set_env.sh;
 source /usr/local/Ascend/nnal/atb/set_env.sh;
