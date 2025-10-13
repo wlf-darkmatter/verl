@@ -9,7 +9,7 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 
 
 #! 注意，自定义配置
-# export VLLM_SLEEP_LEVEL=1
+export VLLM_SLEEP_LEVEL=1
 export VERL_DEBUG_NOSHARDING=0
 export VERL_MEMORY_LOG_DIR="/home/code/tmp/512die_12k_base_1012_tp8dp8_new"
 export VERL_CUSTOM_REWARD_RULE="1"
@@ -59,7 +59,7 @@ export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 
-export ASCEND_PROCESS_LOG_PATH=/home/code/plog/$(basename $(dirname $0))/1012/${RANK}
+export ASCEND_PROCESS_LOG_PATH=/home/code/plog/$(basename $(dirname $0))/NODE_${RANK}
 
 
 

@@ -9,9 +9,9 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 
 
 #! 注意，自定义配置
-# export VLLM_SLEEP_LEVEL=1
+export VLLM_SLEEP_LEVEL=1
 export VERL_DEBUG_NOSHARDING=0
-export VERL_MEMORY_LOG_DIR="/home/code/tmp/512die_12k_base_1012_tp8dp8_new"
+export VERL_MEMORY_LOG_DIR="/home/code/tmp/512die_12k_base_1010_tp8dp8"
 export VERL_CUSTOM_REWARD_RULE="1"
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
@@ -25,7 +25,7 @@ export ACL_DEVICE_SYNC_TIMEOUT=7200
 export HCCL_ASYNC_ERROR_HANDLING=0
 
 #! 注意，1003 加了这 几个超时配置
-# export RAY_DEBUG_POST_MORTEM=1
+export RAY_DEBUG_POST_MORTEM=1
 # export ASCEND_LAUNCH_BLOCKING=1
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
@@ -59,7 +59,7 @@ export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 
-export ASCEND_PROCESS_LOG_PATH=/home/code/plog/$(basename $(dirname $0))/1012/${RANK}
+export ASCEND_PROCESS_LOG_PATH=/home/code/plog/$(basename $(dirname $0))/1009/${RANK}
 
 
 
