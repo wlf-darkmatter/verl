@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek671-verl-moe-256die-12k-base-full-1012-mbridge  #sp-64-train-3b-moe-msrun #需要修改
+  name: deepseek671-verl-moe-32die-12k-base-cut-mbridge2  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -9,12 +9,12 @@ metadata:
     ring-controller.atlas: ascend-910b
     subHealthyStrategy: "ignore"
   annotations:
-    sp-block: "256"
+    sp-block: "32"
 spec:
   schedulerName: volcano    #需要修改 work when enableGangScheduling is true
   runPolicy:
     schedulingPolicy:
-      minAvailable: 16    #需要修改， work when enableGangScheduling is true
+      minAvailable: 2    #需要修改， work when enableGangScheduling is true
       queue: default
   successPolicy: AllWorkers
   replicaSpecs:
@@ -39,7 +39,7 @@ spec:
               command: ["/bin/bash", "-c"]
 
               args:
-                - "bash /home/code/verl/k8s/A3/256die_12k_base_full_mbridge/start.sh ;sleep 7d"
+                - "bash /home/code/verl/k8s/A3/32die_12k_base_cut_mbridge/start.sh ;sleep 7d"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
@@ -91,7 +91,7 @@ spec:
               hostPath:
                 path: /mnt
     Worker:
-      replicas: 15  #Master can only be 1
+      replicas: 1  #Master can only be 1
       restartPolicy: Never
       template:
         metadata:
@@ -110,7 +110,7 @@ spec:
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "bash /home/code/verl/k8s/A3/256die_12k_base_full_mbridge/start.sh ;sleep 7d"
+                - "bash /home/code/verl/k8s/A3/32die_12k_base_cut_mbridge/start.sh ;sleep 7d"
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify

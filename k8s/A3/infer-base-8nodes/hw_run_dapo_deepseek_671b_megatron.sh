@@ -8,7 +8,8 @@ MODEL_PATH="/mnt/hpfs_test/weights/dsv3-base-fp8-zy-bf16"
 
 cd /opt/verl
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
-ray job submit --runtime-env="${RUNTIME_ENV}" --working-dir /opt/verl \
+ray job submit --runtime-env="${RUNTIME_ENV}" \
+    --working-dir /opt/verl \
     -- python3 tests/verl_offline_infer.py \
     ${kwargs[@]} \
     --ray_master_ip $MASTER_ADDR \

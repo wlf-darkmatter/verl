@@ -183,7 +183,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.resume_mode=auto \
     trainer.rollout_data_dir=/mnt/hpfs_test/wlf/${exp_name}/rollout \
     trainer.log_val_generations=10 \
-    +actor_rollout_ref.model.override_config.
+    +actor_rollout_ref.model.override_config.num_hidden_layers=4 \
     trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
 
 

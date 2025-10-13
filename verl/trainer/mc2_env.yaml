@@ -3,7 +3,7 @@ excludes: ["/.git/", "/k8s", "/docker", "/doc", "/tmp", "/kernel_meta", "/plog"]
 env_vars:
 
   VLLM_USE_V1: "1"
-  VLLM_VERSION: "0.9.1"
+  VLLM_VERSION: "0.10.0"
   HCCL_IF_BASE_PORT: "23999"
   HCCL_ASYNC_ERROR_HANDLING: "0"
 
