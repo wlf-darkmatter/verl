@@ -275,7 +275,12 @@ def compute_score(
         Reward score (1.0 for correct, -1.0 for incorrect)
     """
     # Limit solution length for efficiency
-    solution_str = solution_str[-300:]  # The longest answer in MATH-500 has 159 characters
+    if os.getenv("VERL_CUSTOM_REWARD_RULE") == "1":
+        print("\033[32msolution不截断，REWARD_TEST=1\033[0m")
+        solution_str = solution_str
+    else:
+        solution_str = solution_str[-300:]  # The longest answer in MATH-500 has 159 characters
+
 
     # Verify the solution
     correct, pred = verify(solution_str, ground_truth, strict_box_verify, pause_tokens_index)

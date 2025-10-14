@@ -390,6 +390,9 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
 
     def _build_rollout(self, trust_remote_code=False):
         from torch.distributed.device_mesh import init_device_mesh
+        
+        from verl.models.mcore.patch_v012 import apply_patch
+        apply_patch()
 
         # 1. parse rollout and huggingface model config
         rollout_config: RolloutConfig = omega_conf_to_dataclass(self.config.rollout)

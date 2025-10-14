@@ -106,6 +106,9 @@ class MegatronEngine(BaseEngine):
         use_mbridge = self.engine_config.use_mbridge
         if use_mbridge:
             from verl.models.mcore.mbridge import AutoBridge
+            from verl.models.mcore.patch_v012 import apply_patch
+
+            apply_patch()
 
             bridge = AutoBridge.from_config(self.model_config.hf_config)
             bridge.set_extra_args(**self.engine_config.override_transformer_config)
