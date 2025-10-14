@@ -34,7 +34,6 @@ unset LOCAL_RANK
 # export ASCEND_LAUNCH_BLOCKING=1
 
 export NPU_PER_NODE=8  # A2 NPU Number
-export NNODES=16         # example is 4 Nodes
 
 export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according to actual situation
 export ASCEND_PROCESS_LOG_PATH=/home/code/verl/plog/$(basename $(dirname $0))/${RANK}
@@ -51,7 +50,10 @@ cnt=0
 if [ "$RANK" = "0" ]; then
   # head start
   echo "This is head node"
+  mkdir -p ${JOB_LOG_DIR}
+  mkdir -p ${JOB_LOG_DIR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
+  ln -s ${JOB_LOG_DIR}/ray_host /tmp/ray
 
   ray start --head --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 

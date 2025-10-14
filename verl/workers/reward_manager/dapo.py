@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from collections import defaultdict
-
+import os
 import torch
 
 from verl import DataProto
@@ -97,7 +97,9 @@ class DAPORewardManager(AbstractRewardManager):
             rollout_reward_scores = data_item.non_tensor_batch.get("reward_scores", {})
 
             extra_info["rollout_reward_scores"] = rollout_reward_scores
-
+            
+            # if os.getenv("REWARD_DEBUG_ZY", False):
+            #     breakpoint()
             result = self.compute_score(
                 data_source=data_source,
                 solution_str=response_str,

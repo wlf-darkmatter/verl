@@ -6,9 +6,9 @@ export RAY_DEDUP_LOGS=0
 # export HCCL_EXEC_TIMEOUT=3600
 export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
 #! 自定义环境变量
-export VERL_MEMORY_LOG_DIR=/data01/huawei-2025/wlf/tmp/test_vllm_sleep_memory_log
-export VLLM_SLEEP_LEVEL=1
-export VERL_DEBUG_NOSHARDING=0
+export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR}/memory_log
+
+
 
 export ASCEND_GLOBAL_LOG_LEVEL=3
 
@@ -88,7 +88,10 @@ cnt=0
 if [ "$RANK" = "0" ]; then
   # head start
   echo "This is head node"
+  mkdir -p ${JOB_LOG_DIR}
+  mkdir -p ${JOB_LOG_DIR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
+  ln -s ${JOB_LOG_DIR}/ray_host /tmp/ray
 
   ray start --head --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 

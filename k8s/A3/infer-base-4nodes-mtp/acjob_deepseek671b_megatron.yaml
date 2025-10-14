@@ -1,0 +1,160 @@
+apiVersion: mindxdl.gitee.com/v1
+kind: AscendJob
+metadata:
+  name: deepseek671-verl-moe-infer-mtp  #sp-64-train-3b-moe-msrun #需要修改
+  labels:
+    framework: pytorch
+    fault-scheduling: "force"
+    fault-retry-times: "0"
+    ring-controller.atlas: ascend-910b
+    subHealthyStrategy: "ignore"
+  annotations:
+    sp-block: "64"
+spec:
+  schedulerName: volcano    #需要修改 work when enableGangScheduling is true
+  runPolicy:
+    schedulingPolicy:
+      minAvailable: 4    #需要修改， work when enableGangScheduling is true
+      queue: default
+  successPolicy: AllWorkers
+  replicaSpecs:
+    Master:
+      replicas: 1  #Master can only be 1
+      restartPolicy: Never
+      template:
+        metadata:
+          labels:
+            ring-controller.atlas: ascend-910b
+        spec:
+          priorityClassName: system-cluster-critical
+          terminationGracePeriodSeconds: 60
+          automountServiceAccountToken: false
+          hostNetwork: true
+          nodeSelector:                        # modify according to the actual situation
+            host-arch: huawei-arm
+          containers:
+            - name: ascend # do not modify
+              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.7.1-cann_8.2.rc1-py_3.10-aarch64_0928  ##image
+              imagePullPolicy: IfNotPresent
+              command: ["/bin/bash", "-c"]
+
+              args:
+                - "bash /home/code/verl/k8s/A3/infer-base-4nodes/start.sh ;sleep 7d"
+
+              ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
+                - containerPort: 60350        # determined by user
+                  name: ascendjob-port        # do not modify
+                - containerPort: 6666 #modify according to actual situation
+                  name: ray-port
+                - containerPort: 8888 #modify according to actual situation
+                  name: ray-dash-port
+              resources:
+                limits:
+                  huawei.com/Ascend910: 16
+                  memory: "1500Gi"
+                requests:
+                  huawei.com/Ascend910: 16
+                  memory: "1500Gi"
+
+              volumeMounts:
+                - name: npu-smi
+                  mountPath: /usr/local/bin/npu-smi
+                - name: ascend-driver
+                  mountPath: /usr/local/Ascend/driver
+                - name: dshm
+                  mountPath: /dev/shm
+                - name: localtime
+                  mountPath: /etc/localtime
+                - name: start-path
+                  mountPath: /home/code/
+                - name: data-path
+                  mountPath: /mnt
+
+          volumes:
+            - name: dshm
+              emptyDir:
+                medium: Memory
+                sizeLimit: 1000Gi
+            - name: npu-smi
+              hostPath:
+                path: /usr/local/bin/npu-smi
+            - name: ascend-driver
+              hostPath:
+                path: /usr/local/Ascend/driver                     # Configure the NPU driver and mount it to Docker.
+            - name: localtime
+              hostPath:
+                path: /etc/localtime                               # Configure the Docker time.
+            - name: start-path
+              hostPath:
+                path: /mnt/hpfs_test/wlf/
+            - name: data-path
+              hostPath:
+                path: /mnt
+    Worker:
+      replicas: 3  #Master can only be 1
+      restartPolicy: Never
+      template:
+        metadata:
+          labels:
+            ring-controller.atlas: ascend-910b
+        spec:
+          priorityClassName: system-cluster-critical
+          terminationGracePeriodSeconds: 60
+          automountServiceAccountToken: false
+          hostNetwork: true
+          nodeSelector:                        # modify according to the actual situation
+            host-arch: huawei-arm
+          containers:
+            - name: ascend # do not modify
+              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.7.1-cann_8.2.rc1-py_3.10-aarch64_0928  ##image
+              imagePullPolicy: IfNotPresent
+              command: ["/bin/bash", "-c"]
+              args:
+                - "bash /home/code/verl/k8s/A3/infer-base-4nodes/start.sh ;sleep 7d"
+              ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
+                - containerPort: 60350        # determined by user
+                  name: ascendjob-port        # do not modify
+                - containerPort: 6666 #modify according to actual situation
+                  name: ray-port
+                - containerPort: 8888 #modify according to actual situation
+                  name: ray-dash-port
+              resources:
+                limits:
+                  huawei.com/Ascend910: 16
+                  memory: "1500Gi"
+                requests:
+                  huawei.com/Ascend910: 16
+                  memory: "1500Gi"
+              volumeMounts:
+                - name: npu-smi
+                  mountPath: /usr/local/bin/npu-smi
+                - name: ascend-driver
+                  mountPath: /usr/local/Ascend/driver
+                - name: dshm
+                  mountPath: /dev/shm
+                - name: localtime
+                  mountPath: /etc/localtime
+                - name: start-path
+                  mountPath: /home/code/
+                - name: data-path
+                  mountPath: /mnt
+          volumes:
+            - name: dshm
+              emptyDir:
+                medium: Memory
+                sizeLimit: 1000Gi
+            - name: npu-smi
+              hostPath:
+                path: /usr/local/bin/npu-smi
+            - name: ascend-driver
+              hostPath:
+                path: /usr/local/Ascend/driver                     # Configure the NPU driver and mount it to Docker.
+            - name: localtime
+              hostPath:
+                path: /etc/localtime                               # Configure the Docker time.
+            - name: start-path
+              hostPath:
+                path: /mnt/hpfs_test/wlf/
+            - name: data-path
+              hostPath:
+                path: /mnt

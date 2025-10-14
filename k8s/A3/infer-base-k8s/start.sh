@@ -33,7 +33,7 @@ export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 
-export ASCEND_PROCESS_LOG_PATH=/home/code/logs/$(basename $(dirname $0))/plog/${RANK}
+
 
 
 ray stop --force
@@ -51,7 +51,10 @@ cd /home/code/verl
 if [[ "$RANK" = "0" ]]; then
   # head start
   echo "This is head node"
+  mkdir -p ${JOB_LOG_DIR}
+  mkdir -p ${JOB_LOG_DIR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
+  ln -s ${JOB_LOG_DIR}/ray_host /tmp/ray
 
   kwargs=(--is_master --ray_dashboard_port $DashboardPort )
 else

@@ -66,7 +66,7 @@ max_num_batched_tokens=$((6*1024))
 offload=True
 gen_tp=8
 gen_dp=8
-# gen_world_size=$((NNODES*8))
+
 train_tp=8
 train_ep=64
 train_pp=8
@@ -83,7 +83,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     --config-name="dapo_megatron_trainer" \
     actor_rollout_ref.rollout.load_format=safetensors \
     actor_rollout_ref.rollout.skip.enable=True \
-    actor_rollout_ref.rollout.skip.dump_dir="/mnt/hpfs_test/data/wlf/rollout_dump/baseline_gpu" \
+    actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
@@ -107,7 +107,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
-    actor_rollout_ref.model.path="${MODEL_PATH}" \
+    actor_rollout_ref.model.path=${MODEL_PATH} \
     actor_rollout_ref.actor.optim.lr=3e-6 \
     actor_rollout_ref.actor.optim.weight_decay=0.1 \
     actor_rollout_ref.actor.ppo_mini_batch_size=${train_prompt_mini_bsz} \
@@ -166,7 +166,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.ref.load_weight=True \
     trainer.project_name="${project_name}" \
     trainer.experiment_name="${exp_name}" \
-    trainer.rollout_data_dir=/home/code/logs/$(basename $(dirname $0))/rollout \
+    trainer.rollout_data_dir=${JOB_LOG_DIR}/rollout_data_dir \
     trainer.n_gpus_per_node=16 \
     trainer.nnodes="${NNODES}" \
     trainer.val_before_train=False \
@@ -180,8 +180,4 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
 
 
-sleep 600
-ray_name=$(cat /tmp/ray.output | grep "submitted successfully" | awk -F "'" '{print $2}')
-ray_name=${ray_name//\'}
-echo "ray_name: $ray_name"
-ray job logs $ray_name --follow | tee $(dirname $0)/ray.log
+

@@ -119,7 +119,7 @@ python3 -m recipe.dapo.main_dapo \
     algorithm.use_kl_in_reward=${use_kl_in_reward} \
     algorithm.kl_penalty=${kl_penalty} \
     algorithm.kl_ctrl.kl_coef=${kl_coef} \
-    actor_rollout_ref.model.path="${MODEL_PATH}" \
+    actor_rollout_ref.model.path=${MODEL_PATH} \
     actor_rollout_ref.actor.use_kl_loss=${use_kl_loss} \
     actor_rollout_ref.actor.kl_loss_coef=${kl_loss_coef} \
     actor_rollout_ref.actor.policy_loss.loss_mode=vanilla \
@@ -216,5 +216,5 @@ python3 -m recipe.dapo.main_dapo \
     trainer.total_epochs=10 \
     trainer.default_local_dir=$EXP_DIR \
     trainer.resume_mode=auto \
-    trainer.rollout_data_dir=$EXP_DIR/rollout \
+    trainer.rollout_data_dir=${JOB_LOG_DIR}/rollout_data_dir \
     trainer.log_val_generations=10 2>&1 | tee $EXP_DIR/run_$(date +%Y%m%d%H%M%S).log

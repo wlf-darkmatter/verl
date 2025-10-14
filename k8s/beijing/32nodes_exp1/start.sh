@@ -5,8 +5,8 @@ export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
 export RAY_DEDUP_LOGS=0
 # export HCCL_EXEC_TIMEOUT=3600
 
-export VLLM_SLEEP_LEVEL=1
-export VERL_DEBUG_NOSHARDING=0
+
+
 
 export ASCEND_GLOBAL_LOG_LEVEL=3
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
@@ -71,7 +71,10 @@ cnt=0
 if [ "$RANK" = "0" ]; then
   # head start
   echo "This is head node"
+  mkdir -p ${JOB_LOG_DIR}
+  mkdir -p ${JOB_LOG_DIR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
+  ln -s ${JOB_LOG_DIR}/ray_host /tmp/ray
 
   ray start --head --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 

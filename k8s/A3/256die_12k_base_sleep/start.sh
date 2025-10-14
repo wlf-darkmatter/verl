@@ -9,9 +9,14 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 
 
 #! 注意，自定义配置
+# * 确保 JOB_LOG_DIR 在共享盘下
+export JOB_LOG_DIR=/home/code/logs/$(basename $(dirname $0))/$(date +"%Y-%m-%d")
+export ASCEND_PROCESS_LOG_PATH=${JOB_LOG_DIR}/plog/${RANK}
+
+
 export VLLM_SLEEP_LEVEL=2
-export VERL_DEBUG_NOSHARDING=0
-export VERL_MEMORY_LOG_DIR="/home/code/logs/memory/512die_12k_base_sleep2"
+
+export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR}/memory_log
 export VERL_CUSTOM_REWARD_RULE="1"
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
@@ -82,7 +87,10 @@ cnt=0
 if [ "$RANK" = "0" ]; then
   # head start
   echo "This is head node"
+  mkdir -p ${JOB_LOG_DIR}
+  mkdir -p ${JOB_LOG_DIR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
+  ln -s ${JOB_LOG_DIR}/ray_host /tmp/ray
 
   ray start --head --ray-debugger-external --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 

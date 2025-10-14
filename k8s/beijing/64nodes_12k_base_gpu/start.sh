@@ -6,7 +6,7 @@ export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
 export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
 export VLLM_SLEEP_LEVEL=0
-export VERL_DEBUG_NOSHARDING=0
+
 
 export ASCEND_GLOBAL_LOG_LEVEL=3
 
@@ -21,7 +21,7 @@ export ACL_DEVICE_SYNC_TIMEOUT=7200
 export HCCL_ASYNC_ERROR_HANDLING=0
 
 #内存打印
-#export VERL_MEMORY_LOG_DIR="/home/code/verl/tmp/exp_12k_base_gpu"
+#export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR}/memory_log
 unset VERL_MEMORY_LOG_DIR
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
@@ -86,7 +86,10 @@ cnt=0
 if [ "$RANK" = "0" ]; then
   # head start
   echo "This is head node"
+  mkdir -p ${JOB_LOG_DIR}
+  mkdir -p ${JOB_LOG_DIR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
+  ln -s ${JOB_LOG_DIR}/ray_host /tmp/ray
 
   ray start --head --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 

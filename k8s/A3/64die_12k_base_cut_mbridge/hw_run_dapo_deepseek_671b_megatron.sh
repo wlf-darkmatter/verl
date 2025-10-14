@@ -16,18 +16,18 @@ kl_loss_coef=0.001
 
 clip_ratio_low=0.2
 clip_ratio_high=0.28
-max_prompt_length=$((1024 * 2))
-max_response_length=$((1024 * 12))
+max_prompt_length=$((512 * 1))
+max_response_length=$((512 * 1))
 enable_overlong_buffer=True
 overlong_buffer_len=$((1024 * 1))
 overlong_penalty_factor=1.0
 
 loss_agg_mode="token-mean"
 train_prompt_bsz=32
-n_resp_per_prompt=16
-train_prompt_mini_bsz=32
-train_ppo_micro_batch_size_per_gpu=2
-infer_ppo_micro_batch_size_per_gpu=2
+n_resp_per_prompt=8
+train_prompt_mini_bsz=1
+train_ppo_micro_batch_size_per_gpu=1
+infer_ppo_micro_batch_size_per_gpu=1
 # Paths
 MODEL_PATH="/mnt/hpfs_test/weights/dsv3-base-fp8-wlf-bf16"
 MCORE_MODEL_PATH="/mnt/hpfs_test/weights/dsv3_base_bf16_mcore_zy_hs_mtp0"
@@ -67,13 +67,19 @@ last_layer=2
 offload=True
 gen_tp=4
 gen_dp=2
-# gen_world_size=$((NNODES*8))
+
 train_tp=8
-train_ep=1
-train_pp=1
+train_ep=32
+train_pp=2
 enable_filter_group=False
 train_cp=1
 #    +actor_rollout_ref.actor.megatron.override_transformer_config.context_parallel_size=${train_cp} \
+#    trainer.rollout_data_dir=${JOB_LOG_DIR}/rollout_data_dir \
+    # ++actor_rollout_ref.actor.megatron.override_transformer_config.attention_backend=fused \
+
+    # mbridge false
+    # actor_rollout_ref.actor.load_weight=False \
+    # actor_rollout_ref.ref.load_weight=False \
 ETP=1
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 cd /opt/verl
@@ -83,7 +89,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     --config-name="dapo_megatron_trainer" \
     actor_rollout_ref.rollout.load_format=safetensors \
     actor_rollout_ref.rollout.skip.enable=False \
-    actor_rollout_ref.rollout.skip.dump_dir="/mnt/hpfs_test/data/wlf/rollout_dump/baseline_gpu" \
+    actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
@@ -97,7 +103,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     algorithm.use_kl_in_reward=${use_kl_in_reward} \
     algorithm.kl_penalty=${kl_penalty} \
     algorithm.kl_ctrl.kl_coef=${kl_coef} \
-    actor_rollout_ref.model.path="${MODEL_PATH}" \
+    actor_rollout_ref.model.path=${MODEL_PATH} \
     actor_rollout_ref.actor.use_kl_loss=${use_kl_loss} \
     actor_rollout_ref.actor.kl_loss_coef=${kl_loss_coef} \
     actor_rollout_ref.actor.policy_loss.loss_mode=vanilla \
@@ -134,6 +140,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_method=uniform \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_granularity=full \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=1 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.multi_latent_attention=True \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
     actor_rollout_ref.rollout.load_format=safetensors \
@@ -181,14 +188,11 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.total_epochs=10 \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
-    trainer.rollout_data_dir=/home/code/logs/$(basename $(dirname $0))/rollout \
     trainer.log_val_generations=10 \
     +actor_rollout_ref.model.override_config.model_config.num_hidden_layers=4 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.position_embedding_type='rope' \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.use_fused_rotary_pos_emb=True \
     trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
 
 
-sleep 600
-ray_name=$(cat /tmp/ray.output | grep "submitted successfully" | awk -F "'" '{print $2}')
-ray_name=${ray_name//\'}
-echo "ray_name: $ray_name"
-ray job logs $ray_name --follow | tee $(dirname $0)/ray.log
+

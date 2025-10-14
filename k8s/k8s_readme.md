@@ -1,13 +1,15 @@
 # 通用部分
 
+
+
 watch kubectl get pods -n rein-learing
 
 tail -f /tmp/ray/session_latest/logs/job-driver
 
 ## 监控内存打印
 
-```
-export VERL_MEMORY_LOG_DIR="/home/code/logs/memory/512die_12k_base_sleep2"
+```bash
+export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR}/memory_log
 ```
 
 网页分析使用关键词：

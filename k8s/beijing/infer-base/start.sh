@@ -58,7 +58,10 @@ cd /home/code/verl
 if [[ "$RANK" = "0" ]]; then
   # head start
   echo "This is head node"
+  mkdir -p ${JOB_LOG_DIR}
+  mkdir -p ${JOB_LOG_DIR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
+  ln -s ${JOB_LOG_DIR}/ray_host /tmp/ray
 
   kwargs=(--is_master --ray_dashboard_port $DashboardPort )
 else

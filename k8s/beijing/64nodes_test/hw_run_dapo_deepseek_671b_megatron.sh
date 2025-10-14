@@ -64,7 +64,7 @@ offload=True
 gen_tp=8
 gen_dp=32 #! 无法大于 64. assert self.num_local_experts > 0, "Expected at least one expert"
 
-# gen_world_size=$((NNODES*8))
+
 train_tp=4
 train_ep=16
 train_pp=8
