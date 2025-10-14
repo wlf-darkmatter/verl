@@ -43,6 +43,7 @@ else
 fi
 
 ray stop --force
+sleep 10
 
 python k8s/test_comm.py \
     --ray_init \

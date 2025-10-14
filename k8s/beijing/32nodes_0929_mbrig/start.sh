@@ -58,6 +58,7 @@ export ASCEND_PROCESS_LOG_PATH=/home/code/verl/plog/$(basename $(dirname $0))/${
 
 
 ray stop --force
+sleep 10
 rm -rf /tmp/ray
 rm -rf /opt/verl
 cp -r /home/code/verl /opt/verl
@@ -91,7 +92,7 @@ if [ "$RANK" = "0" ]; then
 
     echo "Waiting for Ray to allocate $((NNODES*NPU_PER_NODE)) devices. Current device count: $npu_count_int"
     cnt=$((cnt+1))
-    sleep 10
+
   done
 
 else
@@ -111,6 +112,8 @@ while true; do
   if [[ $cnt -gt 100 ]]; then
     echo "Job $ray_name start failed"
     ray stop --force
+    sleep 10
+
     rm -rf /tmp
     exit 1
   fi
@@ -128,6 +131,8 @@ while true; do
   if [[ -n $gcs_error ]]; then
     echo "ray cannot connect，Job $ray_name exit with exception"
     ray stop --force
+    sleep 10
+
    # rm -rf /tmp
     exit 1
   fi
@@ -135,6 +140,8 @@ while true; do
 
   if [[ -n $succeeded ]]; then
     ray stop --force
+    sleep 10
+
  #   rm -rf /tmp
     echo "Job $ray_name exit without exception"
     exit 0
@@ -143,6 +150,8 @@ while true; do
 #   if [[ -n $failed ]]; then
 #     echo "Job $ray_name exit with exception"
 #     ray stop --force
+    sleep 10
+
 # #    rm -rf /tmp
 #     exit 1
 #   fi

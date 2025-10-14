@@ -37,6 +37,7 @@ export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 
 ray stop --force
+sleep 10
 rm -rf /tmp/ray
 rm -rf /opt/verl
 cp -r /home/code/verl /opt/verl

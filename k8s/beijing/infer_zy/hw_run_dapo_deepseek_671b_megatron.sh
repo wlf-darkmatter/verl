@@ -30,6 +30,7 @@ export ASCEND_PROCESS_LOG_PATH=/home/code/verl/plog/$(basename $(dirname $0))/${
 
 
 ray stop --force
+sleep 10
 rm -rf /tmp
 
 export ServerPort=6666     # modify according to actual situation

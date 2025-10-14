@@ -57,6 +57,7 @@ export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according t
 export ASCEND_PROCESS_LOG_PATH=/opt/verl/logs/$MINDX_TASK_ID/plog # modify according to actual situation
 
 ray stop --force
+sleep 10
 rm -rf /tmp/ray
 rm -rf /opt/verl
 cp -r /home/new_verl /opt/verl
