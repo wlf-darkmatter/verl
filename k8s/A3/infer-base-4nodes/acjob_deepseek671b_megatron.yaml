@@ -69,6 +69,8 @@ spec:
                   mountPath: /home/code/
                 - name: data-path
                   mountPath: /mnt
+                - name: tmp-path
+                  mountPath: /tmp
 
           volumes:
             - name: dshm
@@ -90,6 +92,9 @@ spec:
             - name: data-path
               hostPath:
                 path: /mnt
+            - name: tmp-path
+              hostPath:
+                path: /mnt/nv03
     Worker:
       replicas: 3  #Master can only be 1
       restartPolicy: Never
@@ -138,6 +143,8 @@ spec:
                   mountPath: /home/code/
                 - name: data-path
                   mountPath: /mnt
+                - name: tmp-path
+                  mountPath: /tmp
           volumes:
             - name: dshm
               emptyDir:
@@ -158,3 +165,6 @@ spec:
             - name: data-path
               hostPath:
                 path: /mnt
+            - name: tmp-path
+              hostPath:
+                path: /mnt/nv03

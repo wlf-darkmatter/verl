@@ -32,7 +32,6 @@ infer_ppo_micro_batch_size_per_gpu=2
 MODEL_PATH="/mnt/hpfs_test/weights/dsv3-base-fp8-zy-bf16"
 MCORE_MODEL_PATH="/mnt/hpfs_test/weights/dsv3_base_bf16_mcore_zy_hs_mtp0"
 DIST_CKPT_PATH="/mnt/hpfs_test/weights/dsv3_base_bf16_mcore_zy_hs_mtp0"
-RAY_DATA_HOME="/opt"
 CKPTS_DIR=/mnt/hpfs_test/weights/CKPT/ckpt-DAPO-DeepSeek-671b-megatron-base-2k12k-1014-0827images
 TRAIN_FILE="/mnt/hpfs_test/data/rl_data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
 TEST_FILE="/mnt/hpfs_test/data/rl_data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"

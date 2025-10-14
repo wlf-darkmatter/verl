@@ -10,10 +10,17 @@ CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){
 #######################################
 #! 规避模型加载时 权重读取错误的问题
 rm -f /opt/vllm/vllm/model_executor/model_loader/base_loader.py
-cp -f /home/code/verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/model_loader/base_loader.py
+cp -f /home/code/verl/k8s/patch/0827/base_loader.py /opt/vllm/vllm/model_executor/model_loader/base_loader.py
 
 rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
-cp -f /home/code/verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+cp -f /home/code/verl/k8s/patch/0827/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+
+rm -f /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
+cp -f /home/code/verl/k8s/patch/0827/vllm_ascend/ops/fused_moe.py /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
+
+#! [Megatron]
+rm -f /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
+cp -f /home/code/verl/k8s/patch/0827/megatron/dot_product_attention.py /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
 #######################################
 source /usr/local/Ascend/ascend-toolkit/set_env.sh;
 source /usr/local/Ascend/nnal/atb/set_env.sh;
@@ -28,9 +35,6 @@ unset LOCAL_RANK
 
 export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=8         # example is 4 Nodes
-
-
-
 
 
 ray stop --force
