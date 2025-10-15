@@ -10,11 +10,13 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
 export TASK_QUEUE_ENABLE=2
-#! 注意，1001 加了这 几个超时配置
+#! 注意，HCCL 相关配置
 export HCCL_EXEC_TIMEOUT=86400
 export HCCL_EVENT_TIMEOUT=86400
 export ACL_DEVICE_SYNC_TIMEOUT=86400
 export HCCL_ASYNC_ERROR_HANDLING=0
+export P2P_HCCL_BUFFSIZE=30
+export HCCL_BUFFSIZE=300
 export P2P_HCCL_BUFFSIZE=20
 export HCCL_BUFFSIZE=300
 export VLLM_ASCEND_ENABLE_MOE_ALL2ALL_SEQ=1

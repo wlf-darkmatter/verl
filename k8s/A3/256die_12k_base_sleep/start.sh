@@ -23,12 +23,14 @@ export VERL_CUSTOM_REWARD_RULE="1"
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
 export TASK_QUEUE_ENABLE=2
-#! 注意，1001 加了这 几个超时配置
+#! 注意，HCCL 相关配置
 export HCCL_EXEC_TIMEOUT=7200
 export HCCL_EVENT_TIMEOUT=7200
 export HCCL_CONNECT_TIMEOUT=7200
 export ACL_DEVICE_SYNC_TIMEOUT=7200
 export HCCL_ASYNC_ERROR_HANDLING=0
+export P2P_HCCL_BUFFSIZE=30
+export HCCL_BUFFSIZE=300
 
 #! 注意，1003 加了这 几个超时配置
 export RAY_DEBUG_POST_MORTEM=1
