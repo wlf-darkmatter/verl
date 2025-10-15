@@ -37,19 +37,22 @@ export RAY_DEBUG_POST_MORTEM=0
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
-#######################################
+#! #################  【0928】  #####################
 #! 规避模型加载时 权重读取错误的问题
-rm -f /opt/vllm/vllm/model_executor/model_loader/base_loader.py
-cp -f /home/code/verl/k8s/patch/base_loader.py /opt/vllm/vllm/model_executor/model_loader/base_loader.py
 
+#! [VLLM]
+#* 规避直接读 hf 权重的报错（出现减层或者带有MTP）
 rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
-cp -f /home/code/verl/k8s/patch/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+cp -f /home/code/verl/k8s/patch/0928/vllm/vllm/model_executor/models/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 
-rm -f /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
-cp -f /home/code/verl/k8s/patch/vllm_ascend/ops/fused_moe.py /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
+#! [VLLM-ASCEND]
 
+rm -f /opt/vllm-ascend/vllm_ascend/models/deepseek_v2.py
+cp -f /home/code/verl/k8s/patch/0928/vllm-ascend/vllm_ascend/models/deepseek_v2.py /opt/vllm-ascend/vllm_ascend/models/deepseek_v2.py
+
+#! [Megatron]
 rm -f /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
-cp -f /home/code/verl/k8s/patch/megatron/dot_product_attention.py /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
+cp -f /home/code/verl/k8s/patch/0928/Megatron-LM/megatron/dot_product_attention.py /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
 
 #######################################
 
@@ -70,13 +73,18 @@ export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 export ASCEND_PROCESS_LOG_PATH=/home/code/logs/$(basename $(dirname $0))/plog/1009_tp8/${RANK}
 
-
-
 ray stop --force
-sleep 10
-rm -rf /tmp/ray
-rm -rf /opt/verl
-cp -r /home/code/verl /opt/verl
+sleep 1
+echo "Overwrite verl code"
+#* 提速 ray 拉起速度
+if [[ -f /home/code/verl/docker/pkg/rsync ]];then
+   /home/code/verl/docker/pkg/rsync -az /home/code/verl/* /opt/verl/ --exclude=**/kernel_meta --exclude=plog --exclude=docker --exclude=docs
+else
+  unalias cp
+  cp -rf /home/code/verl/* /opt/verl/
+fi
+echo "Overwrite verl code, done."
+
 rm -f /opt/verl/.gitignore
 cd $(dirname $0)
 
@@ -113,6 +121,7 @@ if [ "$RANK" = "0" ]; then
 
 else
   echo "This is worker node"
+  sleep 10
   ray start --address="$MASTER_ADDR:$ServerPort" --disable-usage-stats
 fi
 

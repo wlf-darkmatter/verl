@@ -75,6 +75,7 @@ if [ "$RANK" = "0" ]; then
 
 else
   echo "This is worker node"
+  sleep 10
   ray start --address="$MASTER_ADDR:$ServerPort" --disable-usage-stats
 fi
 

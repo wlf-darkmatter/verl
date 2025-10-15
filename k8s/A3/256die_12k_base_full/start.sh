@@ -73,13 +73,18 @@ export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 export ASCEND_PROCESS_LOG_PATH=/home/code/logs/$(basename $(dirname $0))/plog/1009/${RANK}
 
-
-
 ray stop --force
-sleep 10
-rm -rf /tmp/ray
-rm -rf /opt/verl
-cp -r /home/code/verl /opt/verl
+sleep 1
+echo "Overwrite verl code"
+#* 提速 ray 拉起速度
+if [[ -f /home/code/verl/docker/pkg/rsync ]];then
+   /home/code/verl/docker/pkg/rsync -az /home/code/verl/* /opt/verl/ --exclude=**/kernel_meta --exclude=plog --exclude=docker --exclude=docs
+else
+  unalias cp
+  cp -rf /home/code/verl/* /opt/verl/
+fi
+echo "Overwrite verl code, done."
+
 rm -f /opt/verl/.gitignore
 cd $(dirname $0)
 
@@ -116,6 +121,7 @@ if [ "$RANK" = "0" ]; then
 
 else
   echo "This is worker node"
+  sleep 10
   ray start --address="$MASTER_ADDR:$ServerPort" --disable-usage-stats
 fi
 

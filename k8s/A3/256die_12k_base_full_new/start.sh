@@ -77,13 +77,18 @@ export ASCEND_PROCESS_LOG_PATH=/home/code/logs/$(basename $(dirname $0))/plog/10
 #! REWARD_DEBUG_ZY环境变量
 # export REWARD_DEBUG_ZY="1"
 export REWARD_TEST=="1"
-
-
 ray stop --force
-sleep 10
-rm -rf /tmp/ray
-rm -rf /opt/verl
-cp -r /home/code/verl /opt/verl
+sleep 1
+echo "Overwrite verl code"
+#* 提速 ray 拉起速度
+if [[ -f /home/code/verl/docker/pkg/rsync ]];then
+  /home/code/verl/docker/pkg/rsync -avzP /home/code/verl/* /opt/verl/ --exclude=**/kernel_meta --exclude=plog --exclude=docker --exclude=docs
+else
+  unalias cp
+  cp -rf /home/code/verl/* /opt/verl/
+fi
+echo "Overwrite verl code, done."
+
 rm -f /opt/verl/.gitignore
 cd $(dirname $0)
 
@@ -120,6 +125,7 @@ if [ "$RANK" = "0" ]; then
 
 else
   echo "This is worker node"
+  sleep 10
   ray start --address="$MASTER_ADDR:$ServerPort" --disable-usage-stats
 fi
 
