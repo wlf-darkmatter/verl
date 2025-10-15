@@ -11,7 +11,7 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 #! 注意，自定义配置
 # * 确保 JOB_LOG_DIR 在共享盘下
 export JOB_LOG_DIR=/home/code/logs/$(basename $(dirname $0))
-export JOB_LOG_DIR_CURR=${JOB_LOG_DIR}/$(date +"%Y-%m-%d")
+export JOB_LOG_DIR_CURR=${JOB_LOG_DIR}/$(date +"%Y-%m-%d_%H")
 export ASCEND_PROCESS_LOG_PATH=${JOB_LOG_DIR_CURR}/plog/${RANK}
 
 
@@ -77,6 +77,7 @@ export ASCEND_PROCESS_LOG_PATH=/home/code/logs/$(basename $(dirname $0))/plog/10
 #! REWARD_DEBUG_ZY环境变量
 # export REWARD_DEBUG_ZY="1"
 export REWARD_TEST=="1"
+rm -rf /tmp/ray
 ray stop --force
 sleep 1
 echo "Overwrite verl code"

@@ -169,7 +169,7 @@ def main(
         "The president of the United States is",
         "The capital of France is",
         "The future of AI is",
-    ] * 10
+    ] * 100
     sampling_params = SamplingParams(
         temperature=temperature,
         top_p=0.95,

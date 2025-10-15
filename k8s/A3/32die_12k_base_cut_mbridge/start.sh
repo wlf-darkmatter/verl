@@ -11,7 +11,7 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 #! 注意，自定义配置
 # * 确保 JOB_LOG_DIR 在共享盘下
 export JOB_LOG_DIR=/home/code/logs/$(basename $(dirname $0))
-export JOB_LOG_DIR_CURR=${JOB_LOG_DIR}/$(date +"%Y-%m-%d")
+export JOB_LOG_DIR_CURR=${JOB_LOG_DIR}/$(date +"%Y-%m-%d_%H")
 export ASCEND_PROCESS_LOG_PATH=${JOB_LOG_DIR_CURR}/plog/${RANK}
 export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR_CURR}/memory_log
 
@@ -79,6 +79,7 @@ export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 export ASCEND_PROCESS_LOG_PATH=/home/code/logs/$(basename $(dirname $0))/plog/1009/${RANK}
 
+rm -rf /tmp/ray
 ray stop --force
 sleep 1
 echo "Overwrite verl code"
