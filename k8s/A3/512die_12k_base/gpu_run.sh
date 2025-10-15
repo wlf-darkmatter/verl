@@ -216,5 +216,5 @@ python3 -m recipe.dapo.main_dapo \
     trainer.total_epochs=10 \
     trainer.default_local_dir=$EXP_DIR \
     trainer.resume_mode=auto \
-    trainer.rollout_data_dir=${JOB_LOG_DIR}/rollout_data_dir \
+    trainer.rollout_data_dir=${JOB_LOG_DIR_CURR}/rollout_data_dir \
     trainer.log_val_generations=10 2>&1 | tee $EXP_DIR/run_$(date +%Y%m%d%H%M%S).log

@@ -74,7 +74,7 @@ train_pp=4
 enable_filter_group=False
 train_cp=1
 #    +actor_rollout_ref.actor.megatron.override_transformer_config.context_parallel_size=${train_cp} \
-#    trainer.rollout_data_dir=${JOB_LOG_DIR}/rollout_data_dir \
+#    trainer.rollout_data_dir=${JOB_LOG_DIR_CURR}/rollout_data_dir \
     # ++actor_rollout_ref.actor.megatron.override_transformer_config.attention_backend=fused \
 
     # mbridge false

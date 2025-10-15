@@ -87,10 +87,10 @@ cnt=0
 if [ "$RANK" = "0" ]; then
   # head start
   echo "This is head node"
-  mkdir -p ${JOB_LOG_DIR}
-  mkdir -p ${JOB_LOG_DIR}/ray_host
+  mkdir -p ${JOB_LOG_DIR_CURR}
+  mkdir -p ${JOB_LOG_DIR_CURR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
-  ln -s ${JOB_LOG_DIR}/ray_host /tmp/ray
+  ln -s ${JOB_LOG_DIR_CURR}/ray_host /tmp/ray
 
   ray start --head --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 

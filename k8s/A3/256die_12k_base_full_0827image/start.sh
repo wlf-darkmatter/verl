@@ -10,13 +10,10 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 
 #! 注意，自定义配置
 # * 确保 JOB_LOG_DIR 在共享盘下
-export JOB_LOG_DIR=/home/code/logs/$(basename $(dirname $0))/$(date +"%Y-%m-%d")
-export ASCEND_PROCESS_LOG_PATH=${JOB_LOG_DIR}/plog/${RANK}
-
-
-
-
-export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR}/memory_log
+export JOB_LOG_DIR=/home/code/logs/$(basename $(dirname $0))
+export JOB_LOG_DIR_CURR=${JOB_LOG_DIR}/$(date +"%Y-%m-%d")
+export ASCEND_PROCESS_LOG_PATH=${JOB_LOG_DIR_CURR}/plog/${RANK}
+export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR_CURR}/memory_log
 export VERL_CUSTOM_REWARD_RULE="1"
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
@@ -86,10 +83,10 @@ cnt=0
 if [ "$RANK" = "0" ]; then
   # head start
   echo "This is head node"
-  mkdir -p ${JOB_LOG_DIR}
-  mkdir -p ${JOB_LOG_DIR}/ray_host
+  mkdir -p ${JOB_LOG_DIR_CURR}
+  mkdir -p ${JOB_LOG_DIR_CURR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
-  ln -s ${JOB_LOG_DIR}/ray_host /tmp/ray
+  ln -s ${JOB_LOG_DIR_CURR}/ray_host /tmp/ray
 
   ray start --head --ray-debugger-external --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 
