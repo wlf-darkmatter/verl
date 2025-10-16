@@ -18,6 +18,10 @@ export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR}/memory_log
 ["Total:", "Allocated:", "Reserved:", "Cached:"]
 ```
 
+git clone https://github.com/HuangShiqing/memory_viz_plus.git
+cd memory_viz_plus
+python ./_memory_viz.py trace_plot mem_snapshot.pickle -o mem_snapshot -p 1
+
 ## 观测指标
 
 ```python
