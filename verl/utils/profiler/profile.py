@@ -15,6 +15,7 @@
 import functools
 import os
 from typing import Callable, Optional
+from omegaconf import OmegaConf
 
 import torch
 import torch.distributed
@@ -217,6 +218,8 @@ class DistProfiler:
             self._impl = Profiler(config=config, tool_config=tool_config)
         elif self._tool == "torch_memory":
             self._impl = TorchMemoryProfiler(rank=rank, config=config, tool_config=tool_config)
+        elif self._tool == "torch_memory_split":
+            self._impl = TorchMemoryProfilerSplit(rank=rank, config=config, tool_config=tool_config)
         else:
             # Fallback to a no-op impl
             self._impl = _NoOpProfiler()
@@ -341,6 +344,83 @@ class TorchMemoryProfiler:
             return self.rank in self.config.ranks
         # default rank 0
         return self.rank == 0
+
+
+class TorchMemoryProfilerSplit(TorchMemoryProfiler):
+    """Profiler that dumps CUDA memory snapshots at step boundaries.
+
+    Behavior:
+    - On first construction (per process), enable memory history recording if CUDA is available
+    - On start(step=X), remember sub_dir for this step
+    - On stop(), dump a memory snapshot into config.save_path under the remembered sub_dir
+    """
+
+    _memory_history_enabled: bool = False
+
+    def __init__(
+        self, rank: int, config: Optional[ProfilerConfig], tool_config: Optional[TorchMemoryToolConfig] = None
+    ):
+        # Always respond to explicit start/stop calls for torch_memory tool,
+        # regardless of per-role enable flag, to align with global step control.
+        self.enable = True
+        if not config:
+            config = ProfilerConfig(ranks=[])
+        self.config = config
+        self.rank = rank
+        self.this_step = False
+        self.sub_dir = None
+        self.tag = "torch_memory"
+
+        self.sampler = MemorySnapshotSampler()
+
+        # Get parameters from tool_config, with fallback to defaults
+        if tool_config:
+            trace_alloc_max_entries = tool_config.trace_alloc_max_entries
+            stack_depth = tool_config.stack_depth
+        else:
+            trace_alloc_max_entries = 100_000
+            stack_depth = 32
+
+        self.trace_alloc_max_entries = trace_alloc_max_entries
+        self.stack_depth = stack_depth
+
+        # Best-effort enable memory history once
+        print(f"Using custom snapshot.", flush=True)
+        if not TorchMemoryProfiler._memory_history_enabled:
+            try:
+                enable_memory_visualize(trace_alloc_max_entries=trace_alloc_max_entries, stack_depth=stack_depth)
+            except Exception:
+                # silently ignore if not supported
+                pass
+            TorchMemoryProfiler._memory_history_enabled = True
+
+    def start(self, **kwargs):
+        if not self.enable:
+            return
+        if not self._should_profile_this_rank():
+            return
+
+        enable_memory_visualize(trace_alloc_max_entries=self.trace_alloc_max_entries, stack_depth=self.stack_depth)
+        profile_step = kwargs.get("profile_step", None)
+        self.tag = kwargs.get("tag", "snapshot")
+
+        # Keep ranks aligned under same folder name
+        self.sub_dir = f"step{profile_step}" if profile_step is not None else None
+        self.this_step = True
+
+
+    def stop(self):
+        if not self.enable or not self.this_step:
+            return
+        self.this_step = False
+        if not self._should_profile_this_rank():
+            return
+        out_dir = self.config.save_path or "outputs/profile"
+        # Dump snapshot; all ranks write into same sub_dir
+        try:
+            self.sampler.dump_memory_snapshot(out_dir=out_dir, tag=self.tag, sub_dir=self.sub_dir)
+        except Exception:
+            pass
 
 
 class DistProfilerExtension:

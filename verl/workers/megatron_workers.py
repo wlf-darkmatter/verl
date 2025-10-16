@@ -194,11 +194,13 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
         if not torch.distributed.is_initialized():
             set_numa_affinity()
             rank = int(os.environ["LOCAL_RANK"])
+            print(f"\033[32m开始建链 local_rank: {rank}\033[0m", flush=True)
             torch.distributed.init_process_group(
                 backend=get_nccl_backend(),
                 timeout=datetime.timedelta(seconds=self.config.get("nccl_timeout", 600)),
                 init_method=os.environ.get("DIST_INIT_METHOD", None),
             )
+            print(f"\033[33m 建链 Done\033[0m", flush=True)
             get_torch_device().set_device(rank)
 
             mpu.initialize_model_parallel(
@@ -393,7 +395,7 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
 
     def _build_rollout(self, trust_remote_code=False):
         from torch.distributed.device_mesh import init_device_mesh
-        
+
         from verl.models.mcore.patch_v012 import apply_patch
         apply_patch()
 
