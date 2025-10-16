@@ -449,3 +449,58 @@ class DistProfilerExtension:
     def stop_profile(self) -> None:
         """Stop profiling for the current rank in the current training step."""
         self.profiler.stop()
+
+    @register(dispatch_mode=Dispatch.ONE_TO_ALL)
+    def dump_memory_snapshot(self, tag: str = "manual", sub_dir: str = None) -> None:
+        """Manually trigger a CUDA memory snapshot dump on all ranks."""
+        # Memory snapshot is now handled by the profiler system
+        # This method is kept for backward compatibility but delegates to profiler
+        breakpoint()
+        if hasattr(self, "profiler") and hasattr(self.profiler, "_impl"):
+            try:
+                # Try to use the profiler's memory snapshot functionality
+                if hasattr(self.profiler._impl, "sampler"):
+                    out_dir = OmegaConf.select(self.config, "actor.profiler.save_path") or "."
+                    self.profiler._impl.sampler.dump_memory_snapshot(out_dir=out_dir, tag=tag, sub_dir=sub_dir)
+            except Exception:
+                # silently ignore if profiler doesn't support memory snapshots
+                pass
+
+    # @register(dispatch_mode=Dispatch.ONE_TO_ALL)
+    def custom_memory_snapshot_start(self, tag: str = "manual", sub_dir: str = None) -> None:
+        pass
+        if os.getenv("VERL_CUSTOM_SNAPSHOT_DIR", "") == "":
+            return
+        if not hasattr(self, "dict_curr_step"):
+            self.dict_curr_step = {}
+        self.dict_curr_step.setdefault(tag, 0)
+
+
+        print(f"\033[32m开启自定义内存快照: {tag}\033[0m", flush=True)
+        #* 不区分 rank
+        trace_alloc_max_entries = 100_000
+        stack_depth = 50
+        enable_memory_visualize(trace_alloc_max_entries=trace_alloc_max_entries, stack_depth=stack_depth)
+
+    @register(dispatch_mode=Dispatch.ONE_TO_ALL)
+    def custom_memory_snapshot_stop(self, tag: str = "manual") -> None:
+        if os.getenv("VERL_CUSTOM_SNAPSHOT_DIR", "") == "":
+            return
+        self.dict_curr_step[tag] += 1
+
+        from verl.utils.device import get_torch_device, is_cuda_available
+        from pathlib import Path
+
+        path_dir = Path(os.getenv("VERL_CUSTOM_SNAPSHOT_DIR"))
+        path_dir.mkdir(exist_ok=True, parents=True)
+        print(f"\033[32m保存自定义内存快照: {tag}\033[0m", flush=True)
+        device = get_torch_device()
+        device.synchronize()
+
+        pid = os.getpid()
+        rank = os.environ.get("RANK", "0")
+        fname = f"Step_{self.dict_curr_step[tag]}-{tag}_rank{rank}_pid{pid}.pickle"
+        device.memory._dump_snapshot(path_dir/fname)
+
+        #! 这个地方持疑
+        device.memory._record_memory_history()

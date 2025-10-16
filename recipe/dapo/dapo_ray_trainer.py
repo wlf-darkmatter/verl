@@ -114,14 +114,11 @@ class RayDAPOTrainer(RayPPOTrainer):
 
                 #*
                 with marked_timer("start_profile", timing_raw):
-                    if self.config.global_profiler.tool == "torch_memory_split":
-                        self._start_profiling(True, profile_step=f"gen_{self.gen_steps}", tag="Gen")
-                    else:
-                        self._start_profiling(
-                            not prev_step_profile and curr_step_profile
-                            if self.config.global_profiler.profile_continuous_steps
-                            else curr_step_profile
-                        )
+                    self._start_profiling(
+                        not prev_step_profile and curr_step_profile
+                        if self.config.global_profiler.profile_continuous_steps
+                        else curr_step_profile
+                    )
 
                 new_batch: DataProto = DataProto.from_single_dict(batch_dict)
                 num_gen_batches += 1
@@ -143,22 +140,12 @@ class RayDAPOTrainer(RayPPOTrainer):
                 with marked_timer("step", timing_raw):
                     # generate a batch
 
-                    try:
-                        with marked_timer("gen", timing_raw, "red"):
-                            if rollout_skip.is_enable:
-                                rollout_skip.record(new_batch, self.global_steps, self.gen_steps)
-                            gen_batch_output = self.actor_rollout_wg.generate_sequences(gen_batch)
-                            timing_raw.update(gen_batch_output.meta_info["timing"])
-                            gen_batch_output.meta_info.pop("timing", None)
-                    except Exception as e:
-                        print(f"\033[32m推理报错。{e.__repr__()}\033[0m", flush=True)
-
-                    finally:
-                        #! 记录推理的显存占用
-                        if self.config.global_profiler.tool == "torch_memory_split":
-                            self._stop_profiling(True)
-                            print("\033[32m开始保存推理显存情况 dump_memory_snapshot\033[0m", flush=True)
-
+                    with marked_timer("gen", timing_raw, "red"):
+                        if rollout_skip.is_enable:
+                            rollout_skip.record(new_batch, self.global_steps, self.gen_steps)
+                        gen_batch_output = self.actor_rollout_wg.generate_sequences(gen_batch)
+                        timing_raw.update(gen_batch_output.meta_info["timing"])
+                        gen_batch_output.meta_info.pop("timing", None)
 
                     if self.config.algorithm.adv_estimator == AdvantageEstimator.REMAX:
                         with marked_timer("gen_max", timing_raw, "red"):
@@ -284,8 +271,6 @@ class RayDAPOTrainer(RayPPOTrainer):
                             batch = batch[:traj_bsz]
 
                     # === Updating ===
-                    if self.config.global_profiler.tool == "torch_memory_split":
-                        self._start_profiling(True, profile_step=f"Train_{self.global_steps}_from_gen_{self.gen_steps}", tag="Train")
 
                     batch.batch["response_mask"] = compute_response_mask(batch)
 
@@ -380,16 +365,14 @@ class RayDAPOTrainer(RayPPOTrainer):
                         if self.config.global_profiler.steps is not None
                         else False
                     )
-                    if self.config.global_profiler.tool == "torch_memory_split":
-                            self._stop_profiling(True)
-                    else:
-                        self._stop_profiling(
-                            curr_step_profile and not next_step_profile
-                            if self.config.global_profiler.profile_continuous_steps
-                            else curr_step_profile
-                        )
-                        prev_step_profile = curr_step_profile
-                        curr_step_profile = next_step_profile
+
+                    self._stop_profiling(
+                        curr_step_profile and not next_step_profile
+                        if self.config.global_profiler.profile_continuous_steps
+                        else curr_step_profile
+                    )
+                    prev_step_profile = curr_step_profile
+                    curr_step_profile = next_step_profile
 
                 # collect metrics
                 metrics.update(compute_data_metrics(batch=batch, use_critic=self.use_critic))
@@ -404,15 +387,7 @@ class RayDAPOTrainer(RayPPOTrainer):
                 num_prompt_in_batch = 0
                 num_gen_batches = 0
 
-                #! 记录训练的显存占用
-                if (
-                        hasattr(self.config.actor_rollout_ref.actor, "profiler")
-                        and self.config.actor_rollout_ref.actor.profiler.tool == "torch_memory"
-                ):
-                    print("\033[32m开始保存训练显存情况 dump_memory_snapshot\033[0m", flush=True)
-                    self.actor_rollout_wg.dump_memory_snapshot(
-                        tag=f"Train_step_{self.global_steps}", sub_dir=f"Train_step_{self.global_steps}"
-                    )
+
                 # TODO: make a canonical logger that supports various backend
                 logger.log(data=metrics, step=self.global_steps)
 
@@ -424,6 +399,7 @@ class RayDAPOTrainer(RayPPOTrainer):
                 progress_bar.update(1)
                 self.global_steps += 1
                 self.gen_steps += 1
+
         # check if last step checkpint exists
         checkpoint_dir = os.path.join(self.config.trainer.default_local_dir, f"global_step_{self.global_steps}")
         if not os.path.exists(checkpoint_dir):

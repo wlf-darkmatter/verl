@@ -845,6 +845,7 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
     @register(dispatch_mode=make_nd_compute_dataproto_dispatch_fn(mesh_name="actor"))
     @DistProfiler.annotate(color="red", role="actor_update")
     def update_actor(self, data: DataProto):
+        self.custom_memory_snapshot_start("update_actor")
         assert self._is_actor
         if self._is_offload_param:
             load_fsdp_model_to_gpu(self.actor_module_fsdp)
@@ -883,11 +884,13 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
             offload_fsdp_optimizer(optimizer=self.actor_optimizer)
             log_gpu_memory_usage("After offload actor optimizer during update_actor", logger=logger)
 
+        self.custom_memory_snapshot_stop("update_actor")
         return output
 
     @register(dispatch_mode=make_nd_compute_dataproto_dispatch_fn(mesh_name="rollout"))
     @DistProfiler.annotate(color="red", role="rollout_generate")
     def generate_sequences(self, prompts: DataProto):
+        self.custom_memory_snapshot_start("generate_sequences")
         # Support all hardwares
         assert self._is_rollout
         prompts = prompts.to(get_device_id())
@@ -933,6 +936,7 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
 
         # clear kv cache
         get_torch_device().empty_cache()
+        self.custom_memory_snapshot_stop("generate_sequences")
         return output
 
     @register(dispatch_mode=make_nd_compute_dataproto_dispatch_fn(mesh_name="actor"))
@@ -940,6 +944,7 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
     def compute_log_prob(self, data: DataProto):
         # when is_lora is True, we use the actor without lora applied to calculate the log_prob
         # which is mostly used for ref log_prob calculation
+        self.custom_memory_snapshot_start("compute_log_prob")
         assert self._is_actor
         if self._is_offload_param:
             load_fsdp_model_to_gpu(self.actor_module_fsdp)
@@ -974,6 +979,7 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
             offload_fsdp_model_to_cpu(self.actor_module_fsdp)
             log_gpu_memory_usage("After offload actor model during compute_log_prob", logger=logger)
 
+        self.custom_memory_snapshot_stop("compute_log_prob")
         return output
 
     @register(dispatch_mode=make_nd_compute_dataproto_dispatch_fn(mesh_name="actor"))
@@ -1091,20 +1097,7 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
         """Stop profiling for the current rank in the current training step."""
         self.profiler.stop()
 
-    @register(dispatch_mode=Dispatch.ONE_TO_ALL)
-    def dump_memory_snapshot(self, tag: str = "manual", sub_dir: str = None) -> None:
-        """Manually trigger a CUDA memory snapshot dump on all ranks."""
-        # Memory snapshot is now handled by the profiler system
-        # This method is kept for backward compatibility but delegates to profiler
-        if hasattr(self, "profiler") and hasattr(self.profiler, "_impl"):
-            try:
-                # Try to use the profiler's memory snapshot functionality
-                if hasattr(self.profiler._impl, "sampler"):
-                    out_dir = OmegaConf.select(self.config, "actor.profiler.save_path") or "."
-                    self.profiler._impl.sampler.dump_memory_snapshot(out_dir=out_dir, tag=tag, sub_dir=sub_dir)
-            except Exception:
-                # silently ignore if profiler doesn't support memory snapshots
-                pass
+
 
 
 class CriticWorker(Worker, DistProfilerExtension):
