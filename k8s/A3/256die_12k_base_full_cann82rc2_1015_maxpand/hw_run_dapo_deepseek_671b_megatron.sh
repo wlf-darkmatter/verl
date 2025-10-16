@@ -65,7 +65,7 @@ last_layer=7
 # pipeline_num_transformer_layers="[[3],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[2]]"
 offload=True
 gen_tp=8
-gen_dp=16
+gen_dp=8
 
 train_tp=8
 train_ep=32

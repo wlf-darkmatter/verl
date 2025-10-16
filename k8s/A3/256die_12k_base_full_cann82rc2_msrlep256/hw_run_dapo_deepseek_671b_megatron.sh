@@ -17,7 +17,7 @@ kl_loss_coef=0.001
 clip_ratio_low=0.2
 clip_ratio_high=0.28
 max_prompt_length=$((1024 * 2))
-max_response_length=$((1024 * 12))
+max_response_length=$((1024 * 6))
 enable_overlong_buffer=True
 overlong_buffer_len=$((1024 * 1))
 overlong_penalty_factor=1.0
@@ -44,9 +44,10 @@ top_k=-1 # 0 for HF rollout, -1 for vLLM rollout
 val_top_p=0.7
 
 # Performance Related Parameter
+#! 验证max_token_len
 use_dynamic_bsz=True
-actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 1))
-infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
+actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) ))
+infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) ))
 
 optimizer_offload_fraction=1
 
@@ -64,8 +65,8 @@ first_layer=6
 last_layer=7
 # pipeline_num_transformer_layers="[[3],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[2]]"
 offload=True
-gen_tp=8
-gen_dp=16
+gen_tp=4
+gen_dp=64
 
 train_tp=8
 train_ep=32

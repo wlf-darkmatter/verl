@@ -46,7 +46,7 @@ val_top_p=0.7
 # Performance Related Parameter
 use_dynamic_bsz=True
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 1))
-infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
+infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 1))
 
 optimizer_offload_fraction=1
 
@@ -65,7 +65,7 @@ last_layer=7
 # pipeline_num_transformer_layers="[[3],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[2]]"
 offload=True
 gen_tp=8
-gen_dp=16
+gen_dp=32
 
 train_tp=8
 train_ep=32
@@ -87,6 +87,13 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.rollout.skip.enable=True \
     actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
+    global_profiler.tool=torch_memory_split \
+    global_profiler.save_path=${JOB_LOG_DIR_CURR}/snapshot \
+    +global_profiler.all_ranks=True \
+    global_profiler.global_tool_config.torch_memory.trace_alloc_max_entries=100000 \
+    global_profiler.global_tool_config.torch_memory.stack_depth=32 \
+    global_profiler.steps=[1,2,3,4] \
+    actor_rollout_ref.rollout.load_format=dummy \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
     data.prompt_key=messages \
@@ -141,7 +148,6 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=1 \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
-    actor_rollout_ref.rollout.load_format=safetensors \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=${infer_ppo_micro_batch_size_per_gpu} \
     actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu=${infer_ppo_max_token_len} \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.65 \
