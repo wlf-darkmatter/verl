@@ -18,6 +18,7 @@ from packaging import version as vs
 
 from verl.utils.device import is_npu_available
 from verl.utils.import_utils import is_sglang_available
+import os
 
 
 def get_version(pkg):
@@ -60,5 +61,8 @@ else:
             f"vllm version {package_version} not supported and SGLang also not Found. Currently supported "
             f"vllm versions are 0.7.0+"
         )
+
+if os.environ.get("VLLM_SLEEP_LEVEL", "") != "" :
+    VLLM_SLEEP_LEVEL = int(VLLM_SLEEP_LEVEL)
 
 __all__ = ["LLM", "parallel_state"]
