@@ -66,7 +66,7 @@ max_num_batched_tokens=$((4*1024))
 offload=True
 gen_tp=8
 gen_dp=8
-# gen_world_size=$((NNODES*8))
+
 train_tp=8
 train_ep=64
 train_pp=8

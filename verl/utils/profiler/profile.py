@@ -15,6 +15,7 @@
 import functools
 import os
 from typing import Callable, Optional
+from omegaconf import OmegaConf
 
 import torch
 import torch.distributed
@@ -217,6 +218,8 @@ class DistProfiler:
             self._impl = Profiler(config=config, tool_config=tool_config)
         elif self._tool == "torch_memory":
             self._impl = TorchMemoryProfiler(rank=rank, config=config, tool_config=tool_config)
+        elif self._tool == "torch_memory_split":
+            self._impl = TorchMemoryProfilerSplit(rank=rank, config=config, tool_config=tool_config)
         else:
             # Fallback to a no-op impl
             self._impl = _NoOpProfiler()
@@ -343,6 +346,83 @@ class TorchMemoryProfiler:
         return self.rank == 0
 
 
+class TorchMemoryProfilerSplit(TorchMemoryProfiler):
+    """Profiler that dumps CUDA memory snapshots at step boundaries.
+
+    Behavior:
+    - On first construction (per process), enable memory history recording if CUDA is available
+    - On start(step=X), remember sub_dir for this step
+    - On stop(), dump a memory snapshot into config.save_path under the remembered sub_dir
+    """
+
+    _memory_history_enabled: bool = False
+
+    def __init__(
+        self, rank: int, config: Optional[ProfilerConfig], tool_config: Optional[TorchMemoryToolConfig] = None
+    ):
+        # Always respond to explicit start/stop calls for torch_memory tool,
+        # regardless of per-role enable flag, to align with global step control.
+        self.enable = True
+        if not config:
+            config = ProfilerConfig(ranks=[])
+        self.config = config
+        self.rank = rank
+        self.this_step = False
+        self.sub_dir = None
+        self.tag = "torch_memory"
+
+        self.sampler = MemorySnapshotSampler()
+
+        # Get parameters from tool_config, with fallback to defaults
+        if tool_config:
+            trace_alloc_max_entries = tool_config.trace_alloc_max_entries
+            stack_depth = tool_config.stack_depth
+        else:
+            trace_alloc_max_entries = 100_000
+            stack_depth = 32
+
+        self.trace_alloc_max_entries = trace_alloc_max_entries
+        self.stack_depth = stack_depth
+
+        # Best-effort enable memory history once
+        print(f"Using custom snapshot.", flush=True)
+        if not TorchMemoryProfiler._memory_history_enabled:
+            try:
+                enable_memory_visualize(trace_alloc_max_entries=trace_alloc_max_entries, stack_depth=stack_depth)
+            except Exception:
+                # silently ignore if not supported
+                pass
+            TorchMemoryProfiler._memory_history_enabled = True
+
+    def start(self, **kwargs):
+        if not self.enable:
+            return
+        if not self._should_profile_this_rank():
+            return
+
+        enable_memory_visualize(trace_alloc_max_entries=self.trace_alloc_max_entries, stack_depth=self.stack_depth)
+        profile_step = kwargs.get("profile_step", None)
+        self.tag = kwargs.get("tag", "snapshot")
+
+        # Keep ranks aligned under same folder name
+        self.sub_dir = f"step{profile_step}" if profile_step is not None else None
+        self.this_step = True
+
+
+    def stop(self):
+        if not self.enable or not self.this_step:
+            return
+        self.this_step = False
+        if not self._should_profile_this_rank():
+            return
+        out_dir = self.config.save_path or "outputs/profile"
+        # Dump snapshot; all ranks write into same sub_dir
+        try:
+            self.sampler.dump_memory_snapshot(out_dir=out_dir, tag=self.tag, sub_dir=self.sub_dir)
+        except Exception:
+            pass
+
+
 class DistProfilerExtension:
     """An extension class for DistProfiler that provides distributed profiling capabilities.
 
@@ -369,3 +449,58 @@ class DistProfilerExtension:
     def stop_profile(self) -> None:
         """Stop profiling for the current rank in the current training step."""
         self.profiler.stop()
+
+    @register(dispatch_mode=Dispatch.ONE_TO_ALL)
+    def dump_memory_snapshot(self, tag: str = "manual", sub_dir: str = None) -> None:
+        """Manually trigger a CUDA memory snapshot dump on all ranks."""
+        # Memory snapshot is now handled by the profiler system
+        # This method is kept for backward compatibility but delegates to profiler
+        breakpoint()
+        if hasattr(self, "profiler") and hasattr(self.profiler, "_impl"):
+            try:
+                # Try to use the profiler's memory snapshot functionality
+                if hasattr(self.profiler._impl, "sampler"):
+                    out_dir = OmegaConf.select(self.config, "actor.profiler.save_path") or "."
+                    self.profiler._impl.sampler.dump_memory_snapshot(out_dir=out_dir, tag=tag, sub_dir=sub_dir)
+            except Exception:
+                # silently ignore if profiler doesn't support memory snapshots
+                pass
+
+    # @register(dispatch_mode=Dispatch.ONE_TO_ALL)
+    def custom_memory_snapshot_start(self, tag: str = "manual", sub_dir: str = None) -> None:
+        pass
+        if os.getenv("VERL_CUSTOM_SNAPSHOT_DIR", "") == "":
+            return
+        if not hasattr(self, "dict_curr_step"):
+            self.dict_curr_step = {}
+        self.dict_curr_step.setdefault(tag, 0)
+
+
+        print(f"\033[32m开启自定义内存快照: {tag}\033[0m", flush=True)
+        #* 不区分 rank
+        trace_alloc_max_entries = 100_000
+        stack_depth = 50
+        enable_memory_visualize(trace_alloc_max_entries=trace_alloc_max_entries, stack_depth=stack_depth)
+
+    @register(dispatch_mode=Dispatch.ONE_TO_ALL)
+    def custom_memory_snapshot_stop(self, tag: str = "manual") -> None:
+        if os.getenv("VERL_CUSTOM_SNAPSHOT_DIR", "") == "":
+            return
+        self.dict_curr_step[tag] += 1
+
+        from verl.utils.device import get_torch_device, is_cuda_available
+        from pathlib import Path
+
+        path_dir = Path(os.getenv("VERL_CUSTOM_SNAPSHOT_DIR"))
+        path_dir.mkdir(exist_ok=True, parents=True)
+        print(f"\033[32m保存自定义内存快照: {tag}\033[0m", flush=True)
+        device = get_torch_device()
+        device.synchronize()
+
+        pid = os.getpid()
+        rank = os.environ.get("RANK", "0")
+        fname = f"Step_{self.dict_curr_step[tag]}-{tag}_rank{rank}_pid{pid}.pickle"
+        device.memory._dump_snapshot(path_dir/fname)
+
+        #! 这个地方持疑
+        device.memory._record_memory_history()

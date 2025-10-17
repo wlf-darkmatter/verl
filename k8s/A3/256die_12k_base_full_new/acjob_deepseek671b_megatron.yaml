@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek671-verl-moe-256die-12k-base-full-1013-new  #sp-64-train-3b-moe-msrun #需要修改
+  name: deepseek671-verl-moe-256die-12k-base-full-1014-new  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -69,6 +69,8 @@ spec:
                   mountPath: /home/code/
                 - name: data-path
                   mountPath: /mnt
+                - name: tmp-path
+                  mountPath: /tmp
 
           volumes:
             - name: dshm
@@ -90,6 +92,9 @@ spec:
             - name: data-path
               hostPath:
                 path: /mnt
+            - name: tmp-path
+              hostPath:
+                path: /mnt/nv03
     Worker:
       replicas: 15  #Master can only be 1
       restartPolicy: Never
@@ -138,6 +143,8 @@ spec:
                   mountPath: /home/code/
                 - name: data-path
                   mountPath: /mnt
+                - name: tmp-path
+                  mountPath: /tmp
           volumes:
             - name: dshm
               emptyDir:
@@ -158,3 +165,6 @@ spec:
             - name: data-path
               hostPath:
                 path: /mnt
+            - name: tmp-path
+              hostPath:
+                path: /mnt/nv03

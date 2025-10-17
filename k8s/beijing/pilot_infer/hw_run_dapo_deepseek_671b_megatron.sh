@@ -66,7 +66,7 @@ max_num_batched_tokens=$((6*1024))
 offload=True
 gen_tp=8
 gen_dp=2
-# gen_world_size=$((NNODES*8))
+
 train_tp=2
 train_ep=8
 train_pp=1
@@ -173,8 +173,3 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
 
 
-sleep 600
-ray_name=$(cat /tmp/ray.output | grep "submitted successfully" | awk -F "'" '{print $2}')
-ray_name=${ray_name//\'}
-echo "ray_name: $ray_name"
-ray job logs $ray_name --follow | tee $(dirname $0)/ray.log

@@ -10,11 +10,13 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
 export TASK_QUEUE_ENABLE=2
-#! 注意，1001 加了这 几个超时配置
+#! 注意，HCCL 相关配置
 export HCCL_EXEC_TIMEOUT=86400
 export HCCL_EVENT_TIMEOUT=86400
 export ACL_DEVICE_SYNC_TIMEOUT=86400
 export HCCL_ASYNC_ERROR_HANDLING=0
+export P2P_HCCL_BUFFSIZE=30
+export HCCL_BUFFSIZE=300
 export P2P_HCCL_BUFFSIZE=20
 export HCCL_BUFFSIZE=300
 export VLLM_ASCEND_ENABLE_MOE_ALL2ALL_SEQ=1
@@ -53,10 +55,11 @@ export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 
-export ASCEND_PROCESS_LOG_PATH=/home/code/logs/$(basename $(dirname $0))/plog/${RANK}
+
 
 
 ray stop --force
+sleep 10
 rm -rf /tmp/ray
 rm -rf /opt/verl
 cp -r /home/code/verl /opt/verl
@@ -69,7 +72,10 @@ cnt=0
 if [ "$RANK" = "0" ]; then
   # head start
   echo "This is head node"
+  mkdir -p ${JOB_LOG_DIR_CURR}
+  mkdir -p ${JOB_LOG_DIR_CURR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
+  ln -s ${JOB_LOG_DIR_CURR}/ray_host /tmp/ray
 
   ray start --head --ray-debugger-external --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 
@@ -87,11 +93,12 @@ if [ "$RANK" = "0" ]; then
 
     echo "Waiting for Ray to allocate $((NNODES*NPU_PER_NODE)) devices. Current device count: $npu_count_int"
     cnt=$((cnt+1))
-    sleep 10
+
   done
 
 else
   echo "This is worker node"
+  sleep 10
   ray start --address="$MASTER_ADDR:$ServerPort" --disable-usage-stats
 fi
 
@@ -107,6 +114,8 @@ while true; do
   if [[ $cnt -gt 100 ]]; then
     echo "Job $ray_name start failed"
     ray stop --force
+    sleep 10
+
     rm -rf /tmp
     exit 1
   fi
@@ -124,6 +133,8 @@ while true; do
   if [[ -n $gcs_error ]]; then
     echo "ray cannot connect，Job $ray_name exit with exception"
     ray stop --force
+    sleep 10
+
    # rm -rf /tmp
     exit 1
   fi
@@ -131,6 +142,8 @@ while true; do
 
   if [[ -n $succeeded ]]; then
     ray stop --force
+    sleep 10
+
  #   rm -rf /tmp
     echo "Job $ray_name exit without exception"
     exit 0
@@ -139,6 +152,8 @@ while true; do
 #   if [[ -n $failed ]]; then
 #     echo "Job $ray_name exit with exception"
 #     ray stop --force
+    sleep 10
+
 # #    rm -rf /tmp
 #     exit 1
 #   fi

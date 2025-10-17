@@ -62,7 +62,7 @@ infer_ppo_max_token_len=$(((max_prompt_length + max_response_length)))
 offload=True
 gen_tp=8
 gen_dp=8
-# gen_world_size=$((NNODES*8))
+
 train_tp=4
 train_ep=32
 train_pp=8

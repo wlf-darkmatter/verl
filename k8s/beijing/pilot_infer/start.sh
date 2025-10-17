@@ -5,8 +5,8 @@ export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
 export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
 export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
-export VLLM_SLEEP_LEVEL=1
-export VERL_DEBUG_NOSHARDING=0
+
+
 
 export ASCEND_GLOBAL_LOG_LEVEL=3
 
@@ -57,6 +57,7 @@ export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according t
 export ASCEND_PROCESS_LOG_PATH=/opt/verl/logs/$MINDX_TASK_ID/plog # modify according to actual situation
 
 ray stop --force
+sleep 10
 rm -rf /tmp/ray
 rm -rf /opt/verl
 cp -r /home/new_verl /opt/verl
@@ -69,7 +70,10 @@ cd /home/new_verl
 if [ "$RANK" = "0" ]; then
   # head start
   echo "This is head node"
+  mkdir -p ${JOB_LOG_DIR_CURR}
+  mkdir -p ${JOB_LOG_DIR_CURR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
+  ln -s ${JOB_LOG_DIR_CURR}/ray_host /tmp/ray
 
   kwargs=(--is_master --ray_dashboard_port $DashboardPort )
 else

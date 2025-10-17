@@ -6,22 +6,24 @@ export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
 export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
 export VLLM_SLEEP_LEVEL=0
-export VERL_DEBUG_NOSHARDING=0
+
 
 export ASCEND_GLOBAL_LOG_LEVEL=3
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
 export TASK_QUEUE_ENABLE=2
-#! 注意，1001 加了这 几个超时配置
+#! 注意，HCCL 相关配置
 export HCCL_EXEC_TIMEOUT=7200
 export HCCL_EVENT_TIMEOUT=7200
 export HCCL_CONNECT_TIMEOUT=7200
 export ACL_DEVICE_SYNC_TIMEOUT=7200
 export HCCL_ASYNC_ERROR_HANDLING=0
+export P2P_HCCL_BUFFSIZE=20
+export HCCL_BUFFSIZE=300
 
 #内存打印
-#export VERL_MEMORY_LOG_DIR="/home/code/verl/tmp/exp_12k_base_gpu"
+#export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR}/memory_log
 unset VERL_MEMORY_LOG_DIR
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
@@ -73,6 +75,7 @@ export path_log_dir=/opt/verl/logs/$MINDX_TASK_ID/trainlog  # modify according t
 export ASCEND_PROCESS_LOG_PATH=/home/code/verl/plog/64nodes_12k_base_gpu/$(date +"%Y-%m-%d--%H-%M-%S")
 
 ray stop --force
+sleep 10
 rm -rf /tmp/ray
 rm -rf /opt/verl
 cp -r /home/code/verl /opt/verl
@@ -86,7 +89,10 @@ cnt=0
 if [ "$RANK" = "0" ]; then
   # head start
   echo "This is head node"
+  mkdir -p ${JOB_LOG_DIR_CURR}
+  mkdir -p ${JOB_LOG_DIR_CURR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
+  ln -s ${JOB_LOG_DIR_CURR}/ray_host /tmp/ray
 
   ray start --head --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 
@@ -104,11 +110,12 @@ if [ "$RANK" = "0" ]; then
 
     echo "Waiting for Ray to allocate $((NNODES*NPU_PER_NODE)) devices. Current device count: $$npu_count_int"
     cnt=$((cnt+1))
-    sleep 10
+
   done
 
 else
   echo "This is worker node"
+  sleep 10
   ray start --address="$MASTER_ADDR:$ServerPort" --disable-usage-stats
 fi
 
@@ -124,6 +131,8 @@ while true; do
   if [[ $cnt -gt 100 ]]; then
     echo "Job $ray_name start failed"
     ray stop --force
+    sleep 10
+
     rm -rf /tmp
     exit 1
   fi
@@ -141,6 +150,8 @@ while true; do
   if [[ -n $gcs_error ]]; then
     echo "ray cannot connect，Job $ray_name exit with exception"
     ray stop --force
+    sleep 10
+
    # rm -rf /tmp
     exit 1
   fi
@@ -148,6 +159,8 @@ while true; do
 
   if [[ -n $succeeded ]]; then
     ray stop --force
+    sleep 10
+
  #   rm -rf /tmp
     echo "Job $ray_name exit without exception"
     exit 0
@@ -156,6 +169,8 @@ while true; do
 #   if [[ -n $failed ]]; then
 #     echo "Job $ray_name exit with exception"
 #     ray stop --force
+    sleep 10
+
 # #    rm -rf /tmp
 #     exit 1
 #   fi

@@ -103,15 +103,16 @@ class RayDAPOTrainer(RayPPOTrainer):
             else False
         )
         next_step_profile = False
-
         timing_raw = defaultdict(float)
         batch = None
+
         num_prompt_in_batch = 0
         num_gen_batches = 0
         for epoch in range(self.config.trainer.total_epochs):
             for batch_dict in self.train_dataloader:
                 metrics = {}
 
+                #*
                 with marked_timer("start_profile", timing_raw):
                     self._start_profiling(
                         not prev_step_profile and curr_step_profile
@@ -138,6 +139,7 @@ class RayDAPOTrainer(RayPPOTrainer):
 
                 with marked_timer("step", timing_raw):
                     # generate a batch
+
                     with marked_timer("gen", timing_raw, "red"):
                         if rollout_skip.is_enable:
                             rollout_skip.record(new_batch, self.global_steps, self.gen_steps)
@@ -363,6 +365,7 @@ class RayDAPOTrainer(RayPPOTrainer):
                         if self.config.global_profiler.steps is not None
                         else False
                     )
+
                     self._stop_profiling(
                         curr_step_profile and not next_step_profile
                         if self.config.global_profiler.profile_continuous_steps
@@ -384,6 +387,7 @@ class RayDAPOTrainer(RayPPOTrainer):
                 num_prompt_in_batch = 0
                 num_gen_batches = 0
 
+
                 # TODO: make a canonical logger that supports various backend
                 logger.log(data=metrics, step=self.global_steps)
 
@@ -395,6 +399,7 @@ class RayDAPOTrainer(RayPPOTrainer):
                 progress_bar.update(1)
                 self.global_steps += 1
                 self.gen_steps += 1
+
         # check if last step checkpint exists
         checkpoint_dir = os.path.join(self.config.trainer.default_local_dir, f"global_step_{self.global_steps}")
         if not os.path.exists(checkpoint_dir):

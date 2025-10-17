@@ -35,8 +35,6 @@ train_prompt_bsz=8 # must be > n_gpus. need to fix
 n_resp_per_prompt=8
 train_prompt_mini_bsz=8  # mini_bsz * n >= micro_bsz * pp * dp
 
-NNODES=16
-
 # 1. download the dist_ckpt format model from https://huggingface.co/BearBiscuit05/dpsk-v3-671B-BF16-dist_ckpt/tree/main
 # change the MODEL_PATH and MCORE_MODEL_PATH to your own path
 # Paths

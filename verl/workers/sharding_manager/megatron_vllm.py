@@ -200,7 +200,8 @@ class MegatronVLLMShardingManager(BaseShardingManager):
 
         aggressive_empty_cache(force_sync=True)
 
-        set_expandable_segments(True)
+        if os.getenv("VERL_CUSTOM_SET_MEMEXPAND_TRAIN", "1") == "1":
+            set_expandable_segments(True)
 
         # restore random states
         if self.device_mesh is not None:

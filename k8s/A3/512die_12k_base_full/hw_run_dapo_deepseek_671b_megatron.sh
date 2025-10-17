@@ -67,7 +67,7 @@ last_layer=7
 offload=True
 gen_tp=8
 gen_dp=8
-# gen_world_size=$((NNODES*8))
+
 train_tp=8
 train_ep=64
 train_pp=8
@@ -83,7 +83,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     --config-name="dapo_megatron_trainer" \
     actor_rollout_ref.rollout.load_format=safetensors \
     actor_rollout_ref.rollout.skip.enable=False \
-    actor_rollout_ref.rollout.skip.dump_dir="/mnt/hpfs_test/data/wlf/rollout_dump/baseline_gpu" \
+    actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
@@ -97,7 +97,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     algorithm.use_kl_in_reward=${use_kl_in_reward} \
     algorithm.kl_penalty=${kl_penalty} \
     algorithm.kl_ctrl.kl_coef=${kl_coef} \
-    actor_rollout_ref.model.path="${MODEL_PATH}" \
+    actor_rollout_ref.model.path=${MODEL_PATH} \
     actor_rollout_ref.actor.use_kl_loss=${use_kl_loss} \
     actor_rollout_ref.actor.kl_loss_coef=${kl_loss_coef} \
     actor_rollout_ref.actor.policy_loss.loss_mode=vanilla \
@@ -183,13 +183,9 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.total_epochs=10 \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
-    trainer.rollout_data_dir=/home/code/logs/$(basename $(dirname $0))/rollout \
+    trainer.rollout_data_dir=${JOB_LOG_DIR_CURR}/rollout_data_dir \
     trainer.log_val_generations=10 \
     trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
 
 
-sleep 600
-ray_name=$(cat /tmp/ray.output | grep "submitted successfully" | awk -F "'" '{print $2}')
-ray_name=${ray_name//\'}
-echo "ray_name: $ray_name"
-ray job logs $ray_name --follow | tee $(dirname $0)/ray.log
+

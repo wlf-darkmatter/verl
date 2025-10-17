@@ -194,11 +194,13 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
         if not torch.distributed.is_initialized():
             set_numa_affinity()
             rank = int(os.environ["LOCAL_RANK"])
+            print(f"\033[32m开始建链 local_rank: {rank}\033[0m", flush=True)
             torch.distributed.init_process_group(
                 backend=get_nccl_backend(),
                 timeout=datetime.timedelta(seconds=self.config.get("nccl_timeout", 600)),
                 init_method=os.environ.get("DIST_INIT_METHOD", None),
             )
+            print(f"\033[33m 建链 Done\033[0m", flush=True)
             get_torch_device().set_device(rank)
 
             mpu.initialize_model_parallel(
@@ -393,7 +395,7 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
 
     def _build_rollout(self, trust_remote_code=False):
         from torch.distributed.device_mesh import init_device_mesh
-        
+
         from verl.models.mcore.patch_v012 import apply_patch
         apply_patch()
 
@@ -616,6 +618,7 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
     @GPUMemoryLogger(role="update_actor", logger=logger)
     @DistProfiler.annotate(color="red")
     def update_actor(self, data: DataProto):
+        self.custom_memory_snapshot_start("update_actor")
         assert self._is_actor
         if self._is_offload_param:
             load_megatron_model_to_gpu(self.actor_module)
@@ -653,12 +656,14 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
             log_gpu_memory_usage("After offload actor optimizer during update_actor", logger=logger)
 
         aggressive_empty_cache(force_sync=True)
+        self.custom_memory_snapshot_stop("update_actor")
         return output
 
     @register(dispatch_mode=make_nd_compute_dataproto_dispatch_fn(mesh_name="rollout"))
     @GPUMemoryLogger(role="generate_sequences", logger=logger)
     @DistProfiler.annotate(color="red")
     def generate_sequences(self, prompts: DataProto):
+        self.custom_memory_snapshot_start("generate_sequences")
         assert self._is_rollout
         prompts = prompts.to(get_device_name())
         meta_info = {
@@ -703,12 +708,14 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
         output = output.to("cpu")
         # clear kv cache
         aggressive_empty_cache(force_sync=True)
+        self.custom_memory_snapshot_stop("generate_sequences")
         return output
 
     @register(dispatch_mode=make_nd_compute_dataproto_dispatch_fn(mesh_name="actor"))
     @GPUMemoryLogger(role="compute_ref_log_prob", logger=logger)
     @DistProfiler.annotate(color="olive")
     def compute_ref_log_prob(self, data: DataProto):
+        self.custom_memory_snapshot_start("compute_ref_log_prob")
         assert self._is_ref
         if self._ref_is_offload_param:
             load_megatron_model_to_gpu(self.ref_module, load_grad=False)
@@ -725,12 +732,14 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
             offload_megatron_model_to_cpu(self.ref_module)
             log_gpu_memory_usage("After offload ref params and grad during compute_ref_log_prob", logger=logger)
         aggressive_empty_cache(force_sync=True)
+        self.custom_memory_snapshot_stop("compute_ref_log_prob")
         return output
 
     @register(dispatch_mode=make_nd_compute_dataproto_dispatch_fn(mesh_name="actor"))
     @GPUMemoryLogger(role="compute_log_prob", logger=logger)
     @DistProfiler.annotate(color="blue")
     def compute_log_prob(self, data: DataProto):
+        self.custom_memory_snapshot_start("compute_log_prob")
         assert self._is_actor
         if self._is_offload_param:
             load_megatron_model_to_gpu(self.actor_module, load_grad=False)
@@ -751,6 +760,7 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
             offload_megatron_model_to_cpu(self.actor_module)
             log_gpu_memory_usage("After offload actor params and grad during compute_log_prob", logger=logger)
         aggressive_empty_cache(force_sync=True)
+        self.custom_memory_snapshot_stop("compute_log_prob")
         return output
 
     @register(dispatch_mode=Dispatch.ONE_TO_ALL)

@@ -53,6 +53,7 @@ export ASCEND_PROCESS_LOG_PATH=/home/code/verl/plog/$(basename $(dirname $0))/${
 
 
 ray stop --force
+sleep 10
 rm -rf /tmp/ray
 rm -rf /opt/verl
 cp -r /home/code/verl /opt/verl
@@ -67,7 +68,10 @@ cd /home/code/verl
 if [[ "$RANK" = "0" ]]; then
   # head start
   echo "This is head node"
+  mkdir -p ${JOB_LOG_DIR_CURR}
+  mkdir -p ${JOB_LOG_DIR_CURR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
+  ln -s ${JOB_LOG_DIR_CURR}/ray_host /tmp/ray
 
   kwargs=(--is_master --ray_dashboard_port $DashboardPort )
 else

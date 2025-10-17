@@ -9,20 +9,28 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 
 
 #! 注意，自定义配置
+# * 确保 JOB_LOG_DIR 在共享盘下
+export JOB_LOG_DIR=/home/code/logs/$(basename $(dirname $0))
+export JOB_LOG_DIR_CURR=${JOB_LOG_DIR}/$(date +"%Y-%m-%d_%H")
+export ASCEND_PROCESS_LOG_PATH=${JOB_LOG_DIR_CURR}/plog/${RANK}
+
+
 export VLLM_SLEEP_LEVEL=2
-export VERL_DEBUG_NOSHARDING=0
-export VERL_MEMORY_LOG_DIR="/home/code/logs/memory/512die_12k_base_full_new"
+
+export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR}/memory_log
 export VERL_CUSTOM_REWARD_RULE="1"
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
 export TASK_QUEUE_ENABLE=2
-#! 注意，1001 加了这 几个超时配置
+#! 注意，HCCL 相关配置
 export HCCL_EXEC_TIMEOUT=7200
 export HCCL_EVENT_TIMEOUT=7200
 export HCCL_CONNECT_TIMEOUT=7200
 export ACL_DEVICE_SYNC_TIMEOUT=7200
 export HCCL_ASYNC_ERROR_HANDLING=0
+export P2P_HCCL_BUFFSIZE=30
+export HCCL_BUFFSIZE=300
 
 #! 注意，1003 加了这 几个超时配置
 # export RAY_DEBUG_POST_MORTEM=1
@@ -64,14 +72,24 @@ export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 
-export ASCEND_PROCESS_LOG_PATH=/home/code/logs/$(basename $(dirname $0))/plog/1009/${RANK}
+export ASCEND_PROCESS_LOG_PATH=/home/code/logs/$(basename $(dirname $0))/plog/1013/${RANK}
 
-
-
-ray stop --force
+#! REWARD_DEBUG_ZY环境变量
+# export REWARD_DEBUG_ZY="1"
+export REWARD_TEST=="1"
 rm -rf /tmp/ray
-rm -rf /opt/verl
-cp -r /home/code/verl /opt/verl
+ray stop --force
+sleep 1
+echo "Overwrite verl code"
+#* 提速 ray 拉起速度
+if [[ -f /home/code/verl/docker/pkg/rsync ]];then
+  /home/code/verl/docker/pkg/rsync -avzP /home/code/verl/* /opt/verl/ --exclude=**/kernel_meta --exclude=plog --exclude=docker --exclude=docs
+else
+  unalias cp
+  cp -rf /home/code/verl/* /opt/verl/
+fi
+echo "Overwrite verl code, done."
+
 rm -f /opt/verl/.gitignore
 cd $(dirname $0)
 
@@ -82,7 +100,10 @@ cnt=0
 if [ "$RANK" = "0" ]; then
   # head start
   echo "This is head node"
+  mkdir -p ${JOB_LOG_DIR_CURR}
+  mkdir -p ${JOB_LOG_DIR_CURR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
+  ln -s ${JOB_LOG_DIR_CURR}/ray_host /tmp/ray
 
   ray start --head --ray-debugger-external --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 
@@ -100,11 +121,12 @@ if [ "$RANK" = "0" ]; then
 
     echo "Waiting for Ray to allocate $((NNODES*NPU_PER_NODE)) devices. Current device count: $npu_count_int"
     cnt=$((cnt+1))
-    sleep 10
+
   done
 
 else
   echo "This is worker node"
+  sleep 10
   ray start --address="$MASTER_ADDR:$ServerPort" --disable-usage-stats
 fi
 
@@ -121,6 +143,8 @@ while true; do
   if [[ $cnt -gt 100 ]]; then
     echo "Job $ray_name start failed"
     ray stop --force
+    sleep 10
+
     rm -rf /tmp
     exit 1
   fi
@@ -139,6 +163,8 @@ while true; do
   if [[ -n $gcs_error ]]; then
     echo "ray cannot connect，Job $ray_name exit with exception"
     ray stop --force
+    sleep 10
+
    # rm -rf /tmp
     exit 1
   fi
@@ -146,6 +172,8 @@ while true; do
 
   if [[ -n $succeeded ]]; then
     ray stop --force
+    sleep 10
+
  #   rm -rf /tmp
     echo "Job $ray_name exit without exception"
     exit 0
@@ -154,6 +182,8 @@ while true; do
 #   if [[ -n $failed ]]; then
 #     echo "Job $ray_name exit with exception"
 #     ray stop --force
+    sleep 10
+
 # #    rm -rf /tmp
 #     exit 1
 #   fi

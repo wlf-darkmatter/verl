@@ -1,13 +1,15 @@
 # 通用部分
 
+
+
 watch kubectl get pods -n rein-learing
 
 tail -f /tmp/ray/session_latest/logs/job-driver
 
 ## 监控内存打印
 
-```
-export VERL_MEMORY_LOG_DIR="/home/code/logs/memory/512die_12k_base_sleep2"
+```bash
+export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR}/memory_log
 ```
 
 网页分析使用关键词：
@@ -15,6 +17,10 @@ export VERL_MEMORY_LOG_DIR="/home/code/logs/memory/512die_12k_base_sleep2"
 ```python
 ["Total:", "Allocated:", "Reserved:", "Cached:"]
 ```
+
+git clone https://github.com/HuangShiqing/memory_viz_plus.git
+cd memory_viz_plus
+python ./_memory_viz.py trace_plot mem_snapshot.pickle -o mem_snapshot -p 1
 
 ## 观测指标
 
