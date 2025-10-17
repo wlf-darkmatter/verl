@@ -1,0 +1,100 @@
+FROM swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.5.1-cann_8.2.rc1-py_3.10-aarch64_0827a
+# cd /data01/huawei-2025/docker/pkg
+# python -m http.server 1111
+
+SHELL [ "/usr/bin/bash", "-c", "-l" ]
+
+ENV CANN_TOOLKIT_NAME=Ascend-cann-toolkit_8.2.RC2_linux-aarch64.run
+ENV CANN_KERNEL_NAME=Atlas-A3-cann-kernels_8.2.RC2_linux-aarch64.run
+ENV CANN_NNAL_NAME=Ascend-cann-nnal_8.2.RC2_linux-aarch64.run
+
+RUN wget -q http://127.0.0.1:1111/$CANN_TOOLKIT_NAME ;\
+    bash $CANN_TOOLKIT_NAME -q --full --install-path=/usr/local/Ascend ;\
+    rm $CANN_TOOLKIT_NAME -f
+
+RUN wget -q http://127.0.0.1:1111/$CANN_KERNEL_NAME ;\
+    source /usr/local/Ascend/ascend-toolkit/set_env.sh ;\
+    bash $CANN_KERNEL_NAME -q --install --install-path=/usr/local/Ascend ;\
+    rm $CANN_KERNEL_NAME -f
+
+RUN wget -q http://127.0.0.1:1111/$CANN_NNAL_NAME ;\
+    source /usr/local/Ascend/ascend-toolkit/set_env.sh ;\
+    bash $CANN_NNAL_NAME -q --install --install-path=/usr/local/Ascend ;\
+    rm $CANN_NNAL_NAME -f
+
+
+RUN pip install glances "ray[default]" debugpy
+RUN yum install -y rsync
+
+RUN cd /opt ;\
+    rm -rf jemalloc ;\
+    tar -zxvf jemalloc.tar.gz ;\
+    cd jemalloc ;\
+    ./autogen.sh ;\
+    ./configure --prefix=/usr/local ;\
+    make -j 64 ;\
+    make install
+
+#* 迁移代码
+# # python -m http.server 1111
+RUN cd /tmp; wget -q http://127.0.0.1:1111/libascend_hal.so ;\
+    rm -f /usr/local/Ascend/driver/lib64/driver/libascend_hal.so ;\
+    cp -f libascend_hal.so /usr/local/Ascend/driver/lib64/driver/ ;\
+    cd /opt/ ;\
+    rm /opt/vllm.tar.gz -f ;\
+    rm /opt/vllm-ascend.tar.gz -f ;\
+    wget -q http://127.0.0.1:1111/vllm_0.10.0.tar.gz  ;\
+    wget -q http://127.0.0.1:1111/vllm-ascend_0.10.0.tar.gz ;\
+    rm -rf /opt/vllm ;\
+    rm -rf /opt/vllm-ascend ;\
+    tar zxvf vllm_0.10.0.tar.gz ;\
+    tar zxvf vllm-ascend_0.10.0.tar.gz ;\
+    pip uninstall vllm-ascend -y ;\
+    pip uninstall vllm -y ;\
+    rm /opt/pyvenv/lib/python3.10/site-packages/__editable__.vllm* -f ;\
+    sed -i 's/.*vllm-ascend.*//g' /opt/pyvenv/lib/python3.10/site-packages/easy-install.pth
+
+ENV PIP_DEFAULT_TIMEOUT=100 \
+    PIP_RETRIES=5 \
+    PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple \
+    PIP_TRUSTED_HOST=pypi.tuna.tsinghua.edu.cn \
+    LD_LIBRARY_PATH=/opt/python3.10/lib/:$LD_LIBRARY_PATH
+
+ENV TORCH_VISION=2.5.1 \
+    TORCH_NPU_VERSION=2.7.1.dev20251016 \
+    TORCH_NPU_VERSION_NAME=torch_npu-2.7.1.dev20251016
+
+ENV TORCH_NPU_WHL_NAME=$TORCH_NPU_VERSION_NAME-cp310-cp310-manylinux_2_28_aarch64.whl
+
+#! 因为已经装了 torch 2.5.1，不需要任何安装torch的工作
+# RUN pip install torch==${TORCH_VISION} torchaudio torchvision -i https://pypi.tuna.tsinghua.edu.cn/simple
+# RUN wget -q http://127.0.0.1:1111/$TORCH_NPU_WHL_NAME ;\
+#     pip install $TORCH_NPU_WHL_NAME ;\
+#     rm -f $TORCH_NPU_WHL_NAME
+
+# ! 重新编译 0.10.0 vllm
+RUN cd /opt/vllm ;\
+    git config --global --add safe.directory /opt/vllm ;\
+    VLLM_TARGET_DEVICE=empty pip install -e . --no-build-isolation -v
+
+#! 重新编译 vllm-ascend
+
+#! 编译vllm-ascend的时候一定要依赖下载源，否则会找不到 torch_npu，可能设置 TORCH_NPU_PATH 可以规避，还没试过
+RUN cd /opt/vllm-ascend ;\
+    pip config --global set global.extra-index-url https://mirrors.huaweicloud.com/ascend/repos/pypi ;\
+    git config --global --add safe.directory /opt/vllm-ascend ;\
+    sed -i "s/--pre//g" /opt/vllm-ascend/requirements.txt ;\
+    sed -i "s@--extra-index-url.*@@g" /opt/vllm-ascend/requirements.txt ;\
+    sed -i "s/torch-npu==2.7.1.dev20250724//g" /opt/vllm-ascend/requirements.txt ;\
+    sed -i "s/torch>=.*/torch==${TORCH_VISION}/g" /opt/vllm-ascend/requirements.txt ;\
+    sed -i "s/.*torch-npu==.*//g" /opt/vllm-ascend/pyproject.toml ;\
+    sed -i "s/torch>=.*/torch==${TORCH_VISION}\",/g" /opt/vllm-ascend/pyproject.toml ;\
+    pip install -r /opt/vllm-ascend/requirements.txt ;\
+    source /usr/local/Ascend/nnal/atb/set_env.sh ;\
+    export Torch_DIR=/opt/pyvenv/lib/python3.10/site-packages/torch/share/cmake ;\
+    pip install -e . --no-deps --no-build-isolation -v
+# #! 最后对齐版本
+RUN pip install "numpy<=1.26.0"
+
+# cd /mnt/hpfs_test/wlf/verl/docker
+# docker build -f /mnt/hpfs_test/wlf/verl/docker/Dockerfile.A3.vllm0100-pta251-cann8.2.rc2 --network=host -t swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:A3_pytorch_2.5.1-cann_8.2.rc2-py_3.10-aarch64_verl0928_build1017 .
