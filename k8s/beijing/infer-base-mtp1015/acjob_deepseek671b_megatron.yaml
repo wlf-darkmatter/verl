@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek671-16-verl-moe-infer-base-mtp  #sp-64-train-3b-moe-msrun #需要修改
+  name: deepseek671-16-verl-moe-infer-base-mtp1015  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
