@@ -110,6 +110,10 @@ if [ "$RANK" = "0" ]; then
   mkdir -p ${JOB_LOG_DIR_CURR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
   ln -s ${JOB_LOG_DIR_CURR}/ray_host /tmp/ray
+  #* 拷贝当前脚本文件
+  mkdir -p ${JOB_LOG_DIR_CURR}/script.bak
+  cp $(dirname $0)/*.sh ${JOB_LOG_DIR_CURR}/script.bak/
+  cp $(dirname $0)/*.yaml ${JOB_LOG_DIR_CURR}/script.bak/
 
   ray start --head --ray-debugger-external --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 
@@ -135,6 +139,8 @@ else
   sleep 10
   ray start --address="$MASTER_ADDR:$ServerPort" --disable-usage-stats
 fi
+
+# start Mark 1
 
 #* 判断RAY的任务是否持续运行中，如果是，则不断sleep
 cnt=0

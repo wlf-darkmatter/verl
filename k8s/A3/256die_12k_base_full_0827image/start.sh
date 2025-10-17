@@ -22,6 +22,7 @@ export VERL_CUSTOM_REWARD_RULE="1"
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
 export TASK_QUEUE_ENABLE=2
+
 #! 注意，HCCL 相关配置
 export HCCL_EXEC_TIMEOUT=7200
 export HCCL_EVENT_TIMEOUT=7200
@@ -51,6 +52,12 @@ cp -f /home/code/verl/k8s/patch/0827/vllm_ascend/ops/fused_moe.py /opt/vllm-asce
 #! [Megatron]
 rm -f /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
 cp -f /home/code/verl/k8s/patch/0827/megatron/dot_product_attention.py /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
+
+#! VLLM_SLEEP_LEVEL
+export VLLM_SLEEP_LEVEL="1"
+
+#!MC2.YAML
+export VLLM_VERSION="0.9.1"
 
 #######################################
 
@@ -87,6 +94,7 @@ echo "Overwrite verl code, done."
 rm -f /opt/verl/.gitignore
 cd $(dirname $0)
 
+
 export ServerPort=6666     # modify according to actual situation
 export DashboardPort=8888  # modify according to actual situation
 
@@ -98,6 +106,10 @@ if [ "$RANK" = "0" ]; then
   mkdir -p ${JOB_LOG_DIR_CURR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
   ln -s ${JOB_LOG_DIR_CURR}/ray_host /tmp/ray
+  #* 拷贝当前脚本文件
+  mkdir -p ${JOB_LOG_DIR_CURR}/script.bak
+  cp $(dirname $0)/*.sh ${JOB_LOG_DIR_CURR}/script.bak/
+  cp $(dirname $0)/*.yaml ${JOB_LOG_DIR_CURR}/script.bak/
 
   ray start --head --ray-debugger-external --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 
@@ -123,6 +135,8 @@ else
   sleep 10
   ray start --address="$MASTER_ADDR:$ServerPort" --disable-usage-stats
 fi
+
+# start Mark 1
 
 cnt=0
 while true; do
