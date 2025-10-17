@@ -212,4 +212,4 @@ def apply_patch():
 
         return query, key, value
 
-    MLASelfAttention.get_query_key_value_tensors = patch_get_query_key_value_tensors
+    # MLASelfAttention.get_query_key_value_tensors = patch_get_query_key_value_tensors
