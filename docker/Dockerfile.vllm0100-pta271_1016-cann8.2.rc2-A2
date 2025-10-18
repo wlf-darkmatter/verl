@@ -93,4 +93,5 @@ RUN cd /opt/vllm-ascend ;\
 # #! 最后对齐版本
 # RUN pip install "numpy<=1.26.0"
 
-# docker build -f /mnt/hpfs_test/wlf/verl/docker/Dockerfile.A3.vllm0100-pta271_1016-cann8.2.rc2 --network=host -t swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:A3_pytorch_2.7.1_1016-cann_8.2.rc2-py_3.10-aarch64_verl0928_build1016 .
+#! 所谓的 锚定镜像
+# docker build -f /mnt/hpfs_test/wlf/verl/docker/Dockerfile.vllm0100-pta271_1016-cann8.2.rc2-A2 --network=host -t swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:A3_pytorch_2.7.1_1016-cann_8.2.rc2-py_3.10-aarch64_verl0928_build1016 .
