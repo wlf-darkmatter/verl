@@ -30,6 +30,7 @@ spec:
           terminationGracePeriodSeconds: 60
           automountServiceAccountToken: false
           hostNetwork: true
+          privileged: true
           nodeSelector:                        # modify according to the actual situation
             host-arch: huawei-arm
           containers:
@@ -107,6 +108,7 @@ spec:
           terminationGracePeriodSeconds: 60
           automountServiceAccountToken: false
           hostNetwork: true
+          privileged: true
           nodeSelector:                        # modify according to the actual situation
             host-arch: huawei-arm
           containers:
