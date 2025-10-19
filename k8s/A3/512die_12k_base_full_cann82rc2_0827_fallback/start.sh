@@ -52,8 +52,6 @@ cp -f /home/code/verl/k8s/patch/0827/base_loader.py /opt/vllm/vllm/model_executo
 rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 cp -f /home/code/verl/k8s/patch/0827/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 
-rm -f /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
-cp -f /home/code/verl/k8s/patch/0827/vllm_ascend/ops/fused_moe.py /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
 
 #! [Megatron]
 rm -f /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
