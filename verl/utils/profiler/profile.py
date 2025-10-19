@@ -437,6 +437,7 @@ class DistProfilerExtension:
 
     def __init__(self, profiler: DistProfiler):
         self.profiler = profiler
+        self.dict_impl = {}
 
     from verl.single_controller.base.decorator import Dispatch, register
 
@@ -449,6 +450,33 @@ class DistProfilerExtension:
     def stop_profile(self) -> None:
         """Stop profiling for the current rank in the current training step."""
         self.profiler.stop()
+
+    @register(dispatch_mode=Dispatch.ONE_TO_ALL)
+    def custom_start_profile(self, profile_step, role) -> None:
+        """Start profiling for the current rank in the current training step."""
+        config = getattr(self.config, role).profiler
+        if config.ranks is not None:
+            config.all_ranks = False
+        tool_config = config.tool_config
+        if config.enable:
+            if role not in self.dict_impl:
+                print(f"创建profile对象: rank={self.rank}, role={role}")
+                tool = getattr(config, "tool")
+                self.dict_impl[role] = DistProfiler(self.rank, config, getattr(tool_config, tool))
+                self.dict_impl[role]._impl.profile_save_path += f"/{role}/{profile_step}"
+            self.dict_impl[role].start()
+
+    @register(dispatch_mode=Dispatch.ONE_TO_ALL)
+    def custom_stop_profile(self, role) -> None:
+        """Stop profiling for the current rank in the current training step."""
+        config = getattr(self.config, role).profiler
+        if not config.enable:
+            return
+        if role not in self.dict_impl:
+            print(f"出现未被初始化的profile对象: {role}")
+        else:
+            self.dict_impl[role].stop()
+
 
     # @register(dispatch_mode=Dispatch.ONE_TO_ALL)
     def custom_memory_snapshot_start(self, tag: str = "manual", sub_dir: str = None) -> None:

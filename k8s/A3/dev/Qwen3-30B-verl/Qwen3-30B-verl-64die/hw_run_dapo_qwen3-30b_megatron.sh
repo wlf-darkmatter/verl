@@ -4,7 +4,7 @@ echo ">>Starting script at: $(date), path = $(pwd)"
 
 
 project_name='DAPO'
-exp_name='DAPO-qwen3-30b-megatron-1NNODES-0928Verl-1015images'
+exp_name='DAPO-qwen3-30b-megatron-0928Verl-1015images'
 
 adv_estimator=grpo
 
@@ -60,18 +60,15 @@ offload=True
 gen_tp=4
 gen_dp=1
 
-#!256die
+#!64 die
 train_tp=4
-train_ep=2
+train_ep=4
 train_pp=2
 enable_filter_group=False
 train_cp=1
-#    +actor_rollout_ref.actor.megatron.override_transformer_config.context_parallel_size=${train_cp} \
+
 ETP=1
-#    +actor_rollout_ref.actor.megatron.override_transformer_config.moe_router_dtype=fp32 \
-#   +actor_rollout_ref.actor.megatron.override_transformer_config.moe_grouped_gemm=True \
-#   +actor_rollout_ref.actor.megatron.override_transformer_config.moe_token_dispatcher_type="alltoall" \
-#
+
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 
 cd /home/code/verl

@@ -77,8 +77,6 @@ export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 
-
-
 rm -rf /tmp/ray
 ray stop --force
 sleep 1
@@ -99,6 +97,8 @@ cd $(dirname $0)
 export ServerPort=6666     # modify according to actual situation
 export DashboardPort=8888  # modify according to actual situation
 
+
+echo "Manul start !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 cnt=0
 if [ "$RANK" = "0" ]; then
   # head start
@@ -128,7 +128,7 @@ if [ "$RANK" = "0" ]; then
 
     echo "Waiting for Ray to allocate $((NNODES*NPU_PER_NODE)) devices. Current device count: $npu_count_int"
     cnt=$((cnt+1))
-
+    sleep 10
   done
 
 else
@@ -139,61 +139,3 @@ fi
 
 # start Mark 1
 
-cnt=0
-while true; do
-  ray_name=$(ray job list | grep -o "raysubmit_[a-zA-Z0-9]*")
-  if [[ -n $ray_name ]]; then
-    echo "Job $ray_name start succeeded"
-    break
-  fi
-
-  cnt=$((cnt+1))
-  if [[ $cnt -gt 100 ]]; then
-    echo "Job $ray_name start failed"
-    # ray stop --force
-    # sleep 10
-
-    # rm -rf /tmp
-    exit 1
-  fi
-
-  sleep 50
-done
-
-# ray_name=$(ray job list | grep -o "raysubmit_[a-zA-Z0-9]*")
-# while true; do
-#   output=$(ray job status $ray_name)
-#   failed=$(echo $output | grep $ray_name | grep -i failed)
-#   succeeded=$(echo $output | grep $ray_name | grep -i succeeded)
-#   gcs_error=$(echo $output | grep -i 'Failed to get cluster ID from GCS server')
-
-#   if [[ -n $gcs_error ]]; then
-#     echo "ray cannot connect，Job $ray_name exit with exception"
-#     ray stop --force
-#     sleep 10
-
-#    # rm -rf /tmp
-#     exit 1
-#   fi
-
-
-#   if [[ -n $succeeded ]]; then
-#     ray stop --force
-#     sleep 10
-
-#  #   rm -rf /tmp
-#     echo "Job $ray_name exit without exception"
-#     exit 0
-#   fi
-
-# #   if [[ -n $failed ]]; then
-# #     echo "Job $ray_name exit with exception"
-# #     ray stop --force
-#     sleep 10
-
-# # #    rm -rf /tmp
-# #     exit 1
-# #   fi
-
-#   sleep 10
-# done
