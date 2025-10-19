@@ -90,7 +90,7 @@ def preprocess_packed_seqs(
             input_ids_rmpad[start_idx + half_seqlen : start_idx + half_seqlen + remain_len] = d[
                 remain_start:remain_end
             ]
-    
+
     # define packed_seq_params for mla_cp
     cu_seqlens_padded_out = cu_seqlens_padded[1:] // cp_size
     max_seqlen_in_batch_out = max_seqlen_in_batch // cp_size
@@ -116,6 +116,8 @@ def preprocess_packed_seqs(
             cu_seqlens_q_padded=cu_seqlens_padded,
             cu_seqlens_kv_padded=cu_seqlens_padded,
         )
+
+    print(f"MindSpeed CP preprocess", flush=True)
 
     if pre_process:
         return input_ids_rmpad.unsqueeze(0), packed_seq_params, packed_seq_params_core

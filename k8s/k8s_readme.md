@@ -25,7 +25,9 @@ python ./_memory_viz.py trace_plot mem_snapshot.pickle -o mem_snapshot -p 1
 ## 观测指标
 
 ```python
-["critic/rewards/mean:","actor/grad_norm:", "actor/kl_loss", "response_length/mean:", "response_length/clip_ratio:"]
+["critic/rewards/mean:","actor/grad_norm:", "actor/kl_loss:", "response_length/mean:", "response_length/clip_ratio:"]
+["critic/rewards/mean:","actor/grad_norm:", "actor/pg_loss:", "response_length/mean:", "response_length/clip_ratio:"]
+
 ```
 
 # 正式执行部分
