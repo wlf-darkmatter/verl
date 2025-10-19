@@ -103,7 +103,7 @@ if [ "$RANK" = "0" ]; then
   mkdir -p ${JOB_LOG_DIR_CURR}
   mkdir -p ${JOB_LOG_DIR_CURR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
-  ln -s ${JOB_LOG_DIR_CURR}/ray_host /tmp/ray
+#   ln -s ${JOB_LOG_DIR_CURR}/ray_host /tmp/ray
   #* 拷贝当前脚本文件
   mkdir -p ${JOB_LOG_DIR_CURR}/script.bak
   cp $(dirname $0)/*.sh ${JOB_LOG_DIR_CURR}/script.bak/
@@ -119,7 +119,7 @@ if [ "$RANK" = "0" ]; then
     # judge npu_count_int bigger than NNODES*NPU_PER_NODE
     if [ "$npu_count_int" -ge "$((NNODES*NPU_PER_NODE))" ]; then
       echo "Ray cluster is ready with $npu_count_int npu (from $npu_count NPU resources), starting Python script."
-      bash hw_run_dapo_deepseek_671b_megatron.sh
+      bash hw_run_dapo_deepseek_671b_megatron.sh | tee ${JOB_LOG_DIR_CURR}/ray_host/$(date +"%Y-%m-%d_%H-%M-%S")_ray.log
       break
     fi
 

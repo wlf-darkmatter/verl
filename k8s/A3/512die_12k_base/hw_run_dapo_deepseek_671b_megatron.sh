@@ -174,7 +174,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
     trainer.log_val_generations=10 \
-    trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
+    trainer.device="npu" $@ 2>&1
 
 
 

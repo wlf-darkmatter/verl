@@ -24,9 +24,9 @@ overlong_buffer_len=$((1024 * 1))
 overlong_penalty_factor=1.0
 
 loss_agg_mode="token-mean"
-train_prompt_bsz=32
+train_prompt_bsz=8
 n_resp_per_prompt=16
-train_prompt_mini_bsz=32
+train_prompt_mini_bsz=8
 train_ppo_micro_batch_size_per_gpu=2
 infer_ppo_micro_batch_size_per_gpu=2
 # Paths
@@ -61,8 +61,8 @@ gen_tp=4
 gen_dp=1
 
 #!16 die
-train_tp=4
-train_ep=2
+train_tp=2
+train_ep=4
 train_pp=2
 enable_filter_group=False
 train_cp=1
@@ -145,7 +145,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=${infer_ppo_micro_batch_size_per_gpu} \
     actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu=${infer_ppo_max_token_len} \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.65 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.60 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=${gen_tp} \
     actor_rollout_ref.rollout.dp_model_parallel_size=${gen_dp} \
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
@@ -190,7 +190,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.resume_mode=auto \
     trainer.rollout_data_dir=${JOB_LOG_DIR_CURR}/rollout_data_dir \
     trainer.log_val_generations=10 \
-    trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
+    trainer.device="npu" $@ 2>&1
 
 
 
