@@ -12,7 +12,7 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 # * 确保 JOB_LOG_DIR 在共享盘下
 export JOB_LOG_DIR=/home/code/logs/$(basename $(dirname $0))
 export JOB_LOG_DIR_CURR=${JOB_LOG_DIR}/$(date +"%Y-%m-%d_%H")
-export ASCEND_PROCESS_LOG_PATH=${JOB_LOG_DIR_CURR}/plog/${RANK}
+export ASCEND_PROCESS_LOG_PATH=${JOB_LOG_DIR_CURR}/plog/${CURRENT_IP}
 
 
 export VLLM_SLEEP_LEVEL=2
@@ -38,7 +38,7 @@ export HCCL_BUFFSIZE=300
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
-#! #################  【0928】  #####################
+#! #################  【VLLM 0.10.0 patch】  #####################
 #! 规避模型加载时 权重读取错误的问题
 
 #! [VLLM]

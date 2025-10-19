@@ -3,7 +3,7 @@ set -x
 echo ">>Starting script at: $(date), path = $(pwd)"
 
 project_name='DAPO'
-exp_name='DAPO-dpsk-671b-megatron-BASE-32NNODES-0827images'
+exp_name='DAPO-dpsk-671b-megatron-BASE-16NNODES-0827bimages'
 
 adv_estimator=grpo
 
@@ -65,10 +65,10 @@ last_layer=7
 # pipeline_num_transformer_layers="[[3],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[2]]"
 offload=True
 gen_tp=8
-gen_dp=32
+gen_dp=8
 
 train_tp=8
-train_ep=64
+train_ep=32
 train_pp=8
 enable_filter_group=False
 train_cp=1
@@ -133,6 +133,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_method=uniform \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_granularity=full \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=1 \
+    ++actor_rollout_ref.actor.megatron.override_transformer_config.attention_backend=fused \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
     actor_rollout_ref.rollout.load_format=safetensors \
@@ -190,6 +191,6 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
 # 被取消的参数
 #    +actor_rollout_ref.actor.megatron.override_transformer_config.bias_dropout_fusion=True \
 #    +actor_rollout_ref.actor.megatron.override_transformer_config.persist_layer_norm=True \
-#    +actor_rollout_ref.actor.optim.override_optimizer_config.optimizer_cpu_offload=True \
-#    ++actor_rollout_ref.actor.megatron.override_transformer_config.attention_backend=fused \
-#    ++actor_rollout_ref.actor.megatron.override_transformer_config.attention_backend=fused \
+#     +actor_rollout_ref.actor.optim.override_optimizer_config.optimizer_cpu_offload=True \
+#! 以下特性不使用会导致报错！
+#     ++actor_rollout_ref.actor.megatron.override_transformer_config.attention_backend=fused \

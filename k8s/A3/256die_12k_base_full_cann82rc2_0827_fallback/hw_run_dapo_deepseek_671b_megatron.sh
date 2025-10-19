@@ -84,7 +84,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
-    actor_rollout_ref.rollout.skip.enable=True \
+    actor_rollout_ref.rollout.skip.enable=False \
     actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
     data.train_files="${TRAIN_FILE}" \
@@ -133,6 +133,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_method=uniform \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_granularity=full \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=1 \
+    ++actor_rollout_ref.actor.megatron.override_transformer_config.attention_backend=fused \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
     actor_rollout_ref.rollout.load_format=safetensors \
@@ -191,5 +192,5 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
 #    +actor_rollout_ref.actor.megatron.override_transformer_config.bias_dropout_fusion=True \
 #    +actor_rollout_ref.actor.megatron.override_transformer_config.persist_layer_norm=True \
 #     +actor_rollout_ref.actor.optim.override_optimizer_config.optimizer_cpu_offload=True \
+#! 以下特性不使用会导致报错！
 #     ++actor_rollout_ref.actor.megatron.override_transformer_config.attention_backend=fused \
-#    ++actor_rollout_ref.actor.megatron.override_transformer_config.attention_backend=fused \
