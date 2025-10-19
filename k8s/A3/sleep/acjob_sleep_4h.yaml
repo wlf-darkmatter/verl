@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek-test-comm  #sp-64-train-3b-moe-msrun #需要修改
+  name: sleep-4h  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -9,12 +9,12 @@ metadata:
     ring-controller.atlas: ascend-910b
     subHealthyStrategy: "ignore"
   annotations:
-    sp-block: "512"
+    sp-block: "64"
 spec:
   schedulerName: volcano    #需要修改 work when enableGangScheduling is true
   runPolicy:
     schedulingPolicy:
-      minAvailable: 32    #需要修改， work when enableGangScheduling is true
+      minAvailable: 4    #需要修改， work when enableGangScheduling is true
       queue: default
   successPolicy: AllWorkers
   replicaSpecs:
@@ -34,12 +34,12 @@ spec:
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.5.1-cann_8.2.rc1-py_3.10-aarch64_0827a  ##image
+              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:A3_pytorch_2.7.1_1016-cann_8.2.rc2-py_3.10-aarch64_verl0928_build1016  ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
 
               args:
-                - "bash /home/code/verl/k8s/A3/test/test_1.sh ; sleep 7d;"
+                - "sleep 7d"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
@@ -96,7 +96,7 @@ spec:
               hostPath:
                 path: /mnt/nv03
     Worker:
-      replicas: 31  #Master can only be 1
+      replicas: 3  #Master can only be 1
       restartPolicy: Never
       template:
         metadata:
@@ -111,13 +111,12 @@ spec:
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.5.1-cann_8.2.rc1-py_3.10-aarch64_0827a  ##image
+              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:A3_pytorch_2.7.1_1016-cann_8.2.rc2-py_3.10-aarch64_verl0928_build1016  ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "bash /home/code/verl/k8s/A3/test/test_1.sh ; sleep 7d;"
-
-              ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #
+                - "sleep 7d"
+              ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify
                 - containerPort: 6666 #modify according to actual situation
