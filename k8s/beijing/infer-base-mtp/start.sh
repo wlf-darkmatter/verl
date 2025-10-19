@@ -72,6 +72,10 @@ if [[ "$RANK" = "0" ]]; then
   mkdir -p ${JOB_LOG_DIR_CURR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
   ln -s ${JOB_LOG_DIR_CURR}/ray_host /tmp/ray
+  #* 拷贝当前脚本文件
+  mkdir -p ${JOB_LOG_DIR_CURR}/script.bak
+  cp $(dirname $0)/*.sh ${JOB_LOG_DIR_CURR}/script.bak/
+  cp $(dirname $0)/*.yaml ${JOB_LOG_DIR_CURR}/script.bak/
 
   kwargs=(--is_master --ray_dashboard_port $DashboardPort )
 else

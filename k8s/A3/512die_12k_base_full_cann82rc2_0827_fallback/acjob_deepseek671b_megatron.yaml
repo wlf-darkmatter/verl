@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek-test-comm  #sp-64-train-3b-moe-msrun #需要修改
+  name: deepseek671-512die-12k-base-full-cann82rc2-fallback  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -34,12 +34,12 @@ spec:
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.5.1-cann_8.2.rc1-py_3.10-aarch64_0827a  ##image
+              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.5.1_0724-cann_8.2.rc2-vllm_0.9.1-py_3.10-aarch64_build0827b  ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
 
               args:
-                - "bash /home/code/verl/k8s/A3/test/test_1.sh ; sleep 7d;"
+                - "bash /home/code/verl/k8s/A3/512die_12k_base_full_cann82rc2_0827_fallback/start.sh ;sleep 7d"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
@@ -111,13 +111,12 @@ spec:
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.5.1-cann_8.2.rc1-py_3.10-aarch64_0827a  ##image
+              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.5.1_0724-cann_8.2.rc2-vllm_0.9.1-py_3.10-aarch64_build0827b  ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "bash /home/code/verl/k8s/A3/test/test_1.sh ; sleep 7d;"
-
-              ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #
+                - "bash /home/code/verl/k8s/A3/512die_12k_base_full_cann82rc2_0827_fallback/start.sh ;sleep 7d"
+              ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify
                 - containerPort: 6666 #modify according to actual situation

@@ -7,9 +7,9 @@ set -xeuo pipefail
 #   CUDA_DEVICE_MAX_CONNECTIONS: "1"
 #   NCCL_NVLS_ENABLE: "0"
 #   VLLM_USE_V1: 1
-# 2. install mbridge=0.1.13 on all your node with the following command: 
+# 2. install mbridge=0.1.13 on all your node with the following command:
 # pip3 install git+https://github.com/ISEEKYAN/mbridge
-# 3. remove the `quantization_config` in the DeepSeek-V3's `config.json` and 
+# 3. remove the `quantization_config` in the DeepSeek-V3's `config.json` and
 # set `num_nextn_predict_layers=0` to disable MTP, which is not currently supported
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -111,7 +111,6 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.optim.lr_warmup_steps=10 \
     actor_rollout_ref.actor.optim.weight_decay=0.1 \
     +actor_rollout_ref.actor.optim.override_optimizer_config.optimizer_offload_fraction=${optimizer_offload_fraction} \
-    +actor_rollout_ref.actor.optim.override_optimizer_config.overlap_cpu_optimizer_d2h_h2d=True \
     +actor_rollout_ref.actor.optim.override_optimizer_config.use_precision_aware_optimizer=True \
     +actor_rollout_ref.actor.optim.override_optimizer_config.optimizer_cpu_offload=True \
     actor_rollout_ref.actor.ppo_mini_batch_size=${train_prompt_mini_bsz} \

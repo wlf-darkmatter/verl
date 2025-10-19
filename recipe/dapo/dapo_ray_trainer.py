@@ -373,7 +373,6 @@ class RayDAPOTrainer(RayPPOTrainer):
                     )
                     prev_step_profile = curr_step_profile
                     curr_step_profile = next_step_profile
-
                 # collect metrics
                 metrics.update(compute_data_metrics(batch=batch, use_critic=self.use_critic))
                 metrics.update(compute_timing_metrics(batch=batch, timing_raw=timing_raw))
@@ -399,7 +398,6 @@ class RayDAPOTrainer(RayPPOTrainer):
                 progress_bar.update(1)
                 self.global_steps += 1
                 self.gen_steps += 1
-
         # check if last step checkpint exists
         checkpoint_dir = os.path.join(self.config.trainer.default_local_dir, f"global_step_{self.global_steps}")
         if not os.path.exists(checkpoint_dir):

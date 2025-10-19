@@ -12,11 +12,11 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 # * 确保 JOB_LOG_DIR 在共享盘下
 export JOB_LOG_DIR=/home/code/logs/$(basename $(dirname $0))
 export JOB_LOG_DIR_CURR=${JOB_LOG_DIR}/$(date +"%Y-%m-%d_%H")
-export ASCEND_PROCESS_LOG_PATH=${JOB_LOG_DIR_CURR}/plog/${RANK}
+export ASCEND_PROCESS_LOG_PATH=${JOB_LOG_DIR_CURR}/plog/${CURRENT_IP}
 export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR_CURR}/memory_log
 
 export CACHE_DIR=${JOB_LOG_DIR}/CACHE; mkdir -p ${CACHE_DIR}
-export ACL_OP_COMPILER_CACHE_DIR=${CACHE_DIR}/COMPILER_CACHE/${RANK}; mkdir -p ${ACL_OP_COMPILER_CACHE_DIR}
+export ACL_OP_COMPILER_CACHE_DIR=${CACHE_DIR}/COMPILER_CACHE/${CURRENT_IP}; mkdir -p ${ACL_OP_COMPILER_CACHE_DIR}
 export VERL_CUSTOM_REWARD_RULE="1"
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
@@ -37,7 +37,7 @@ export HCCL_BUFFSIZE=300
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
-#! #################  【0928】  #####################
+#! #################  【VLLM 0.10.0 patch】  #####################
 #! 规避模型加载时 权重读取错误的问题
 
 #! [VLLM]
@@ -100,6 +100,10 @@ if [ "$RANK" = "0" ]; then
   mkdir -p ${JOB_LOG_DIR_CURR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
   ln -s ${JOB_LOG_DIR_CURR}/ray_host /tmp/ray
+  #* 拷贝当前脚本文件
+  mkdir -p ${JOB_LOG_DIR_CURR}/script.bak
+  cp $(dirname $0)/*.sh ${JOB_LOG_DIR_CURR}/script.bak/
+  cp $(dirname $0)/*.yaml ${JOB_LOG_DIR_CURR}/script.bak/
 
   ray start --head --ray-debugger-external --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 
@@ -125,6 +129,8 @@ else
   sleep 10
   ray start --address="$MASTER_ADDR:$ServerPort" --disable-usage-stats
 fi
+
+# start Mark 1
 
 cnt=0
 while true; do
