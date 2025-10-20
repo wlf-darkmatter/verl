@@ -11,7 +11,6 @@ RUNTIME_ENV=verl/trainer/mc2_env.yaml
 ray job submit --runtime-env="${RUNTIME_ENV}" \
     --working-dir /opt/verl \
     -- python3 tests/verl_offline_infer.py \
-    ${kwargs[@]} \
     --ray_master_ip $MASTER_ADDR \
     --ray_master_port $ServerPort \
     --ray_debug \
