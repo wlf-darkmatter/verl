@@ -408,15 +408,15 @@ class RayDAPOTrainer(RayPPOTrainer):
                             actor_output = self.actor_rollout_wg.update_actor(batch)
                         actor_output_metrics = reduce_metrics(actor_output.meta_info["metrics"])
                         metrics.update(actor_output_metrics)
-                        #! 分阶段profiling逻辑
-                        if os.getenv("VERL_CUSTOM_PROFILING", "0") == "1":
-                            self._custom_stop_profiling(
-                                not prev_step_profile and curr_step_profile
-                                if self.config.global_profiler.profile_continuous_steps
-                                else curr_step_profile,
-                                wg=self.actor_rollout_wg,
-                                role="actor",
-                            )
+                    #! 分阶段profiling逻辑
+                    if os.getenv("VERL_CUSTOM_PROFILING", "0") == "1":
+                        self._custom_stop_profiling(
+                            not prev_step_profile and curr_step_profile
+                            if self.config.global_profiler.profile_continuous_steps
+                            else curr_step_profile,
+                            wg=self.actor_rollout_wg,
+                            role="actor",
+                        )
 
                     # Log rollout generations if enabled
                     rollout_data_dir = self.config.trainer.get("rollout_data_dir", None)

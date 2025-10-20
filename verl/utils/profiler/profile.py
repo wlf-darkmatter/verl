@@ -458,13 +458,15 @@ class DistProfilerExtension:
         if config.ranks is not None:
             config.all_ranks = False
         tool_config = config.tool_config
-        if config.enable:
-            if role not in self.dict_impl:
-                print(f"创建profile对象: rank={self.rank}, role={role}")
-                tool = getattr(config, "tool")
-                self.dict_impl[role] = DistProfiler(self.rank, config, getattr(tool_config, tool))
-                self.dict_impl[role]._impl.profile_save_path += f"/{role}/{profile_step}"
-            self.dict_impl[role].start()
+        if not config.enable:
+            return
+        print(f"\033[33m准备开始profiling采集: {role}\033[0m", flush=True)
+        if role not in self.dict_impl:
+            print(f"创建profile对象: rank={self.rank}, role={role}")
+            tool = getattr(config, "tool")
+            self.dict_impl[role] = DistProfiler(self.rank, config, getattr(tool_config, tool))
+        # self.dict_impl[role]._impl.profile_save_path = config.save_path + f"/{role}/{profile_step}"
+        self.dict_impl[role].start(role=role, profile_step=profile_step)
 
     @register(dispatch_mode=Dispatch.ONE_TO_ALL)
     def custom_stop_profile(self, role) -> None:
@@ -472,8 +474,10 @@ class DistProfilerExtension:
         config = getattr(self.config, role).profiler
         if not config.enable:
             return
+        print(f"\033[33m准备结束profiling采集: {role}\033[0m", flush=True)
+        # breakpoint()
         if role not in self.dict_impl:
-            print(f"出现未被初始化的profile对象: {role}")
+            print(f"\033[31m出现未被初始化的profile对象: {role}\033[0m")
         else:
             self.dict_impl[role].stop()
 
