@@ -1,0 +1,31 @@
+diff --git a/mindspeed/features_manager/transformer/flash_attention/reset_attention_mask_feature.py b/mindspeed/features_manager/transformer/flash_attention/reset_attention_mask_feature.py
+index 299cf02c..47b9dd5a 100644
+--- a/mindspeed/features_manager/transformer/flash_attention/reset_attention_mask_feature.py
++++ b/mindspeed/features_manager/transformer/flash_attention/reset_attention_mask_feature.py
+@@ -21,14 +21,14 @@ class ResetAttentionMaskFeature(MindSpeedFeature):
+             patch_manager.register_patch('megatron.core.datasets.gpt_dataset._get_ltor_masks_and_position_ids',
+                                          _get_ltor_masks_and_position_ids)
+             patch_manager.register_patch('torch.utils.data._utils.collate.default_collate', collate_wrapper)
+-            patch_manager.register_patch('megatron.training.utils.get_batch_on_this_cp_rank',
+-                                         get_batch_on_this_cp_rank_wrapper)
++            # patch_manager.register_patch('megatron.training.utils.get_batch_on_this_cp_rank',
++            #                              get_batch_on_this_cp_rank_wrapper)
+ 
+             patch_manager.register_patch('megatron.core.pipeline_parallel.p2p_communication._p2p_ops', _p2p_ops_eod)
+             patch_manager.register_patch('megatron.core.pipeline_parallel.p2p_communication._batched_p2p_ops', _p2p_ops_eod)
+-            patch_manager.register_patch('megatron.core.models.gpt.gpt_model.GPTModel.forward', gpt_forward_wrapper)
++            # patch_manager.register_patch('megatron.core.models.gpt.gpt_model.GPTModel.forward', gpt_forward_wrapper)
+ 
+-            patch_manager.register_patch('megatron.core.transformer.attention.Attention.forward', attention_forward)
++            # patch_manager.register_patch('megatron.core.transformer.attention.Attention.forward', attention_forward)
+             if getattr(args, 'multi_latent_attention', None):
+                 patch_manager.register_patch(
+                     'megatron.core.transformer.multi_latent_attention.MLASelfAttention',
+@@ -43,4 +43,4 @@ class ResetAttentionMaskFeature(MindSpeedFeature):
+                 'megatron.core.models.common.embeddings.rotary_pos_embedding.RotaryEmbedding.get_rotary_seq_len',
+                 Eod_get_rotary_seq_len)
+ 
+-            patch_manager.register_patch('megatron.training.utils.get_batch_on_this_tp_rank', get_batch_on_this_tp_rank)
+\ No newline at end of file
++            # patch_manager.register_patch('megatron.training.utils.get_batch_on_this_tp_rank', get_batch_on_this_tp_rank)
+\ No newline at end of file

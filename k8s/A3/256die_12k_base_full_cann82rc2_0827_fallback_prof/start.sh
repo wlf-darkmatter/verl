@@ -40,6 +40,7 @@ export HCCL_BUFFSIZE=300
 #! 注意，1003 加了这 几个超时配置
 # export RAY_DEBUG_POST_MORTEM=1
 # export ASCEND_LAUNCH_BLOCKING=1
+export USE_CP_PATCH=1 #! 使用CP需要声明这个环境变量才能打上 Patch
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
@@ -51,11 +52,12 @@ bash /home/code/verl/k8s/patch/apply_vllm-ascend.sh
 #! [Megatron]
 bash /home/code/verl/k8s/patch/apply_megatron.sh
 
+#! #################  【MindSpeed patch】  #####################
+#! [MindSpeed]
+bash /home/code/verl/k8s/patch/apply_mindspeed.sh
+
 #! VLLM_SLEEP_LEVEL
 export VLLM_SLEEP_LEVEL="1"
-
-#!MC2.YAML
-export VLLM_VERSION="0.9.1"
 
 #######################################
 
@@ -91,7 +93,9 @@ echo "Overwrite verl code, done."
 
 rm -f /opt/verl/.gitignore
 cd $(dirname $0)
-
+#! #################  【Verl patch】  #####################
+#* [Verl] 一般用于打CP代码
+bash /home/code/verl/k8s/patch/apply_verl.sh
 
 export ServerPort=6666     # modify according to actual situation
 export DashboardPort=8888  # modify according to actual situation
