@@ -42,8 +42,8 @@ class DotProductAttention(MegatronModule):
         attention_dropout: float = None,
         softmax_scale: float = None,
         cp_comm_type: str = None,
-        k_channels: str = None,
-        v_channels: str = None,
+        k_channels: str = None, #! patch 了此处，因为 mindspeed 传入了多余的参数
+        v_channels: str = None, #! patch 了此处，因为 mindspeed 传入了多余的参数
     ):
         super().__init__(config=config)
 
