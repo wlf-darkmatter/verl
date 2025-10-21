@@ -192,7 +192,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +actor_rollout_ref.model.override_config.model_config.num_hidden_layers=4 \
     +actor_rollout_ref.actor.megatron.override_transformer_config.position_embedding_type='rope' \
     +actor_rollout_ref.actor.megatron.override_transformer_config.use_fused_rotary_pos_emb=True \
-    trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
+    trainer.device="npu" $@ 2>&1
 
 
 

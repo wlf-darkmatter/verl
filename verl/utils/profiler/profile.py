@@ -437,6 +437,7 @@ class DistProfilerExtension:
 
     def __init__(self, profiler: DistProfiler):
         self.profiler = profiler
+        self.dict_impl = {}
 
     from verl.single_controller.base.decorator import Dispatch, register
 
@@ -451,20 +452,35 @@ class DistProfilerExtension:
         self.profiler.stop()
 
     @register(dispatch_mode=Dispatch.ONE_TO_ALL)
-    def dump_memory_snapshot(self, tag: str = "manual", sub_dir: str = None) -> None:
-        """Manually trigger a CUDA memory snapshot dump on all ranks."""
-        # Memory snapshot is now handled by the profiler system
-        # This method is kept for backward compatibility but delegates to profiler
-        breakpoint()
-        if hasattr(self, "profiler") and hasattr(self.profiler, "_impl"):
-            try:
-                # Try to use the profiler's memory snapshot functionality
-                if hasattr(self.profiler._impl, "sampler"):
-                    out_dir = OmegaConf.select(self.config, "actor.profiler.save_path") or "."
-                    self.profiler._impl.sampler.dump_memory_snapshot(out_dir=out_dir, tag=tag, sub_dir=sub_dir)
-            except Exception:
-                # silently ignore if profiler doesn't support memory snapshots
-                pass
+    def custom_start_profile(self, profile_step, role) -> None:
+        """Start profiling for the current rank in the current training step."""
+        config = getattr(self.config, role).profiler
+        if config.ranks is not None:
+            config.all_ranks = False
+        tool_config = config.tool_config
+        if not config.enable:
+            return
+        print(f"\033[33m准备开始profiling采集: {role}\033[0m", flush=True)
+        if role not in self.dict_impl:
+            print(f"创建profile对象: rank={self.rank}, role={role}")
+            tool = getattr(config, "tool")
+            self.dict_impl[role] = DistProfiler(self.rank, config, getattr(tool_config, tool))
+        # self.dict_impl[role]._impl.profile_save_path = config.save_path + f"/{role}/{profile_step}"
+        self.dict_impl[role].start(role=role, profile_step=profile_step)
+
+    @register(dispatch_mode=Dispatch.ONE_TO_ALL)
+    def custom_stop_profile(self, role) -> None:
+        """Stop profiling for the current rank in the current training step."""
+        config = getattr(self.config, role).profiler
+        if not config.enable:
+            return
+        print(f"\033[33m准备结束profiling采集: {role}\033[0m", flush=True)
+        # breakpoint()
+        if role not in self.dict_impl:
+            print(f"\033[31m出现未被初始化的profile对象: {role}\033[0m")
+        else:
+            self.dict_impl[role].stop()
+
 
     # @register(dispatch_mode=Dispatch.ONE_TO_ALL)
     def custom_memory_snapshot_start(self, tag: str = "manual", sub_dir: str = None) -> None:

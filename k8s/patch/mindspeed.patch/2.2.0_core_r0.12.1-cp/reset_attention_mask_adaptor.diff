@@ -1,0 +1,74 @@
+diff --git a/mindspeed/core/transformer/flash_attention/reset_attention_mask/adaptor.py b/mindspeed/core/transformer/flash_attention/reset_attention_mask/adaptor.py
+index 84c33fb7..7044bc6a 100644
+--- a/mindspeed/core/transformer/flash_attention/reset_attention_mask/adaptor.py
++++ b/mindspeed/core/transformer/flash_attention/reset_attention_mask/adaptor.py
+@@ -7,8 +7,8 @@ import torch
+ from torch import Tensor
+ from einops import rearrange
+ 
+-from megatron.training import get_args
+-from megatron.training.global_vars import get_args as get_global_args
++from mindspeed.args_utils import get_full_args as get_args
++from mindspeed.args_utils import get_full_args as get_global_args
+ from megatron.core import parallel_state
+ from megatron.core.parallel_state import (
+     get_pipeline_model_parallel_rank,
+@@ -28,11 +28,34 @@ from megatron.core.utils import deprecate_inference_params
+ 
+ from megatron.core.transformer.multi_latent_attention import MLASelfAttention
+ 
+-from mindspeed.utils import get_position_ids, set_position_ids
+-from mindspeed.core.context_parallel.get_batch_utils import get_actual_seq_len, set_actual_seq_len
++# from mindspeed.utils import get_position_ids, set_position_ids
++# from mindspeed.core.context_parallel.get_batch_utils import get_actual_seq_len, set_actual_seq_len
+ from mindspeed.core.context_parallel.rotary_pos_embedding_utils import get_pos_emb_on_this_cp_rank
+ from mindspeed.core.fusions.fused_rope import apply_rotary_pos_emb_bshd, apply_rotary_pos_emb
+ 
++_ACTUAL_SEQ_LEN = None
++_POSITION_IDS = None
++
++
++def get_actual_seq_len():
++    global _ACTUAL_SEQ_LEN
++    return _ACTUAL_SEQ_LEN
++
++
++def set_actual_seq_len(actual_seq_len):
++    global _ACTUAL_SEQ_LEN
++    _ACTUAL_SEQ_LEN = actual_seq_len
++
++
++def get_position_ids():
++    global _POSITION_IDS
++    return _POSITION_IDS
++
++
++def set_position_ids(position_ids):
++    global _POSITION_IDS
++    _POSITION_IDS = position_ids
++
+ 
+ def _p2p_ops_eod(
+         *,
+@@ -63,8 +86,8 @@ def _p2p_ops_eod(
+     length_buffer = None
+ 
+     args = get_args()
+-    bsz = args.micro_batch_size
+-
++    # bsz = args.micro_batch_size
++    bsz = 1
+     if tensor_send_next is not None:
+         tensor_length = torch.tensor(prev_actual_seq_len.numel()).npu()
+ 
+@@ -520,6 +543,10 @@ class MindSpeedMLASelfAttention(MLASelfAttention):
+                 rotary_pos_cos is None and rotary_pos_sin is None
+         ), "MLA does not support Flash Decoding"
+ 
++        # set global vars
++        set_actual_seq_len(packed_seq_params.cu_seqlens_q)
++        set_position_ids(packed_seq_params.position_ids.transpose(0, 1).contiguous())
++
+         # hidden_states: [sq, b, h]
+ 
+         inference_context = deprecate_inference_params(inference_context, inference_params)

@@ -15,8 +15,6 @@ cp -f /home/code/verl/k8s/patch/0827/base_loader.py /opt/vllm/vllm/model_executo
 rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 cp -f /home/code/verl/k8s/patch/0827/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 
-rm -f /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
-cp -f /home/code/verl/k8s/patch/0827/vllm_ascend/ops/fused_moe.py /opt/vllm-ascend/vllm_ascend/ops/fused_moe.py
 
 #! [Megatron]
 rm -f /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
@@ -56,7 +54,11 @@ if [[ "$RANK" = "0" ]]; then
   mkdir -p ${JOB_LOG_DIR_CURR}
   mkdir -p ${JOB_LOG_DIR_CURR}/ray_host
   echo "CURRENT_IP=$CURRENT_IP"
-  ln -s ${JOB_LOG_DIR_CURR}/ray_host /tmp/ray
+#   ln -s ${JOB_LOG_DIR_CURR}/ray_host /tmp/ray
+  #* 拷贝当前脚本文件
+  mkdir -p ${JOB_LOG_DIR_CURR}/script.bak
+  cp $(dirname $0)/*.sh ${JOB_LOG_DIR_CURR}/script.bak/
+  cp $(dirname $0)/*.yaml ${JOB_LOG_DIR_CURR}/script.bak/
 
   kwargs=(--is_master --ray_dashboard_port $DashboardPort )
 else

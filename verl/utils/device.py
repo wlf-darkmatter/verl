@@ -9,7 +9,7 @@
 # This source code is licensed under the BSD-style license in https://github.com/pytorch/torchtune/blob/main/LICENSE
 
 import logging
-
+import os
 import torch
 
 logger = logging.getLogger(__name__)
@@ -92,4 +92,5 @@ def set_expandable_segments(enable: bool) -> None:
         enable (bool): Whether to enable expandable segments. Used to avoid OOM.
     """
     if is_cuda_available:
+        print(f"\033[32m显式地设置了虚拟显存为: {enable}\033[0m", flush=True)
         torch.cuda.memory._set_allocator_settings(f"expandable_segments:{enable}")

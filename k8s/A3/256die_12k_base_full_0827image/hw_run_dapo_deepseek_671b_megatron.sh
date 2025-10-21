@@ -3,7 +3,7 @@ set -x
 echo ">>Starting script at: $(date), path = $(pwd)"
 
 project_name='DAPO'
-exp_name='DAPO-DeepSeek-671b-megatron-BASE-64NNODES-1014-0827-images'
+exp_name='DAPO-dpsk-671b-megatron-BASE-16NNODES-0827images'
 
 adv_estimator=grpo
 
@@ -31,8 +31,7 @@ infer_ppo_micro_batch_size_per_gpu=2
 # Paths
 MODEL_PATH="/mnt/hpfs_test/weights/dsv3-base-fp8-zy-bf16"
 MCORE_MODEL_PATH="/mnt/hpfs_test/weights/dsv3_base_bf16_mcore_zy_hs_mtp0"
-DIST_CKPT_PATH="/mnt/hpfs_test/weights/dsv3_base_bf16_mcore_zy_hs_mtp0"
-CKPTS_DIR=/mnt/hpfs_test/weights/CKPT/ckpt-DAPO-DeepSeek-671b-megatron-base-2k12k-1014-0827images
+CKPTS_DIR=/mnt/hpfs_test/weights/CKPT/ckpt-${exp_name}
 TRAIN_FILE="/mnt/hpfs_test/data/rl_data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
 TEST_FILE="/mnt/hpfs_test/data/rl_data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
 # TEST_FILE="['$aime24_test_path']"
@@ -183,13 +182,13 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.nnodes="${NNODES}" \
     trainer.val_before_train=False \
     trainer.test_freq=-1 \
-    trainer.save_freq=-1 \
+    trainer.save_freq=10 \
     trainer.total_epochs=10 \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
     trainer.rollout_data_dir=${JOB_LOG_DIR_CURR}/rollout_data_dir \
     trainer.log_val_generations=10 \
-    trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
+    trainer.device="npu" $@ 2>&1
 
 
 

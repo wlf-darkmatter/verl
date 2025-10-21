@@ -174,5 +174,5 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.resume_mode=auto \
     trainer.log_val_generations=10 \
     actor_rollout_ref.rollout.free_cache_engine=True \
-    trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
+    trainer.device="npu" $@ 2>&1
 

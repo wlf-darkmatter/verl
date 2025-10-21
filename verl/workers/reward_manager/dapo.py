@@ -98,8 +98,6 @@ class DAPORewardManager(AbstractRewardManager):
 
             extra_info["rollout_reward_scores"] = rollout_reward_scores
             
-            # if os.getenv("REWARD_DEBUG_ZY", False):
-            #     breakpoint()
             result = self.compute_score(
                 data_source=data_source,
                 solution_str=response_str,

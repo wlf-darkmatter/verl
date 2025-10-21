@@ -114,11 +114,12 @@ class RayDAPOTrainer(RayPPOTrainer):
 
                 #*
                 with marked_timer("start_profile", timing_raw):
-                    self._start_profiling(
-                        not prev_step_profile and curr_step_profile
-                        if self.config.global_profiler.profile_continuous_steps
-                        else curr_step_profile
-                    )
+                    if os.getenv("VERL_CUSTOM_PROFILING", "0") == "0":
+                        self._start_profiling(
+                            not prev_step_profile and curr_step_profile
+                            if self.config.global_profiler.profile_continuous_steps
+                            else curr_step_profile
+                        )
 
                 new_batch: DataProto = DataProto.from_single_dict(batch_dict)
                 num_gen_batches += 1
@@ -139,13 +140,25 @@ class RayDAPOTrainer(RayPPOTrainer):
 
                 with marked_timer("step", timing_raw):
                     # generate a batch
+                    #! 分阶段profiling逻辑
+                    if os.getenv("VERL_CUSTOM_PROFILING", "0") == "1":
+                        self._custom_start_profiling(
+                            not prev_step_profile and curr_step_profile
+                            if self.config.global_profiler.profile_continuous_steps
+                            else curr_step_profile,
+                            wg=self.actor_rollout_wg,
+                            role="rollout",
+                        )
 
                     with marked_timer("gen", timing_raw, "red"):
                         if rollout_skip.is_enable:
                             rollout_skip.record(new_batch, self.global_steps, self.gen_steps)
+
+
                         gen_batch_output = self.actor_rollout_wg.generate_sequences(gen_batch)
                         timing_raw.update(gen_batch_output.meta_info["timing"])
                         gen_batch_output.meta_info.pop("timing", None)
+
 
                     if self.config.algorithm.adv_estimator == AdvantageEstimator.REMAX:
                         with marked_timer("gen_max", timing_raw, "red"):
@@ -270,8 +283,28 @@ class RayDAPOTrainer(RayPPOTrainer):
                             traj_bsz = self.config.data.train_batch_size * self.config.actor_rollout_ref.rollout.n
                             batch = batch[:traj_bsz]
 
+                    #! 分阶段profiling逻辑
+                    if os.getenv("VERL_CUSTOM_PROFILING", "0") == "1":
+                        self._custom_stop_profiling(
+                            not prev_step_profile and curr_step_profile
+                            if self.config.global_profiler.profile_continuous_steps
+                            else curr_step_profile,
+                            wg=self.actor_rollout_wg,
+                            role="rollout",
+                        )
+
                     # === Updating ===
 
+
+                    #! 分阶段profiling逻辑
+                    if os.getenv("VERL_CUSTOM_PROFILING", "0") == "1":
+                        self._custom_start_profiling(
+                            not prev_step_profile and curr_step_profile
+                            if self.config.global_profiler.profile_continuous_steps
+                            else curr_step_profile,
+                            wg=self.actor_rollout_wg,
+                            role="actor",
+                        )
                     batch.batch["response_mask"] = compute_response_mask(batch)
 
                     # Balance the number of valid tokens across DP ranks.
@@ -298,16 +331,47 @@ class RayDAPOTrainer(RayPPOTrainer):
                         batch = batch.union(old_log_prob)
 
                     if self.use_reference_policy:
+                        #! 分阶段profiling逻辑
+                        if os.getenv("VERL_CUSTOM_PROFILING", "0") == "1":
+                            self._custom_start_profiling(
+                                not prev_step_profile and curr_step_profile
+                                if self.config.global_profiler.profile_continuous_steps
+                                else curr_step_profile,
+                                wg=self.ref_policy_wg,
+                                role="ref",
+                            )
                         # compute reference log_prob
                         with marked_timer("ref", timing_raw, "olive"):
                             ref_log_prob = self.ref_policy_wg.compute_ref_log_prob(batch)
                             batch = batch.union(ref_log_prob)
+                        #! 分阶段profiling逻辑
+                        if os.getenv("VERL_CUSTOM_PROFILING", "0") == "1":
+                            self._custom_stop_profiling(
+                                not prev_step_profile and curr_step_profile
+                                if self.config.global_profiler.profile_continuous_steps
+                                else curr_step_profile,
+                                wg=self.ref_policy_wg,
+                                role="ref",
+                            )
 
                     # compute values
                     if self.use_critic:
+                        #! 分阶段profiling逻辑
+                        if os.getenv("VERL_CUSTOM_PROFILING", "0") == "1":
+                            self._custom_start_profiling(
+                                not prev_step_profile and curr_step_profile
+                                if self.config.global_profiler.profile_continuous_steps
+                                else curr_step_profile,
+                                wg=self.critic_wg,
+                                config = self.config.critic.ref.profiler,
+                                role="critic",
+                            )
+
                         with marked_timer("values", timing_raw, "cyan"):
                             values = self.critic_wg.compute_values(batch)
                             batch = batch.union(values)
+
+
 
                     with marked_timer("adv", timing_raw, "brown"):
                         # compute advantages, executed on the driver process
@@ -327,6 +391,15 @@ class RayDAPOTrainer(RayPPOTrainer):
                             critic_output = self.critic_wg.update_critic(batch)
                         critic_output_metrics = reduce_metrics(critic_output.meta_info["metrics"])
                         metrics.update(critic_output_metrics)
+                        #! 分阶段profiling逻辑
+                        if os.getenv("VERL_CUSTOM_PROFILING", "0") == "1":
+                            self._custom_stop_profiling(
+                                not prev_step_profile and curr_step_profile
+                                if self.config.global_profiler.profile_continuous_steps
+                                else curr_step_profile,
+                                wg=self.critic_wg,
+                                role="critic",
+                            )
 
                     # implement critic warmup
                     if self.config.trainer.critic_warmup <= self.global_steps:
@@ -335,6 +408,15 @@ class RayDAPOTrainer(RayPPOTrainer):
                             actor_output = self.actor_rollout_wg.update_actor(batch)
                         actor_output_metrics = reduce_metrics(actor_output.meta_info["metrics"])
                         metrics.update(actor_output_metrics)
+                    #! 分阶段profiling逻辑
+                    if os.getenv("VERL_CUSTOM_PROFILING", "0") == "1":
+                        self._custom_stop_profiling(
+                            not prev_step_profile and curr_step_profile
+                            if self.config.global_profiler.profile_continuous_steps
+                            else curr_step_profile,
+                            wg=self.actor_rollout_wg,
+                            role="actor",
+                        )
 
                     # Log rollout generations if enabled
                     rollout_data_dir = self.config.trainer.get("rollout_data_dir", None)
@@ -365,15 +447,14 @@ class RayDAPOTrainer(RayPPOTrainer):
                         if self.config.global_profiler.steps is not None
                         else False
                     )
-
-                    self._stop_profiling(
-                        curr_step_profile and not next_step_profile
-                        if self.config.global_profiler.profile_continuous_steps
-                        else curr_step_profile
-                    )
+                    if os.getenv("VERL_CUSTOM_PROFILING", "0") == "0":
+                        self._stop_profiling(
+                            curr_step_profile and not next_step_profile
+                            if self.config.global_profiler.profile_continuous_steps
+                            else curr_step_profile
+                        )
                     prev_step_profile = curr_step_profile
                     curr_step_profile = next_step_profile
-
                 # collect metrics
                 metrics.update(compute_data_metrics(batch=batch, use_critic=self.use_critic))
                 metrics.update(compute_timing_metrics(batch=batch, timing_raw=timing_raw))
@@ -399,7 +480,6 @@ class RayDAPOTrainer(RayPPOTrainer):
                 progress_bar.update(1)
                 self.global_steps += 1
                 self.gen_steps += 1
-
         # check if last step checkpint exists
         checkpoint_dir = os.path.join(self.config.trainer.default_local_dir, f"global_step_{self.global_steps}")
         if not os.path.exists(checkpoint_dir):
@@ -409,3 +489,14 @@ class RayDAPOTrainer(RayPPOTrainer):
                 self._save_checkpoint()
             metrics = {f"timing/{k}": v for k, v in timing_raw.items()}
             logger.log(data=metrics, step=self.global_steps)
+
+    def _custom_start_profiling(self, do_profile: bool, wg, role) -> None:
+        """Start profiling for all worker groups if profiling is enabled."""
+        if do_profile:
+            #* 更改路径
+            wg.custom_start_profile(profile_step=self.global_steps, role=role)
+
+    def _custom_stop_profiling(self, do_profile: bool, wg, role) -> None:
+        """Stop profiling for all worker groups if profiling is enabled."""
+        if do_profile:
+            wg.custom_stop_profile(role)

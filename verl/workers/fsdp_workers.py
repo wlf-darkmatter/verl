@@ -893,50 +893,52 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
         self.custom_memory_snapshot_start("generate_sequences")
         # Support all hardwares
         assert self._is_rollout
-        prompts = prompts.to(get_device_id())
-
-        meta_info = {
-            "eos_token_id": self.generation_config.eos_token_id
-            if self.generation_config is not None
-            else self.tokenizer.eos_token_id,
-            "pad_token_id": self.generation_config.pad_token_id
-            if self.generation_config is not None
-            else self.tokenizer.pad_token_id,
-        }
-        prompts.meta_info.update(meta_info)
-
-        timing_generate = {}
-        if self._is_actor:  # For rollout only, we do not switch context.
-            loop = asyncio.get_event_loop()
-            loop.run_until_complete(self.rollout_mode())
-            log_gpu_memory_usage("After switch to rollout mode", logger=logger)
-
-        with simple_timer("generate_sequences", timing_generate):
-            output = self.rollout.generate_sequences(prompts=prompts)
-
-        if self._is_actor:
-            loop.run_until_complete(self.trainer_mode())
-            log_gpu_memory_usage("After switch to trainer mode", logger=logger)
-
-        # We calculate the average timing across all ranks
-        # to make sure meta_info["timing"] is the same
-        timing_generate_topk_ratio, timing_generate_min, timing_generate_max = topk_reduce_ratio_min_max(
-            timing_generate["generate_sequences"]
-        )
-        timing_generate = reduce_timing(timing_generate)
-        timing_generate.update(
-            {
-                "generation_timing/max": timing_generate_max,
-                "generation_timing/min": timing_generate_min,
-                "generation_timing/topk_ratio": timing_generate_topk_ratio,
+        try:
+            prompts = prompts.to(get_device_id())
+            meta_info = {
+                "eos_token_id": self.generation_config.eos_token_id
+                if self.generation_config is not None
+                else self.tokenizer.eos_token_id,
+                "pad_token_id": self.generation_config.pad_token_id
+                if self.generation_config is not None
+                else self.tokenizer.pad_token_id,
             }
-        )
-        output.meta_info["timing"] = timing_generate
-        output = output.to("cpu")
+            prompts.meta_info.update(meta_info)
 
-        # clear kv cache
-        get_torch_device().empty_cache()
-        self.custom_memory_snapshot_stop("generate_sequences")
+            timing_generate = {}
+            if self._is_actor:  # For rollout only, we do not switch context.
+                loop = asyncio.get_event_loop()
+                loop.run_until_complete(self.rollout_mode())
+                log_gpu_memory_usage("After switch to rollout mode", logger=logger)
+
+            with simple_timer("generate_sequences", timing_generate):
+                output = self.rollout.generate_sequences(prompts=prompts)
+
+            if self._is_actor:
+                loop.run_until_complete(self.trainer_mode())
+                log_gpu_memory_usage("After switch to trainer mode", logger=logger)
+
+            # We calculate the average timing across all ranks
+            # to make sure meta_info["timing"] is the same
+            timing_generate_topk_ratio, timing_generate_min, timing_generate_max = topk_reduce_ratio_min_max(
+                timing_generate["generate_sequences"]
+            )
+            timing_generate = reduce_timing(timing_generate)
+            timing_generate.update(
+                {
+                    "generation_timing/max": timing_generate_max,
+                    "generation_timing/min": timing_generate_min,
+                    "generation_timing/topk_ratio": timing_generate_topk_ratio,
+                }
+            )
+            output.meta_info["timing"] = timing_generate
+            output = output.to("cpu")
+            get_torch_device().empty_cache()
+        except Exception as e:
+            print(e.__repr__(), flush=True)
+        finally:
+            # clear kv cache
+            self.custom_memory_snapshot_stop("generate_sequences")
         return output
 
     @register(dispatch_mode=make_nd_compute_dataproto_dispatch_fn(mesh_name="actor"))
@@ -946,40 +948,44 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
         # which is mostly used for ref log_prob calculation
         self.custom_memory_snapshot_start("compute_log_prob")
         assert self._is_actor
-        if self._is_offload_param:
-            load_fsdp_model_to_gpu(self.actor_module_fsdp)
+        try:
+            if self._is_offload_param:
+                load_fsdp_model_to_gpu(self.actor_module_fsdp)
 
-        # Support all hardwares
-        from contextlib import nullcontext
+            # Support all hardwares
+            from contextlib import nullcontext
 
-        is_lora = data.meta_info.pop("is_lora", False)
-        adapter_ctx = self.actor.actor_module.disable_adapter() if is_lora else nullcontext()
-        # we should always recompute old_log_probs when it is HybridEngine
-        data.meta_info["micro_batch_size"] = self.config.rollout.log_prob_micro_batch_size_per_gpu
-        data.meta_info["max_token_len"] = self.config.rollout.log_prob_max_token_len_per_gpu
-        data.meta_info["use_dynamic_bsz"] = self.config.rollout.log_prob_use_dynamic_bsz
-        data.meta_info["temperature"] = self.config.rollout.temperature
-        # perform recompute log_prob
-        with self.ulysses_sharding_manager:
-            with adapter_ctx:
-                output, entropys = self.actor.compute_log_prob(data=data, calculate_entropy=True)
-            output = DataProto.from_dict(
-                tensors={"old_log_probs": output, "entropys": entropys},
-                meta_info={"temperature": self.config.rollout.temperature},
-            )
+            is_lora = data.meta_info.pop("is_lora", False)
+            adapter_ctx = self.actor.actor_module.disable_adapter() if is_lora else nullcontext()
+            # we should always recompute old_log_probs when it is HybridEngine
+            data.meta_info["micro_batch_size"] = self.config.rollout.log_prob_micro_batch_size_per_gpu
+            data.meta_info["max_token_len"] = self.config.rollout.log_prob_max_token_len_per_gpu
+            data.meta_info["use_dynamic_bsz"] = self.config.rollout.log_prob_use_dynamic_bsz
+            data.meta_info["temperature"] = self.config.rollout.temperature
+            # perform recompute log_prob
+            with self.ulysses_sharding_manager:
+                with adapter_ctx:
+                    output, entropys = self.actor.compute_log_prob(data=data, calculate_entropy=True)
+                output = DataProto.from_dict(
+                    tensors={"old_log_probs": output, "entropys": entropys},
+                    meta_info={"temperature": self.config.rollout.temperature},
+                )
 
-        output = output.to("cpu")
+            output = output.to("cpu")
 
-        # https://pytorch.org/docs/stable/notes/fsdp.html#fsdp-notes
-        # unshard the root FSDP module
-        if self.world_size > 1 and fsdp_version(self.actor.actor_module) == 1:
-            self.actor.actor_module._handle.reshard(True)
+            # https://pytorch.org/docs/stable/notes/fsdp.html#fsdp-notes
+            # unshard the root FSDP module
+            if self.world_size > 1 and fsdp_version(self.actor.actor_module) == 1:
+                self.actor.actor_module._handle.reshard(True)
 
-        if self._is_offload_param:
-            offload_fsdp_model_to_cpu(self.actor_module_fsdp)
-            log_gpu_memory_usage("After offload actor model during compute_log_prob", logger=logger)
+            if self._is_offload_param:
+                offload_fsdp_model_to_cpu(self.actor_module_fsdp)
+                log_gpu_memory_usage("After offload actor model during compute_log_prob", logger=logger)
 
-        self.custom_memory_snapshot_stop("compute_log_prob")
+        except Exception as e:
+            print(e.__repr__(), flush=True)
+        finally:
+            self.custom_memory_snapshot_stop("compute_log_prob")
         return output
 
     @register(dispatch_mode=make_nd_compute_dataproto_dispatch_fn(mesh_name="actor"))
@@ -1086,16 +1092,6 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
 
         if self._is_offload_optimizer:
             offload_fsdp_optimizer(self.actor_optimizer)
-
-    @register(dispatch_mode=Dispatch.ONE_TO_ALL)
-    def start_profile(self, **kwargs) -> None:
-        """Start profiling for the current rank in the current training step."""
-        self.profiler.start(**kwargs)
-
-    @register(dispatch_mode=Dispatch.ONE_TO_ALL)
-    def stop_profile(self) -> None:
-        """Stop profiling for the current rank in the current training step."""
-        self.profiler.stop()
 
 
 

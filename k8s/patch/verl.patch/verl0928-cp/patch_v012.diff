@@ -1,0 +1,10 @@
+diff --git a/verl/models/mcore/patch_v012.py b/verl/models/mcore/patch_v012.py
+index d54a3eb3..374861a2 100644
+--- a/verl/models/mcore/patch_v012.py
++++ b/verl/models/mcore/patch_v012.py
+@@ -212,4 +212,4 @@ def apply_patch():
+ 
+         return query, key, value
+ 
+-    MLASelfAttention.get_query_key_value_tensors = patch_get_query_key_value_tensors
++    # MLASelfAttention.get_query_key_value_tensors = patch_get_query_key_value_tensors
