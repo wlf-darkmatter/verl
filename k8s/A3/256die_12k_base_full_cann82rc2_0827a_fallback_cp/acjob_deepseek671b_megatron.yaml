@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek671-256die-12k-base-full-cann82rc1-fallback  #sp-64-train-3b-moe-msrun #需要修改
+  name: deepseek671-256die-12k-base-full-cann82rc1-fallback-cp  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -30,7 +30,6 @@ spec:
           terminationGracePeriodSeconds: 60
           automountServiceAccountToken: false
           hostNetwork: true
-          privileged:  true
           nodeSelector:                        # modify according to the actual situation
             host-arch: huawei-arm
           containers:
@@ -108,7 +107,6 @@ spec:
           terminationGracePeriodSeconds: 60
           automountServiceAccountToken: false
           hostNetwork: true
-          privileged:  true
           nodeSelector:                        # modify according to the actual situation
             host-arch: huawei-arm
           containers:
