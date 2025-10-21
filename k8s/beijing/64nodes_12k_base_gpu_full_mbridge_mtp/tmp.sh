@@ -3,7 +3,7 @@ set -x
 echo ">>Starting script at: $(date), path = $(pwd)"
 
 project_name='DAPO'
-exp_name='DAPO-DeepSeek-671b-megatron-BASE-64NNODES'
+exp_name='DAPO-dpsk-671b-megatron-BASE-16NNODES-0827bimages'
 
 adv_estimator=grpo
 
@@ -26,15 +26,12 @@ loss_agg_mode="token-mean"
 train_prompt_bsz=32
 n_resp_per_prompt=16
 train_prompt_mini_bsz=32
-# train_ppo_micro_batch_size_per_gpu=2
-# infer_ppo_micro_batch_size_per_gpu=2
 train_ppo_micro_batch_size_per_gpu=1 #! 1017 会议决定更改
 infer_ppo_micro_batch_size_per_gpu=1 #! 1017 会议决定更改
 # Paths
-MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf-zy-mtp0"
+MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf"
 MCORE_MODEL_PATH="/data01/huawei-2025/weight/dsv3_bf16_mcore_full_base"
-RAY_DATA_HOME="/opt"
-CKPTS_DIR=/data01/huawei-2025/weight/ckpt-DAPO-DeepSeek-671b-megatron-base-2k12k-gpu-mtp-1021
+#CKPTS_DIR=/data01/huawei-2025/weight/ckpt-DAPO-DeepSeek-671b-megatron-base-2k12k-gpu-vllm010
 TRAIN_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
 TEST_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
 # TEST_FILE="['$aime24_test_path']"
@@ -47,21 +44,17 @@ val_top_p=0.7
 
 # Performance Related Parameter
 use_dynamic_bsz=True
-# actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 1))
-# infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 1)) #! 1017 会议决定更改
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 1)) #! 1017 会议决定更改
 
 max_num_batched_tokens=$((max_prompt_length + max_response_length))
-
 optimizer_offload_fraction=1
 
 
 # install mbridge
 # pip3 install git+https://github.com/ISEEKYAN/mbridge
-# ! use mbridge
-USE_MBRIDGE=True
-USE_DIST_CKPT=False
+USE_MBRIDGE=False
+USE_DIST_CKPT=True
 
 
 # first_layer=6
@@ -84,6 +77,7 @@ ETP=1
 #    +actor_rollout_ref.actor.megatron.override_transformer_config.moe_router_dtype=fp32 \
 #   +actor_rollout_ref.actor.megatron.override_transformer_config.moe_grouped_gemm=True \
 #   +actor_rollout_ref.actor.megatron.override_transformer_config.moe_token_dispatcher_type="alltoall" \
+#
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 cd /opt/verl
 ray job submit --runtime-env="${RUNTIME_ENV}" \
@@ -91,7 +85,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
     actor_rollout_ref.rollout.skip.enable=True \
-    actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/wlf/rollout_dump/baseline_gpu_mtp_mbridge_1021" \
+    actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/wlf/rollout_dump/baseline_gpu_gbs32_vllm010" \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
@@ -189,7 +183,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.total_epochs=10 \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
-    trainer.rollout_data_dir=/data01/huawei-2025/zhy/$(basename $(dirname $0))/rollout \
+    trainer.rollout_data_dir=/data01/huawei-2025/lq/$(basename $(dirname $0))/rollout \
     trainer.log_val_generations=10 \
     trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
 

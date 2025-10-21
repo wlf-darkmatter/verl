@@ -40,26 +40,29 @@ CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){
 #######################################
 #! 规避模型加载时 权重读取错误的问题
 #! [VLLM]
-#* 规避直接读 hf 权重的报错（出现减层或者带有MTP）
-rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
-cp -f /home/code/verl/k8s/patch/0928/vllm/vllm/model_executor/models/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+# #* 规避直接读 hf 权重的报错（出现减层或者带有MTP）
+# rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+# cp -f /home/code/verl/k8s/patch/0928/vllm/vllm/model_executor/models/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
 
 
-#! [VLLM-ASCEND]
+# #! [VLLM-ASCEND]
 
-rm -f /opt/vllm-ascend/vllm_ascend/models/deepseek_v2.py
-cp -f /home/code/verl/k8s/patch/0928/vllm-ascend/vllm_ascend/models/deepseek_v2.py /opt/vllm-ascend/vllm_ascend/models/deepseek_v2.py
-
+# rm -f /opt/vllm-ascend/vllm_ascend/models/deepseek_v2.py
+# cp -f /home/code/verl/k8s/patch/0928/vllm-ascend/vllm_ascend/models/deepseek_v2.py /opt/vllm-ascend/vllm_ascend/models/deepseek_v2.py
+#! ################# 【VLLM patch】 #####################
+#! 规避模型加载时 权重读取错误的问题
+bash /home/code/verl/k8s/patch/apply_vllm-ascend.sh
 
 #! [Megatron]
 rm -f /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
-cp -f /home/code/verl/k8s/patch/0928/Megatron-LM/megatron/dot_product_attention.py /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
+cp -f /home/code/verl/k8s/patch/megatron.patch/0.12.1/Megatron-LM/megatron/core/transformer/dot_product_attention.py /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
 
 rm -f /opt/Megatron-LM/megatron/core/transformer/multi_latent_attention.py
-cp -f /home/code/verl/k8s/patch/0928/Megatron-LM/megatron/multi_latent_attention.py /opt/Megatron-LM/megatron/core/transformer/multi_latent_attention.py
+cp -f /home/code/verl/k8s/patch/megatron.patch/0.12.1/Megatron-LM/megatron/core/transformer/multi_latent_attention.py /opt/Megatron-LM/megatron/core/transformer/multi_latent_attention.py
 
-rm -f /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
-cp -f /home/code/verl/k8s/patch/0928/Megatron-LM/megatron/dot_product_attention.py /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
+echo -e "\033[32mApplied Megatron-core!\033[0m"
+# rm -f /opt/Megatron-LM/megatron/core/models/common/embeddings/rope_utils.py
+# cp -f /home/code/verl/k8s/patch/0928/Megatron-LM/megatron/rope_utils.py /opt/Megatron-LM/megatron/core/models/common/embeddings/rope_utils.py
 
 # rm -f /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
 # cp -f /home/code/verl/k8s/patch/megatron/dot_product_attention.py /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
