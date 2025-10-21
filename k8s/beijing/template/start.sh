@@ -21,7 +21,7 @@ export ACL_OP_COMPILER_CACHE_DIR=${CACHE_DIR}/COMPILER_CACHE/${CURRENT_IP}; mkdi
 export VERL_CUSTOM_REWARD_RULE="1"
 #export VERL_CUSTOM_SET_MEMEXPAND_TRAIN="1" #! 0 是关掉训练的虚拟显存, 默认是 1
 export VERL_CUSTOM_PROFILING="1"
-export USE_CP_PATCH=1 #! 使用CP需要声明这个环境变量才能打上 Patch
+# export USE_CP_PATCH=1 #! 使用CP需要声明这个环境变量才能打上 Patch
 
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
@@ -50,8 +50,6 @@ bash /home/code/verl/k8s/patch/apply_megatron.sh
 #! [MindSpeed]
 bash /home/code/verl/k8s/patch/apply_mindspeed.sh
 
-#! VLLM_SLEEP_LEVEL
-export VLLM_SLEEP_LEVEL="1"
 
 #######################################
 
@@ -70,14 +68,8 @@ export NPU_PER_NODE=8  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 ray stop --force
-rm -rf /tmp/ray
-rm -rf /opt/verl
-cp -r /home/code/verl /opt/verl
-rm -f /opt/verl/.gitignore
 cd $(dirname $0)
 
-rm -rf /tmp/ray
-ray stop --force
 sleep 1
 echo "Overwrite verl code"
 #* 提速 ray 拉起速度
