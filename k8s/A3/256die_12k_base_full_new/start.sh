@@ -85,8 +85,8 @@ echo "Overwrite verl code"
 if [[ -f /home/code/verl/docker/pkg/rsync ]];then
   /home/code/verl/docker/pkg/rsync -avzP /home/code/verl/* /opt/verl/ --exclude=**/kernel_meta --exclude=plog --exclude=docker --exclude=docs
 else
-  unalias cp
-  cp -rf /home/code/verl/* /opt/verl/
+  rm -rf /opt/verl/
+  cp -rf /home/code/verl /opt/verl
 fi
 echo "Overwrite verl code, done."
 
