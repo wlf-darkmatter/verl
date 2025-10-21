@@ -70,7 +70,7 @@ export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 #! load-format验证
-export LOAD_VALIDATION="0"
+export LOAD_VALIDATION="1"
 
 
 rm -rf /tmp/ray

@@ -174,6 +174,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +reward_model.reward_kwargs.overlong_buffer_cfg.len=${overlong_buffer_len} \
     +reward_model.reward_kwargs.overlong_buffer_cfg.penalty_factor=${overlong_penalty_factor} \
     +reward_model.reward_kwargs.overlong_buffer_cfg.log=False \
+    actor_rollout_ref.rollout.load_format=safetensors \
     +reward_model.reward_kwargs.max_resp_len=${max_response_length} \
     trainer.logger=['console'] \
     trainer.project_name="${project_name}" \
