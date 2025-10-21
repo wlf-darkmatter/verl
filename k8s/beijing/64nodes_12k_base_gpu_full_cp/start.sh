@@ -5,7 +5,6 @@ export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
 export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
 export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
-# unset PYTORCH_NPU_ALLOC_CONF
 export ASCEND_GLOBAL_LOG_LEVEL=3
 
 
@@ -22,6 +21,7 @@ export ACL_OP_COMPILER_CACHE_DIR=${CACHE_DIR}/COMPILER_CACHE/${CURRENT_IP}; mkdi
 export VERL_CUSTOM_REWARD_RULE="1"
 #export VERL_CUSTOM_SET_MEMEXPAND_TRAIN="1" #! 0 是关掉训练的虚拟显存, 默认是 1
 export VERL_CUSTOM_PROFILING="1"
+export USE_CP_PATCH=1 #! 使用CP需要声明这个环境变量才能打上 Patch
 
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
@@ -36,7 +36,6 @@ export ACL_DEVICE_SYNC_TIMEOUT=7200
 export HCCL_ASYNC_ERROR_HANDLING=0
 export P2P_HCCL_BUFFSIZE=30
 export HCCL_BUFFSIZE=300
-
 
 
 #! #################  【VLLM patch】  #####################
@@ -70,6 +69,12 @@ unset LOCAL_RANK
 export NPU_PER_NODE=8  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
+ray stop --force
+rm -rf /tmp/ray
+rm -rf /opt/verl
+cp -r /home/code/verl /opt/verl
+rm -f /opt/verl/.gitignore
+cd $(dirname $0)
 
 rm -rf /tmp/ray
 ray stop --force
