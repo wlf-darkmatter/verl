@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek671-256die-12k-base-full-cann82rc2-fallback  #sp-64-train-3b-moe-msrun #需要修改
+  name: sleep-0827b-2h  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -9,12 +9,12 @@ metadata:
     ring-controller.atlas: ascend-910b
     subHealthyStrategy: "ignore"
   annotations:
-    sp-block: "256"
+    sp-block: "32"
 spec:
   schedulerName: volcano    #需要修改 work when enableGangScheduling is true
   runPolicy:
     schedulingPolicy:
-      minAvailable: 16    #需要修改， work when enableGangScheduling is true
+      minAvailable: 2    #需要修改， work when enableGangScheduling is true
       queue: default
   successPolicy: AllWorkers
   replicaSpecs:
@@ -30,7 +30,6 @@ spec:
           terminationGracePeriodSeconds: 60
           automountServiceAccountToken: false
           hostNetwork: true
-          #privileged: true
           nodeSelector:                        # modify according to the actual situation
             host-arch: huawei-arm
           containers:
@@ -40,7 +39,7 @@ spec:
               command: ["/bin/bash", "-c"]
 
               args:
-                - "bash /home/code/verl/k8s/A3/256die_12k_base_full_cann82rc2_0827_fallback/start.sh ;sleep 7d"
+                - "sleep 7d"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
@@ -56,8 +55,7 @@ spec:
                 requests:
                   huawei.com/Ascend910: 16
                   memory: "1500Gi"
-             # securityContext:
-              #    privileged: true
+
               volumeMounts:
                 - name: npu-smi
                   mountPath: /usr/local/bin/npu-smi
@@ -98,7 +96,7 @@ spec:
               hostPath:
                 path: /mnt/nv03
     Worker:
-      replicas: 15  #Master can only be 1
+      replicas: 1  #Master can only be 1
       restartPolicy: Never
       template:
         metadata:
@@ -109,7 +107,6 @@ spec:
           terminationGracePeriodSeconds: 60
           automountServiceAccountToken: false
           hostNetwork: true
-          #privileged: true
           nodeSelector:                        # modify according to the actual situation
             host-arch: huawei-arm
           containers:
@@ -118,7 +115,7 @@ spec:
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "bash /home/code/verl/k8s/A3/256die_12k_base_full_cann82rc2_0827_fallback/start.sh ;sleep 7d"
+                - "sleep 7d"
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify
@@ -133,8 +130,6 @@ spec:
                 requests:
                   huawei.com/Ascend910: 16
                   memory: "1500Gi"
-              #securityContext:
-               #   privileged: true
               volumeMounts:
                 - name: npu-smi
                   mountPath: /usr/local/bin/npu-smi
@@ -166,7 +161,7 @@ spec:
                 path: /etc/localtime                               # Configure the Docker time.
             - name: start-path
               hostPath:
-                path: /mnt/hpfs_test/wlf/
+                path: /mnt/hpfs_test/32nodelog/
             - name: data-path
               hostPath:
                 path: /mnt

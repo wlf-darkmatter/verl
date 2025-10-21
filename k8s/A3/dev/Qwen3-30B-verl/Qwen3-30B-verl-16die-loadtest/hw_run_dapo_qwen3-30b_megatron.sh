@@ -2,8 +2,9 @@ set -x
 
 echo ">>Starting script at: $(date), path = $(pwd)"
 
+
 project_name='DAPO'
-exp_name='DAPO-DeepSeek-671b-megatron-INSTRUCT-16NNODES-1014-0827-images'
+exp_name='DAPO-qwen3-30b-megatron-0928Verl-1015images'
 
 adv_estimator=grpo
 
@@ -23,15 +24,16 @@ overlong_buffer_len=$((1024 * 1))
 overlong_penalty_factor=1.0
 
 loss_agg_mode="token-mean"
-train_prompt_bsz=32
+train_prompt_bsz=8
 n_resp_per_prompt=16
-train_prompt_mini_bsz=32
+train_prompt_mini_bsz=8
 train_ppo_micro_batch_size_per_gpu=2
 infer_ppo_micro_batch_size_per_gpu=2
-# Paths insctruct 模型
-MODEL_PATH="/mnt/hpfs_test/weights/dsv3-bf16"
-MCORE_MODEL_PATH="/mnt/hpfs_test/weights/dsv3_bf16_mcore_hs"
-CKPTS_DIR=/mnt/hpfs_test/weights/CKPT/ckpt-DAPO-DeepSeek-671b-megatron-instruct-2k12k-1014-0827images
+# Paths
+MODEL_PATH="/mnt/hpfs_test/weights/Qwen3-30B-A3B-Instruct"
+MCORE_MODEL_PATH="/mnt/hpfs_test/weights/Qwen3-30B-A3B-Instruct-Mcore"
+
+CKPTS_DIR=/mnt/hpfs_test/weights/CKPT/ckpt-${exp_name}
 TRAIN_FILE="/mnt/hpfs_test/data/rl_data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
 TEST_FILE="/mnt/hpfs_test/data/rl_data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
 # TEST_FILE="['$aime24_test_path']"
@@ -49,43 +51,45 @@ infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 1))
 
 optimizer_offload_fraction=1
 
-
 # install mbridge
 # pip3 install git+https://github.com/ISEEKYAN/mbridge
 USE_MBRIDGE=False
 USE_DIST_CKPT=True
 
-
-# first_layer=6
-# last_layer=7
-# pipeline_num_transformer_layers="[[6],[8],[8],[8],[8],[8],[8],[7]]"
-first_layer=6
-last_layer=7
-# pipeline_num_transformer_layers="[[3],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[2]]"
 offload=True
-gen_tp=8
-gen_dp=8
+gen_tp=4
+gen_dp=1
 
-train_tp=8
-train_ep=32
-train_pp=8
+#!16 die
+train_tp=2
+train_ep=4
+train_pp=2
 enable_filter_group=False
 train_cp=1
-#    +actor_rollout_ref.actor.megatron.override_transformer_config.context_parallel_size=${train_cp} \
+
 ETP=1
-#    +actor_rollout_ref.actor.megatron.override_transformer_config.moe_router_dtype=fp32 \
-#   +actor_rollout_ref.actor.megatron.override_transformer_config.moe_grouped_gemm=True \
-#   +actor_rollout_ref.actor.megatron.override_transformer_config.moe_token_dispatcher_type="alltoall" \
-#
+
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
-cd /opt/verl
+
+cd /home/code/verl
 ray job submit --runtime-env="${RUNTIME_ENV}" \
     -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
-    actor_rollout_ref.rollout.skip.enable=False \
+    actor_rollout_ref.rollout.skip.enable=True \
     actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
+    actor_rollout_ref.rollout.profiler.enable=False \
+    actor_rollout_ref.ref.profiler.enable=False \
+    actor_rollout_ref.actor.profiler.enable=True \
+    actor_rollout_ref.actor.profiler.ranks="[0,1,2,3,4,5,6,7]" \
+    actor_rollout_ref.actor.profiler.tool_config.npu.level=level1 \
+    actor_rollout_ref.actor.profiler.tool_config.npu.analysis=True \
+    actor_rollout_ref.actor.profiler.tool_config.npu.discrete=False \
+    actor_rollout_ref.actor.profiler.tool_config.npu.contents="[cpu,npu,memory,module,shapes,stack]" \
+    global_profiler.save_path=${JOB_LOG_DIR_CURR}/profile \
+    global_profiler.steps="[0,1,2,3]" \
+    global_profiler.tool="npu" \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
     data.prompt_key=messages \
@@ -112,8 +116,6 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=${train_ppo_micro_batch_size_per_gpu} \
     actor_rollout_ref.actor.ppo_max_token_len_per_gpu=${actor_ppo_max_token_len} \
     actor_rollout_ref.actor.optim.lr=3e-6 \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_first_pipeline_stage=$first_layer \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_pipeline_stage=$last_layer \
     +actor_rollout_ref.actor.optim.override_optimizer_config.optimizer_offload_fraction=${optimizer_offload_fraction} \
     +actor_rollout_ref.actor.optim.override_optimizer_config.overlap_cpu_optimizer_d2h_h2d=True \
     +actor_rollout_ref.actor.optim.override_optimizer_config.use_precision_aware_optimizer=True \
@@ -140,10 +142,9 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=1 \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
-    actor_rollout_ref.rollout.load_format=dummy \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=${infer_ppo_micro_batch_size_per_gpu} \
     actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu=${infer_ppo_max_token_len} \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.65 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.60 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=${gen_tp} \
     actor_rollout_ref.rollout.dp_model_parallel_size=${gen_dp} \
     actor_rollout_ref.rollout.enable_chunked_prefill=False \

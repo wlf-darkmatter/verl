@@ -40,7 +40,6 @@ export HCCL_BUFFSIZE=300
 #! 注意，1003 加了这 几个超时配置
 # export RAY_DEBUG_POST_MORTEM=1
 # export ASCEND_LAUNCH_BLOCKING=1
-export USE_CP_PATCH=1 #! 使用CP需要声明这个环境变量才能打上 Patch
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 

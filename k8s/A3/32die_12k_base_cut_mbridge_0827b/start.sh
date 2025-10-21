@@ -5,7 +5,6 @@ export GLOO_SOCKET_IFNAME=bond1 # modify according to actual situation
 export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
 export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
-# unset PYTORCH_NPU_ALLOC_CONF
 export ASCEND_GLOBAL_LOG_LEVEL=3
 
 
@@ -15,20 +14,14 @@ export JOB_LOG_DIR=/home/code/logs/$(basename $(dirname $0))
 export JOB_LOG_DIR_CURR=${JOB_LOG_DIR}/$(date +"%Y-%m-%d_%H")
 export ASCEND_PROCESS_LOG_PATH=${JOB_LOG_DIR_CURR}/plog/${CURRENT_IP}
 export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR_CURR}/memory_log
-# export VERL_CUSTOM_Profiling_DIR=${JOB_LOG_DIR_CURR}/prof
-# export VERL_CUSTOM_SNAPSHOT=0
 
 export CACHE_DIR=${JOB_LOG_DIR}/CACHE; mkdir -p ${CACHE_DIR}
 export ACL_OP_COMPILER_CACHE_DIR=${CACHE_DIR}/COMPILER_CACHE/${CURRENT_IP}; mkdir -p ${ACL_OP_COMPILER_CACHE_DIR}
 export VERL_CUSTOM_REWARD_RULE="1"
-export VERL_CUSTOM_SYNCHRONIZE="1"
-export VERL_CUSTOM_PROFILING="1"
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
 export TASK_QUEUE_ENABLE=2
-# export TORCHELASTIC_USE_AGENT_STORE=true
-
 #! 注意，HCCL 相关配置
 export HCCL_EXEC_TIMEOUT=7200
 export HCCL_EVENT_TIMEOUT=7200
@@ -39,11 +32,33 @@ export P2P_HCCL_BUFFSIZE=30
 export HCCL_BUFFSIZE=300
 
 #! 注意，1003 加了这 几个超时配置
-export RAY_DEBUG_POST_MORTEM=1
+# export RAY_DEBUG_POST_MORTEM=1
 # export ASCEND_LAUNCH_BLOCKING=1
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
+# #! #################  【VLLM 0.10.0 patch】  #####################
+# #! 规避模型加载时 权重读取错误的问题
+
+# #! [VLLM]
+# #* 规避直接读 hf 权重的报错（出现减层或者带有MTP）
+# rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+# cp -f /home/code/verl/k8s/patch/0928/vllm/vllm/model_executor/models/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+
+# #! [VLLM-ASCEND]
+
+# rm -f /opt/vllm-ascend/vllm_ascend/models/deepseek_v2.py
+# cp -f /home/code/verl/k8s/patch/0928/vllm-ascend/vllm_ascend/models/deepseek_v2.py /opt/vllm-ascend/vllm_ascend/models/deepseek_v2.py
+
+# #! [Megatron]
+# rm -f /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
+# cp -f /home/code/verl/k8s/patch/0928/Megatron-LM/megatron/dot_product_attention.py /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
+
+
+# #! [新版本mindspeed]
+# rm -f /opt/MindSpeed/mindspeed
+# cp -r /home/code/pkg/0928/MindSpeed/mindspeed /opt/MindSpeed/mindspeed
+#######################################
 #! #################  【VLLM patch】  #####################
 #! 规避模型加载时 权重读取错误的问题
 bash /home/code/verl/k8s/patch/apply_vllm-ascend.sh
@@ -52,6 +67,12 @@ bash /home/code/verl/k8s/patch/apply_vllm-ascend.sh
 #! [Megatron]
 bash /home/code/verl/k8s/patch/apply_megatron.sh
 
+#! #################  【MindSpeed patch】  #####################
+#! [MindSpeed]
+bash /home/code/verl/k8s/patch/apply_mindspeed.sh
+
+#! VLLM_SLEEP_LEVEL
+export VLLM_SLEEP_LEVEL="1"
 
 #######################################
 
@@ -70,6 +91,7 @@ export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 
+export ASCEND_PROCESS_LOG_PATH=/home/code/logs/$(basename $(dirname $0))/plog/1009/${RANK}
 
 rm -rf /tmp/ray
 ray stop --force
@@ -87,12 +109,18 @@ echo "Overwrite verl code, done."
 rm -f /opt/verl/.gitignore
 cd $(dirname $0)
 
+#! #################  【Verl patch】  #####################
+#* [Verl] 一般用于打CP代码
+bash /home/code/verl/k8s/patch/apply_verl.sh
+
+#* [Verl] mtp代码
+rm -f /opt/verl/verl/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
+cp -f /home/code/verl/k8s/patch/0827/verl/vllm_rollout_spmd.py /opt/verl/verl/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
+echo "Overwrite vllm_rollout_spmd code, done."
 
 export ServerPort=6666     # modify according to actual situation
 export DashboardPort=8888  # modify according to actual situation
 
-
-echo "Manul start !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 cnt=0
 if [ "$RANK" = "0" ]; then
   # head start
@@ -116,13 +144,13 @@ if [ "$RANK" = "0" ]; then
     # judge npu_count_int bigger than NNODES*NPU_PER_NODE
     if [ "$npu_count_int" -ge "$((NNODES*NPU_PER_NODE))" ]; then
       echo "Ray cluster is ready with $npu_count_int npu (from $npu_count NPU resources), starting Python script."
-      bash hw_run_dapo_qwen3-30b_megatron.sh | tee ${JOB_LOG_DIR_CURR}/ray_host/$(date +"%Y-%m-%d_%H-%M-%S")_ray.log
+      bash hw_run_dapo_deepseek_671b_megatron.sh | tee ${JOB_LOG_DIR_CURR}/ray_host/$(date +"%Y-%m-%d_%H-%M-%S")_ray.log
       break
     fi
 
     echo "Waiting for Ray to allocate $((NNODES*NPU_PER_NODE)) devices. Current device count: $npu_count_int"
     cnt=$((cnt+1))
-    sleep 10
+
   done
 
 else
@@ -133,3 +161,61 @@ fi
 
 # start Mark 1
 
+cnt=0
+while true; do
+  ray_name=$(ray job list | grep -o "raysubmit_[a-zA-Z0-9]*")
+  if [[ -n $ray_name ]]; then
+    echo "Job $ray_name start succeeded"
+    break
+  fi
+
+  cnt=$((cnt+1))
+  if [[ $cnt -gt 100 ]]; then
+    echo "Job $ray_name start failed"
+    ray stop --force
+    sleep 10
+
+    rm -rf /tmp
+    exit 1
+  fi
+
+  sleep 50
+done
+
+ray_name=$(ray job list | grep -o "raysubmit_[a-zA-Z0-9]*")
+while true; do
+  output=$(ray job status $ray_name)
+  failed=$(echo $output | grep $ray_name | grep -i failed)
+  succeeded=$(echo $output | grep $ray_name | grep -i succeeded)
+  gcs_error=$(echo $output | grep -i 'Failed to get cluster ID from GCS server')
+
+  if [[ -n $gcs_error ]]; then
+    echo "ray cannot connect，Job $ray_name exit with exception"
+    ray stop --force
+    sleep 10
+
+   # rm -rf /tmp
+    exit 1
+  fi
+
+
+  if [[ -n $succeeded ]]; then
+    ray stop --force
+    sleep 10
+
+ #   rm -rf /tmp
+    echo "Job $ray_name exit without exception"
+    exit 0
+  fi
+
+#   if [[ -n $failed ]]; then
+#     echo "Job $ray_name exit with exception"
+#     ray stop --force
+    sleep 10
+
+# #    rm -rf /tmp
+#     exit 1
+#   fi
+
+  sleep 10
+done
