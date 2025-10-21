@@ -14,7 +14,7 @@ CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){
 export JOB_LOG_DIR=/home/code/logs/$(basename $(dirname $0))
 export JOB_LOG_DIR_CURR=${JOB_LOG_DIR}/$(date +"%Y-%m-%d_%H")
 export ASCEND_PROCESS_LOG_PATH=${JOB_LOG_DIR_CURR}/plog/${CURRENT_IP}
-export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR_CURR}/memory_log
+# export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR_CURR}/memory_log
 
 export CACHE_DIR=${JOB_LOG_DIR}/CACHE; mkdir -p ${CACHE_DIR}
 export ACL_OP_COMPILER_CACHE_DIR=${CACHE_DIR}/COMPILER_CACHE/${CURRENT_IP}; mkdir -p ${ACL_OP_COMPILER_CACHE_DIR}

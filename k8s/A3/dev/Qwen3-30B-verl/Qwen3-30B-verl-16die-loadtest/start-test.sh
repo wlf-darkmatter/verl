@@ -11,7 +11,7 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 
 #! 注意，自定义配置
 # * 确保 JOB_LOG_DIR 在共享盘下
-export JOB_LOG_DIR=/home/code/logs/$(basename $(dirname $0))
+export JOB_LOG_DIR=/home/code/logs/$(hostname)/$(basename $(dirname $0))
 export JOB_LOG_DIR_CURR=${JOB_LOG_DIR}/$(date +"%Y-%m-%d_%H")
 export ASCEND_PROCESS_LOG_PATH=${JOB_LOG_DIR_CURR}/plog/${CURRENT_IP}
 export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR_CURR}/memory_log
@@ -22,7 +22,7 @@ export CACHE_DIR=${JOB_LOG_DIR}/CACHE; mkdir -p ${CACHE_DIR}
 export ACL_OP_COMPILER_CACHE_DIR=${CACHE_DIR}/COMPILER_CACHE/${CURRENT_IP}; mkdir -p ${ACL_OP_COMPILER_CACHE_DIR}
 export VERL_CUSTOM_REWARD_RULE="1"
 export VERL_CUSTOM_SYNCHRONIZE="1"
-export VERL_CUSTOM_PROFILING="1"
+export VERL_CUSTOM_PROFILING="0"
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
@@ -69,6 +69,8 @@ unset LOCAL_RANK
 export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
+#! load-format验证
+export LOAD_VALIDATION="1"
 
 
 rm -rf /tmp/ray

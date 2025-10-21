@@ -30,7 +30,7 @@ spec:
           terminationGracePeriodSeconds: 60
           automountServiceAccountToken: false
           hostNetwork: true
-          privileged: true
+          #privileged: true
           nodeSelector:                        # modify according to the actual situation
             host-arch: huawei-arm
           containers:
@@ -56,7 +56,8 @@ spec:
                 requests:
                   huawei.com/Ascend910: 16
                   memory: "1500Gi"
-
+             # securityContext:
+              #    privileged: true
               volumeMounts:
                 - name: npu-smi
                   mountPath: /usr/local/bin/npu-smi
@@ -108,7 +109,7 @@ spec:
           terminationGracePeriodSeconds: 60
           automountServiceAccountToken: false
           hostNetwork: true
-          privileged: true
+          #privileged: true
           nodeSelector:                        # modify according to the actual situation
             host-arch: huawei-arm
           containers:
@@ -132,6 +133,8 @@ spec:
                 requests:
                   huawei.com/Ascend910: 16
                   memory: "1500Gi"
+              #securityContext:
+               #   privileged: true
               volumeMounts:
                 - name: npu-smi
                   mountPath: /usr/local/bin/npu-smi

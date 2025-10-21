@@ -1,19 +1,21 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek671-64-verl-moe-12k-base-full-profile #需要修改
+  name: deepseek671-verl-moe-infer-base-8nodes  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
     fault-retry-times: "0"
     ring-controller.atlas: ascend-910b
     subHealthyStrategy: "ignore"
+  annotations:
+    sp-block: "128"
 spec:
   schedulerName: volcano    #需要修改 work when enableGangScheduling is true
   runPolicy:
     schedulingPolicy:
-      minAvailable: 64    #需要修改， work when enableGangScheduling is true
-      queue: project-6-root
+      minAvailable: 8    #需要修改， work when enableGangScheduling is true
+      queue: default
   successPolicy: AllWorkers
   replicaSpecs:
     Master:
@@ -25,29 +27,19 @@ spec:
             ring-controller.atlas: ascend-910b
         spec:
           priorityClassName: system-cluster-critical
-          affinity:
-            nodeAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                nodeSelectorTerms:
-                - matchExpressions:
-                  - key: volcano.sh/nodegroup-name
-                    operator: In
-                    values:
-                    - rl
           terminationGracePeriodSeconds: 60
           automountServiceAccountToken: false
           hostNetwork: true
           nodeSelector:                        # modify according to the actual situation
-            accelerator-type: module-910b-8
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: harbor.ai-bj.cn/library/verl:verl_0912   ##image
+              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.7.1-cann_8.2.rc1-py_3.10-aarch64_0928  ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
 
               args:
-                - "bash /home/code/verl/k8s/beijing/64nodes_12k_base_gpu_full_1016/start.sh; sleep 7d"
+                - "bash /home/code/verl/k8s/A3/256die_12k_base_full_verl0928_1015image/start.sh ;sleep 7d"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
@@ -58,11 +50,11 @@ spec:
                   name: ray-dash-port
               resources:
                 limits:
-                  huawei.com/Ascend910: 8 #目前需要和requests保持一致
-                  memory: "1000Gi"
+                  huawei.com/Ascend910: 16
+                  memory: "1500Gi"
                 requests:
-                  huawei.com/Ascend910: 8  #需要的NPU芯片个数为8
-                  memory: "1000Gi"
+                  huawei.com/Ascend910: 16
+                  memory: "1500Gi"
 
               volumeMounts:
                 - name: npu-smi
@@ -76,14 +68,15 @@ spec:
                 - name: start-path
                   mountPath: /home/code/
                 - name: data-path
-                  mountPath: /data01
+                  mountPath: /mnt
                 - name: tmp-path
                   mountPath: /tmp
+
           volumes:
             - name: dshm
               emptyDir:
                 medium: Memory
-                sizeLimit: 500Gi
+                sizeLimit: 1000Gi
             - name: npu-smi
               hostPath:
                 path: /usr/local/bin/npu-smi
@@ -95,15 +88,15 @@ spec:
                 path: /etc/localtime                               # Configure the Docker time.
             - name: start-path
               hostPath:
-                path: /data01/huawei-2025/wlf/
+                path: /mnt/hpfs_test/wlf/
             - name: data-path
               hostPath:
-                path: /data01
+                path: /mnt
             - name: tmp-path
               hostPath:
-                path: /data02/tmp
+                path: /mnt/nv03
     Worker:
-      replicas: 63  #Master can only be 1
+      replicas: 7  #Master can only be 1
       restartPolicy: Never
       template:
         metadata:
@@ -111,41 +104,18 @@ spec:
             ring-controller.atlas: ascend-910b
         spec:
           priorityClassName: system-cluster-critical
-          affinity:
-            podAntiAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                - labelSelector:
-                    matchExpressions:
-                      - key: job-name
-                        operator: In
-                        values:
-                          -  deepseek671-64-verl-moe-12k-base-full-1016
-                      - key: replica-type
-                        operator: In
-                        values:
-                          - worker
-                  topologyKey: kubernetes.io/hostname
-            nodeAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                nodeSelectorTerms:
-                - matchExpressions:
-                  - key: volcano.sh/nodegroup-name
-                    operator: In
-                    values:
-                    - rl
           terminationGracePeriodSeconds: 60
           automountServiceAccountToken: false
           hostNetwork: true
           nodeSelector:                        # modify according to the actual situation
-            accelerator-type: module-910b-8
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: harbor.ai-bj.cn/library/verl:verl_0912  ##image
+              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.7.1-cann_8.2.rc1-py_3.10-aarch64_0928  ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "bash /home/code/verl/k8s/beijing/64nodes_12k_base_gpu_full_1016/start.sh; sleep 7d"
+                - "bash /home/code/verl/k8s/A3/256die_12k_base_full_verl0928_1015image/start.sh ;sleep 7d"
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify
@@ -155,11 +125,11 @@ spec:
                   name: ray-dash-port
               resources:
                 limits:
-                  huawei.com/Ascend910: 8 #目前需要和requests保持一致
-                  memory: "1000Gi"
+                  huawei.com/Ascend910: 16
+                  memory: "1500Gi"
                 requests:
-                  huawei.com/Ascend910: 8  #需要的NPU芯片个数为8
-                  memory: "1000Gi"
+                  huawei.com/Ascend910: 16
+                  memory: "1500Gi"
               volumeMounts:
                 - name: npu-smi
                   mountPath: /usr/local/bin/npu-smi
@@ -170,16 +140,16 @@ spec:
                 - name: localtime
                   mountPath: /etc/localtime
                 - name: start-path
-                  mountPath: /home/code
+                  mountPath: /home/code/
                 - name: data-path
-                  mountPath: /data01
+                  mountPath: /mnt
                 - name: tmp-path
                   mountPath: /tmp
           volumes:
             - name: dshm
               emptyDir:
                 medium: Memory
-                sizeLimit: 500Gi
+                sizeLimit: 1000Gi
             - name: npu-smi
               hostPath:
                 path: /usr/local/bin/npu-smi
@@ -191,10 +161,10 @@ spec:
                 path: /etc/localtime                               # Configure the Docker time.
             - name: start-path
               hostPath:
-                path: /data01/huawei-2025/wlf/
+                path: /mnt/hpfs_test/wlf/
             - name: data-path
               hostPath:
-                path: /data01
+                path: /mnt
             - name: tmp-path
               hostPath:
-                path: /data02/tmp
+                path: /mnt/nv03

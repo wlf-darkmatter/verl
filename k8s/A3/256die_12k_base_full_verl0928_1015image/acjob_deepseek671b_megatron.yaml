@@ -34,7 +34,7 @@ spec:
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.7.1_0822-cann_8.2.rc1-py_3.10-aarch64_verl0928_build1015  ##image
+              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.7.1-cann_8.2.rc1-py_3.10-aarch64_0928  ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
 
@@ -111,7 +111,7 @@ spec:
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.7.1_0822-cann_8.2.rc1-py_3.10-aarch64_verl0928_build1015  ##image
+              image: swr.cn-north-4.myhuaweicloud.com/wlf_darkmaster/pytorch_ascend:pytorch_2.7.1-cann_8.2.rc1-py_3.10-aarch64_0928  ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:

@@ -331,6 +331,7 @@ class RayDAPOTrainer(RayPPOTrainer):
                         batch = batch.union(old_log_prob)
 
                     if self.use_reference_policy:
+                        print(f"这里用到了 Ref 的模型", flush=True)
                         #! 分阶段profiling逻辑
                         if os.getenv("VERL_CUSTOM_PROFILING", "0") == "1":
                             self._custom_start_profiling(
