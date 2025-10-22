@@ -3,7 +3,7 @@ set -x
 echo ">>Starting script at: $(date), path = $(pwd)"
 
 project_name='DAPO'
-exp_name='DAPO-dpsk-671b-megatron-BASE-template'
+exp_name='DAPO-dpsk-671b-megatron-BASE-mbridge-cp'
 
 adv_estimator=grpo
 
@@ -69,7 +69,7 @@ train_tp=8
 train_ep=32
 train_pp=8
 enable_filter_group=False
-train_cp=1
+train_cp=2
 
 ETP=1
 
@@ -79,7 +79,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
-    +actor_rollout_ref.model.override_config.model_config.num_hidden_layers=8 \
+    +actor_rollout_ref.model.override_config.model_config.num_nextn_predict_layers=1 \
     actor_rollout_ref.rollout.skip.enable=False \
     actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \

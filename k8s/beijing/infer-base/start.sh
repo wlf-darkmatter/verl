@@ -76,8 +76,8 @@ fi
 #! ------------------------------------------------------------
 TRAIN_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k.parquet"
 # MODEL_PATH="/data01/huawei-2025/weight/dpsk-v3-671B-BF16-dist_ckpt"
-# MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf"
-MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf-zy-mtp0"
+MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf"
+# MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf-zy-mtp0"
 
 n_resp_per_prompt=4
 train_prompt_bsz=16

@@ -346,6 +346,7 @@ class DeepseekV3Bridge(LLMBridge):
     def _convert_mtp_param(self, name: str) -> tuple[list[str]]:
         assert self.config.mtp_num_layers == 1, "only support one mtp layer for now"
         assert self.config.num_layers == 61, "only support 61 layers for now"
+        print("\033[31m################ 【Mbridge】 ################\033[0m")
         direct_name_mapping = {
             "mtp.layers.0.enorm.weight": "model.layers.61.enorm.weight",
             "mtp.layers.0.hnorm.weight": "model.layers.61.hnorm.weight",
