@@ -131,6 +131,8 @@ class RayDAPOTrainer(RayPPOTrainer):
                             else curr_step_profile
                         )
                     elif os.getenv("VERL_CUSTOM_PROFILING", "0") == "2":
+                        config = getattr(self.config.actor_rollout_ref, "actor").profiler
+                        config.enable = True
                         self._custom_start_profiling(
                             not prev_step_profile and curr_step_profile
                             if self.config.global_profiler.profile_continuous_steps
