@@ -49,6 +49,16 @@ class RayDAPOTrainer(RayPPOTrainer):
     """
     Note that this trainer runs on the driver process on a single CPU/GPU node.
     """
+    def _custom_start_profiling(self, do_profile: bool, wg, role) -> None:
+        """Start profiling for all worker groups if profiling is enabled."""
+        if do_profile:
+            #* 更改路径
+            wg.custom_start_profile(profile_step=self.global_steps, role=role)
+
+    def _custom_stop_profiling(self, do_profile: bool, wg, role) -> None:
+        """Stop profiling for all worker groups if profiling is enabled."""
+        if do_profile:
+            wg.custom_stop_profile(role)
 
     def fit(self):
         """
@@ -120,6 +130,15 @@ class RayDAPOTrainer(RayPPOTrainer):
                             if self.config.global_profiler.profile_continuous_steps
                             else curr_step_profile
                         )
+                    elif os.getenv("VERL_CUSTOM_PROFILING", "0") == "2":
+                        self._custom_start_profiling(
+                            not prev_step_profile and curr_step_profile
+                            if self.config.global_profiler.profile_continuous_steps
+                            else curr_step_profile,
+                            wg=self.actor_rollout_wg,
+                            role="e2e",
+                        )
+
 
                 new_batch: DataProto = DataProto.from_single_dict(batch_dict)
                 num_gen_batches += 1
@@ -454,6 +473,16 @@ class RayDAPOTrainer(RayPPOTrainer):
                             if self.config.global_profiler.profile_continuous_steps
                             else curr_step_profile
                         )
+                    elif os.getenv("VERL_CUSTOM_PROFILING", "0") == "2":
+                        self._custom_stop_profiling(
+                            not prev_step_profile and curr_step_profile
+                            if self.config.global_profiler.profile_continuous_steps
+                            else curr_step_profile,
+                            wg=self.actor_rollout_wg,
+                            role="e2e",
+                        )
+
+
                     prev_step_profile = curr_step_profile
                     curr_step_profile = next_step_profile
                 # collect metrics
@@ -491,13 +520,3 @@ class RayDAPOTrainer(RayPPOTrainer):
             metrics = {f"timing/{k}": v for k, v in timing_raw.items()}
             logger.log(data=metrics, step=self.global_steps)
 
-    def _custom_start_profiling(self, do_profile: bool, wg, role) -> None:
-        """Start profiling for all worker groups if profiling is enabled."""
-        if do_profile:
-            #* 更改路径
-            wg.custom_start_profile(profile_step=self.global_steps, role=role)
-
-    def _custom_stop_profiling(self, do_profile: bool, wg, role) -> None:
-        """Stop profiling for all worker groups if profiling is enabled."""
-        if do_profile:
-            wg.custom_stop_profile(role)

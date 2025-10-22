@@ -3,7 +3,7 @@ set -x
 echo ">>Starting script at: $(date), path = $(pwd)"
 
 project_name='DAPO'
-exp_name='DAPO-dpsk-671b-megatron-BASE-16NNODES-0827bimages'
+exp_name='DAPO-qwen3-30b-megatron-0928Verl-1015images'
 
 adv_estimator=grpo
 
@@ -23,14 +23,15 @@ overlong_buffer_len=$((1024 * 1))
 overlong_penalty_factor=1.0
 
 loss_agg_mode="token-mean"
-train_prompt_bsz=16
+train_prompt_bsz=8
 n_resp_per_prompt=16
-train_prompt_mini_bsz=16
-train_ppo_micro_batch_size_per_gpu=1 #! 1017 会议决定更改
-infer_ppo_micro_batch_size_per_gpu=1 #! 1017 会议决定更改
+train_prompt_mini_bsz=8
+train_ppo_micro_batch_size_per_gpu=2
+infer_ppo_micro_batch_size_per_gpu=2
 # Paths
-MODEL_PATH="/mnt/hpfs_test/weights/dsv3-base-fp8-zy-bf16"
-MCORE_MODEL_PATH="/mnt/hpfs_test/weights/dsv3_base_bf16_mcore_zy_hs_mtp0"
+MODEL_PATH="/mnt/hpfs_test/weights/Qwen3-30B-A3B-Instruct"
+MCORE_MODEL_PATH="/mnt/hpfs_test/weights/Qwen3-30B-A3B-Instruct-Mcore"
+
 CKPTS_DIR=/mnt/hpfs_test/weights/CKPT/ckpt-${exp_name}
 TRAIN_FILE="/mnt/hpfs_test/data/rl_data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
 TEST_FILE="/mnt/hpfs_test/data/rl_data/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
@@ -64,35 +65,41 @@ first_layer=1 #* 6
 last_layer=1 #* 7
 # pipeline_num_transformer_layers="[[3],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[2]]"
 offload=True
-gen_tp=8
-gen_dp=8
+gen_tp=4
+gen_dp=1
 
-train_tp=8 #* 8
-train_ep=32 #* 32
-train_pp=8 #* 8
+#!16 die
+train_tp=2
+train_ep=4
+train_pp=2
 enable_filter_group=False
 train_cp=1
 
 ETP=1
 
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
-cd /opt/verl
+
+cd /home/code/verl
 ray job submit --runtime-env="${RUNTIME_ENV}" \
     -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
     actor_rollout_ref.rollout.load_format=dummy \
-    actor_rollout_ref.rollout.skip.enable=False \
+    actor_rollout_ref.rollout.skip.enable=True \
     actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
+    actor_rollout_ref.rollout.profiler.enable=False \
+    actor_rollout_ref.ref.profiler.enable=False \
+    actor_rollout_ref.actor.profiler.enable=True \
     actor_rollout_ref.actor.profiler.ranks="[0,1,2,3,4,5,6,7]" \
     actor_rollout_ref.actor.profiler.tool_config.npu.level=level1 \
     actor_rollout_ref.actor.profiler.tool_config.npu.analysis=True \
     actor_rollout_ref.actor.profiler.tool_config.npu.discrete=False \
-    actor_rollout_ref.actor.profiler.tool_config.npu.contents="[cpu,npu,memory,module]" \
+    actor_rollout_ref.actor.profiler.tool_config.npu.contents="[cpu,npu,memory,module,shapes,stack]" \
     global_profiler.save_path=${JOB_LOG_DIR_CURR}/profile \
-    global_profiler.steps="[1,2]" \
+    global_profiler.steps="[0,1,2,3]" \
     global_profiler.tool="npu" \
+    actor_rollout_ref.rollout.load_format=dummy \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
     data.prompt_key=messages \
@@ -119,9 +126,6 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=${train_ppo_micro_batch_size_per_gpu} \
     actor_rollout_ref.actor.ppo_max_token_len_per_gpu=${actor_ppo_max_token_len} \
     actor_rollout_ref.actor.optim.lr=3e-6 \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_first_pipeline_stage=$first_layer \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_pipeline_stage=$last_layer \
-    +actor_rollout_ref.model.override_config.model_config.num_hidden_layers=8 \
     +actor_rollout_ref.actor.optim.override_optimizer_config.optimizer_offload_fraction=${optimizer_offload_fraction} \
     +actor_rollout_ref.actor.optim.override_optimizer_config.optimizer_cpu_offload=True \
     actor_rollout_ref.actor.megatron.param_offload=${offload} \
@@ -185,10 +189,13 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.nnodes="${NNODES}" \
     trainer.val_before_train=False \
     trainer.test_freq=-1 \
-    trainer.save_freq=10 \
+    trainer.save_freq=-1 \
     trainer.total_epochs=10 \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
     trainer.rollout_data_dir=${JOB_LOG_DIR_CURR}/rollout_data_dir \
     trainer.log_val_generations=10 \
     trainer.device="npu" $@ 2>&1
+
+
+
