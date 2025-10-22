@@ -39,7 +39,7 @@ export P2P_HCCL_BUFFSIZE=30
 export HCCL_BUFFSIZE=300
 
 #! 注意，1003 加了这 几个超时配置
-export RAY_DEBUG_POST_MORTEM=1
+export RAY_DEBUG_POST_MORTEM=0
 # export ASCEND_LAUNCH_BLOCKING=1
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
@@ -70,7 +70,7 @@ export NPU_PER_NODE=16  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
 #! load-format验证
-export LOAD_VALIDATION="0"
+export LOAD_VALIDATION="1"
 
 
 rm -rf /tmp/ray
@@ -81,8 +81,8 @@ echo "Overwrite verl code"
 if [[ -f /home/code/verl/docker/pkg/rsync ]];then
    /home/code/verl/docker/pkg/rsync -az /home/code/verl/* /opt/verl/ --exclude=**/kernel_meta --exclude=plog --exclude=docker --exclude=docs
 else
-  unalias cp
-  cp -rf /home/code/verl/* /opt/verl/
+  rm -rf /opt/verl/
+  cp -rf /home/code/verl /opt/verl
 fi
 echo "Overwrite verl code, done."
 
