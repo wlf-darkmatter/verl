@@ -256,6 +256,7 @@ class vLLMRollout(BaseRollout):
             _init_dp_envs(config)
             enable_infer_ep = True
 
+        print("\033[31m################ 【MTP】 ################\033[0m")
         self.inference_engine = LLM(
             model=model_path,
             enable_sleep_mode=config.free_cache_engine,
