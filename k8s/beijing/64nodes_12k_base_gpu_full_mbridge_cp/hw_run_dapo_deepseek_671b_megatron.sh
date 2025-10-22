@@ -31,7 +31,7 @@ train_prompt_mini_bsz=32
 train_ppo_micro_batch_size_per_gpu=1 #! 1017 会议决定更改
 infer_ppo_micro_batch_size_per_gpu=1 #! 1017 会议决定更改
 # Paths
-MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf-zy-mtp0"
+MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf"
 MCORE_MODEL_PATH="/data01/huawei-2025/weight/dsv3_bf16_mcore_full_base"
 RAY_DATA_HOME="/opt"
 CKPTS_DIR=/data01/huawei-2025/weight/ckpt-DAPO-DeepSeek-671b-megatron-base-2k12k-gpu-mtp-1021
@@ -59,17 +59,12 @@ optimizer_offload_fraction=1
 
 # install mbridge
 # pip3 install git+https://github.com/ISEEKYAN/mbridge
-# ! use mbridge
-USE_MBRIDGE=True
-USE_DIST_CKPT=False
+USE_MBRIDGE=False
+USE_DIST_CKPT=True
 
-
-# first_layer=6
-# last_layer=7
-# pipeline_num_transformer_layers="[[6],[8],[8],[8],[8],[8],[8],[7]]"
 first_layer=6
 last_layer=7
-# pipeline_num_transformer_layers="[[3],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[2]]"
+
 offload=True
 gen_tp=16
 gen_dp=4
@@ -79,19 +74,18 @@ train_ep=64
 train_pp=8
 enable_filter_group=False
 train_cp=1
-#    +actor_rollout_ref.actor.megatron.override_transformer_config.context_parallel_size=${train_cp} \
+
 ETP=1
-#    +actor_rollout_ref.actor.megatron.override_transformer_config.moe_router_dtype=fp32 \
-#   +actor_rollout_ref.actor.megatron.override_transformer_config.moe_grouped_gemm=True \
-#   +actor_rollout_ref.actor.megatron.override_transformer_config.moe_token_dispatcher_type="alltoall" \
+
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 cd /opt/verl
 ray job submit --runtime-env="${RUNTIME_ENV}" \
     -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
-    actor_rollout_ref.rollout.skip.enable=True \
-    actor_rollout_ref.rollout.skip.dump_dir="/data01/huawei-2025/wlf/rollout_dump/baseline_gpu_mtp_mbridge_1021" \
+    +actor_rollout_ref.model.override_config.model_config.num_hidden_layers=8 \
+    actor_rollout_ref.rollout.skip.enable=False \
+    actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
@@ -189,14 +183,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.total_epochs=10 \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
-    trainer.rollout_data_dir=/data01/huawei-2025/zhy/$(basename $(dirname $0))/rollout \
+    trainer.rollout_data_dir=${JOB_LOG_DIR_CURR}/rollout_data_dir \
     trainer.log_val_generations=10 \
-    trainer.device="npu" $@ 2>&1 | tee /tmp/ray.output
+    trainer.device="npu" $@ 2>&1
 
-#! 以下优化特性被舍弃
-# 被取消的参数
-#    +actor_rollout_ref.actor.megatron.override_transformer_config.bias_dropout_fusion=True \
-#    +actor_rollout_ref.actor.megatron.override_transformer_config.persist_layer_norm=True \
-#     +actor_rollout_ref.actor.optim.override_optimizer_config.optimizer_cpu_offload=True \
-#     ++actor_rollout_ref.actor.megatron.override_transformer_config.attention_backend=fused \
-#    ++actor_rollout_ref.actor.megatron.override_transformer_config.attention_backend=fused \

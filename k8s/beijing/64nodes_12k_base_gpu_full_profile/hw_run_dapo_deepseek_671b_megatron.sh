@@ -31,7 +31,7 @@ infer_ppo_micro_batch_size_per_gpu=1 #! 1017 会议决定更改
 # Paths
 MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf"
 MCORE_MODEL_PATH="/data01/huawei-2025/weight/dsv3_bf16_mcore_full_base"
-RAY_DATA_HOME="/opt"
+
 CKPTS_DIR=/data01/huawei-2025/weight/CKPT/ckpt-${exp_name}
 TRAIN_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
 TEST_FILE="/data01/huawei-2025/rl_data/dapo-math/dapo-math-17k_dedup_r1_sys_prompt_mathdapo.parquet"
@@ -199,10 +199,3 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.log_val_generations=10 \
     trainer.device="npu" $@ 2>&1
 
-#! 以下优化特性被舍弃
-# 被取消的参数
-#    +actor_rollout_ref.actor.megatron.override_transformer_config.bias_dropout_fusion=True \
-#    +actor_rollout_ref.actor.megatron.override_transformer_config.persist_layer_norm=True \
-#     +actor_rollout_ref.actor.optim.override_optimizer_config.optimizer_cpu_offload=True \
-#! 以下特性不使用会导致报错！
-#     ++actor_rollout_ref.actor.megatron.override_transformer_config.attention_backend=fused \

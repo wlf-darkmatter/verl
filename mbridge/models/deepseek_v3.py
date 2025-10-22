@@ -242,7 +242,7 @@ class DeepseekV3Bridge(LLMBridge):
                     self.config,
                     transformer_layer_spec_for_mtp,
                     use_transformer_engine=True,
-                    vp_stage=vp_stage,
+                    # vp_stage=vp_stage,
                 )
                 gptmodel_args["mtp_block_spec"] = mtp_block_spec
                 print(f"mtp_block_spec: {mtp_block_spec}")

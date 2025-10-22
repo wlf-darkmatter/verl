@@ -578,7 +578,9 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
             )
 
         set_expandable_segments(False)
-
+        print("\033[33mLOAD_VALIDATION\033[0m")
+        # if os.getenv("LOAD_VALIDATION","0") == "1":
+        #         breakpoint()
         if self.config.rollout.free_cache_engine:
             await self.rollout.resume(tags=["weights"])
         await self.rollout.update_weights(per_tensor_param)
@@ -749,6 +751,7 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
     def compute_ref_log_prob(self, data: DataProto):
         self.custom_memory_snapshot_start("compute_ref_log_prob")
         assert self._is_ref
+        print(f"Reference Model 是否需要被卸掉: {self._ref_is_offload_param}")
         if self._ref_is_offload_param:
             load_megatron_model_to_gpu(self.ref_module, load_grad=False)
             log_gpu_memory_usage("After load ref params and grad during compute_ref_log_prob", logger=logger)
