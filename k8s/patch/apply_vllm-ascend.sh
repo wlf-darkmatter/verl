@@ -1,4 +1,5 @@
 
+set -x # 开启调试模式
 vllm_version=$(cat /opt/vllm/vllm/_version.py | grep 'version =' | awk '{print $5}')
 vllm_version=${vllm_version//\'}
 
@@ -14,3 +15,4 @@ if [[ ${vllm_version} == '0.10.0' ]];then
   echo -e "\033[32mApplied VLLM-ASCEND ${vllm_version}!\033[0m"
 fi
 
+set +x # 关闭调试模式

@@ -454,11 +454,15 @@ class DistProfilerExtension:
     @register(dispatch_mode=Dispatch.ONE_TO_ALL)
     def custom_start_profile(self, profile_step, role) -> None:
         """Start profiling for the current rank in the current training step."""
-        config = getattr(self.config, role).profiler
+        if role == "e2e":
+            config = getattr(self.config, "actor").profiler
+        else:
+            config = getattr(self.config, role).profiler
         if config.ranks is not None:
             config.all_ranks = False
         tool_config = config.tool_config
         if not config.enable:
+            print(f"\033[32m不进行profiling采集: {role}\033[0m", flush=True)
             return
         print(f"\033[33m准备开始profiling采集: {role}\033[0m", flush=True)
         if role not in self.dict_impl:
@@ -471,7 +475,10 @@ class DistProfilerExtension:
     @register(dispatch_mode=Dispatch.ONE_TO_ALL)
     def custom_stop_profile(self, role) -> None:
         """Stop profiling for the current rank in the current training step."""
-        config = getattr(self.config, role).profiler
+        if role == "e2e":
+            config = getattr(self.config, "actor").profiler
+        else:
+            config = getattr(self.config, role).profiler
         if not config.enable:
             return
         print(f"\033[33m准备结束profiling采集: {role}\033[0m", flush=True)

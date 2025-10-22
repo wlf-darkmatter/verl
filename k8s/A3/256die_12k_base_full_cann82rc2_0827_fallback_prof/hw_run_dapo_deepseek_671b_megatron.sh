@@ -72,12 +72,9 @@ train_ep=32 #* 32
 train_pp=8 #* 8
 enable_filter_group=False
 train_cp=1
-#    +actor_rollout_ref.actor.megatron.override_transformer_config.context_parallel_size=${train_cp} \
+
 ETP=1
-#    +actor_rollout_ref.actor.megatron.override_transformer_config.moe_router_dtype=fp32 \
-#   +actor_rollout_ref.actor.megatron.override_transformer_config.moe_grouped_gemm=True \
-#   +actor_rollout_ref.actor.megatron.override_transformer_config.moe_token_dispatcher_type="alltoall" \
-#
+
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 cd /opt/verl
 ray job submit --runtime-env="${RUNTIME_ENV}" \
@@ -88,8 +85,6 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.rollout.skip.enable=False \
     actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
-    actor_rollout_ref.rollout.profiler.enable=True \
-    actor_rollout_ref.ref.profiler.enable=False \
     actor_rollout_ref.actor.profiler.enable=True \
     actor_rollout_ref.actor.profiler.ranks="[0,1,2,3,4,5,6,7]" \
     actor_rollout_ref.actor.profiler.tool_config.npu.level=level1 \
@@ -198,11 +193,3 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.rollout_data_dir=${JOB_LOG_DIR_CURR}/rollout_data_dir \
     trainer.log_val_generations=10 \
     trainer.device="npu" $@ 2>&1
-
-#! 以下优化特性被舍弃
-# 被取消的参数
-#    +actor_rollout_ref.actor.megatron.override_transformer_config.bias_dropout_fusion=True \
-#    +actor_rollout_ref.actor.megatron.override_transformer_config.persist_layer_norm=True \
-#     +actor_rollout_ref.actor.optim.override_optimizer_config.optimizer_cpu_offload=True \
-#! 以下特性不使用会导致报错！
-#     ++actor_rollout_ref.actor.megatron.override_transformer_config.attention_backend=fused \

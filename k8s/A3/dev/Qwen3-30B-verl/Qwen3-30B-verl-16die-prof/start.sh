@@ -38,7 +38,7 @@ export P2P_HCCL_BUFFSIZE=30
 export HCCL_BUFFSIZE=300
 
 #! 注意，1003 加了这 几个超时配置
-# export RAY_DEBUG_POST_MORTEM=1
+export RAY_DEBUG_POST_MORTEM=1
 # export ASCEND_LAUNCH_BLOCKING=1
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
@@ -122,7 +122,7 @@ if [ "$RANK" = "0" ]; then
     # judge npu_count_int bigger than NNODES*NPU_PER_NODE
     if [ "$npu_count_int" -ge "$((NNODES*NPU_PER_NODE))" ]; then
       echo "Ray cluster is ready with $npu_count_int npu (from $npu_count NPU resources), starting Python script."
-      bash hw_run_dapo_deepseek_671b_megatron.sh | tee ${JOB_LOG_DIR_CURR}/ray_host/$(date +"%Y-%m-%d_%H-%M-%S")_ray.log
+      bash hw_run_dapo_qwen3-30b_megatron.sh | tee ${JOB_LOG_DIR_CURR}/ray_host/$(date +"%Y-%m-%d_%H-%M-%S")_ray.log
       break
     fi
 
@@ -139,61 +139,3 @@ fi
 
 # start Mark 1
 
-cnt=0
-while true; do
-  ray_name=$(ray job list | grep -o "raysubmit_[a-zA-Z0-9]*")
-  if [[ -n $ray_name ]]; then
-    echo "Job $ray_name start succeeded"
-    break
-  fi
-
-  cnt=$((cnt+1))
-  if [[ $cnt -gt 100 ]]; then
-    echo "Job $ray_name start failed"
-    ray stop --force
-    sleep 10
-
-    # rm -rf /tmp
-    exit 1
-  fi
-
-  sleep 50
-done
-
-ray_name=$(ray job list | grep -o "raysubmit_[a-zA-Z0-9]*")
-while true; do
-  output=$(ray job status $ray_name)
-  failed=$(echo $output | grep $ray_name | grep -i failed)
-  succeeded=$(echo $output | grep $ray_name | grep -i succeeded)
-  gcs_error=$(echo $output | grep -i 'Failed to get cluster ID from GCS server')
-
-  if [[ -n $gcs_error ]]; then
-    echo "ray cannot connect，Job $ray_name exit with exception"
-    ray stop --force
-    sleep 10
-
-   # rm -rf /tmp
-    exit 1
-  fi
-
-
-  if [[ -n $succeeded ]]; then
-    ray stop --force
-    sleep 10
-
- #   rm -rf /tmp
-    echo "Job $ray_name exit without exception"
-    exit 0
-  fi
-
-#   if [[ -n $failed ]]; then
-#     echo "Job $ray_name exit with exception"
-#     ray stop --force
-    sleep 10
-
-# #    rm -rf /tmp
-#     exit 1
-#   fi
-
-  sleep 10
-done

@@ -3,7 +3,7 @@ set -x
 echo ">>Starting script at: $(date), path = $(pwd)"
 
 project_name='DAPO'
-exp_name='DAPO-dpsk-671b-megatron-BASE-template'
+exp_name='DAPO-dpsk-671b-megatron-BASE-16NNODES-prof'
 
 adv_estimator=grpo
 
@@ -17,15 +17,15 @@ kl_loss_coef=0.001
 clip_ratio_low=0.2
 clip_ratio_high=0.28
 max_prompt_length=$((1024 * 2))
-max_response_length=$((1024 * 12))
+max_response_length=$((2))
 enable_overlong_buffer=True
 overlong_buffer_len=$((1024 * 1))
 overlong_penalty_factor=1.0
 
 loss_agg_mode="token-mean"
-train_prompt_bsz=32
+train_prompt_bsz=16
 n_resp_per_prompt=16
-train_prompt_mini_bsz=32
+train_prompt_mini_bsz=16
 train_ppo_micro_batch_size_per_gpu=1 #! 1017 会议决定更改
 infer_ppo_micro_batch_size_per_gpu=1 #! 1017 会议决定更改
 # Paths
@@ -64,9 +64,9 @@ offload=True
 gen_tp=8
 gen_dp=8
 
-train_tp=8
-train_ep=32
-train_pp=8
+train_tp=8 #* 8
+train_ep=16 #* 32
+train_pp=8 #* 8
 enable_filter_group=False
 train_cp=1
 
@@ -78,10 +78,18 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
-    actor_rollout_ref.rollout.load_format=safetensors \
+    actor_rollout_ref.rollout.load_format=dummy \
     actor_rollout_ref.rollout.skip.enable=False \
     actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
+    actor_rollout_ref.actor.profiler.ranks="[0,1,2,3,4,5,6,7]" \
+    actor_rollout_ref.actor.profiler.tool_config.npu.level=level1 \
+    actor_rollout_ref.actor.profiler.tool_config.npu.analysis=True \
+    actor_rollout_ref.actor.profiler.tool_config.npu.discrete=False \
+    actor_rollout_ref.actor.profiler.tool_config.npu.contents="[cpu,npu,memory,module]" \
+    global_profiler.save_path=${JOB_LOG_DIR_CURR}/profile \
+    global_profiler.steps="[1,2]" \
+    global_profiler.tool="npu" \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
     data.prompt_key=messages \
@@ -173,11 +181,10 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.nnodes="${NNODES}" \
     trainer.val_before_train=False \
     trainer.test_freq=-1 \
-    trainer.save_freq=-1 \
+    trainer.save_freq=10 \
     trainer.total_epochs=10 \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
     trainer.rollout_data_dir=${JOB_LOG_DIR_CURR}/rollout_data_dir \
     trainer.log_val_generations=10 \
     trainer.device="npu" $@ 2>&1
-
