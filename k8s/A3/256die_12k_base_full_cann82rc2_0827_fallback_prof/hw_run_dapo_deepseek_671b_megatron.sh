@@ -85,6 +85,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.rollout.skip.enable=False \
     actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
+    actor_rollout_ref.actor.profiler.enable=True \
     actor_rollout_ref.actor.profiler.ranks="[0,1,2,3,4,5,6,7]" \
     actor_rollout_ref.actor.profiler.tool_config.npu.level=level1 \
     actor_rollout_ref.actor.profiler.tool_config.npu.analysis=True \

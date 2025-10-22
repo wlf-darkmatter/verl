@@ -99,7 +99,6 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     global_profiler.save_path=${JOB_LOG_DIR_CURR}/profile \
     global_profiler.steps="[0,1,2,3]" \
     global_profiler.tool="npu" \
-    actor_rollout_ref.rollout.load_format=dummy \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
     data.prompt_key=messages \
