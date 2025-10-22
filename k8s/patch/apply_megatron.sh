@@ -1,5 +1,6 @@
 megatron_version=$(cat /opt/Megatron-LM/megatron/core/package_info.py | grep 'MINOR =' | awk '{print $3}')
 
+set -x # 开启调试模式
 
 
 if [[ ${megatron_version} == 12 ]];then
@@ -14,3 +15,4 @@ if [[ ${megatron_version} == 12 ]];then
 
 fi
 
+set +x # 关闭调试模式

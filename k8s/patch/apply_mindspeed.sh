@@ -1,4 +1,5 @@
 
+set -x # 开启调试模式
 if [[ ${USE_CP_PATCH} == 1 ]];then
     #! 需要使用新的mindspeed
     rm -rf /opt/MindSpeed
@@ -12,3 +13,4 @@ if [[ ${USE_CP_PATCH} == 1 ]];then
     echo -e "\033[32mApplied MindSpeed CP\033[0m"
 fi
 
+set +x # 关闭调试模式
