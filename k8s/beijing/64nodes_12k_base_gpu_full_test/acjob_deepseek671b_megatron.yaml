@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek671-64-verl-moe-12k-base-gpu-full-mbridge-mtp #需要修改
+  name: deepseek671-64-verl-moe-12k-base-gpu-full-vllm010 #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -47,7 +47,7 @@ spec:
               command: ["/bin/bash", "-c"]
 
               args:
-                - "bash /home/code/verl/k8s/beijing/64nodes_12k_base_gpu_full_mbridge_mtp/start.sh; sleep 7d"
+                - "bash /home/code/verl/k8s/beijing/64nodes_12k_base_gpu_full_vllm010/start.sh; sleep 7d"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
@@ -59,10 +59,10 @@ spec:
               resources:
                 limits:
                   huawei.com/Ascend910: 8 #目前需要和requests保持一致
-                  memory: "800Gi"
+                  memory: "1000Gi"
                 requests:
                   huawei.com/Ascend910: 8  #需要的NPU芯片个数为8
-                  memory: "800Gi"
+                  memory: "1000Gi"
 
               volumeMounts:
                 - name: npu-smi
@@ -114,7 +114,7 @@ spec:
                       - key: job-name
                         operator: In
                         values:
-                          -  deepseek671-64-verl-moe-12k-base-gpu-full-mbridge-mtp
+                          -  deepseek671-64-verl-moe-12k-base-gpu-full-vllm010
                       - key: replica-type
                         operator: In
                         values:
@@ -140,7 +140,7 @@ spec:
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "bash /home/code/verl/k8s/beijing/64nodes_12k_base_gpu_full_mbridge_mtp/start.sh; sleep 7d"
+                - "bash /home/code/verl/k8s/beijing/64nodes_12k_base_gpu_full_vllm010/start.sh; sleep 7d"
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify
@@ -151,10 +151,10 @@ spec:
               resources:
                 limits:
                   huawei.com/Ascend910: 8 #目前需要和requests保持一致
-                  memory: "800Gi"
+                  memory: "1000Gi"
                 requests:
                   huawei.com/Ascend910: 8  #需要的NPU芯片个数为8
-                  memory: "800Gi"
+                  memory: "1000Gi"
               volumeMounts:
                 - name: npu-smi
                   mountPath: /usr/local/bin/npu-smi

@@ -17,12 +17,7 @@ export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR_CURR}/memory_log
 
 export CACHE_DIR=${JOB_LOG_DIR}/CACHE; mkdir -p ${CACHE_DIR}
 export ACL_OP_COMPILER_CACHE_DIR=${CACHE_DIR}/COMPILER_CACHE/${RANK}; mkdir -p ${ACL_OP_COMPILER_CACHE_DIR}
-
-#! 注意，自定义配置
-export VLLM_SLEEP_LEVEL=1
-export VERL_DEBUG_NOSHARDING=0
 export VERL_CUSTOM_REWARD_RULE="1"
-export VLLM_VERSION="0.10.0"
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
@@ -42,8 +37,18 @@ export HCCL_BUFFSIZE=300
 
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
 
-#! ################# 【VLLM patch】 #####################
+#######################################
 #! 规避模型加载时 权重读取错误的问题
+# #! [VLLM]
+# #* 规避直接读 hf 权重的报错（出现减层或者带有MTP）
+# rm -f /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+# cp -f /home/code/verl/k8s/patch/0928/vllm/vllm/model_executor/models/deepseek_v2.py /opt/vllm/vllm/model_executor/models/deepseek_v2.py
+
+
+# #! [VLLM-ASCEND]
+
+# rm -f /opt/vllm-ascend/vllm_ascend/models/deepseek_v2.py
+# cp -f /home/code/verl/k8s/patch/0928/vllm-ascend/vllm_ascend/models/deepseek_v2.py /opt/vllm-ascend/vllm_ascend/models/deepseek_v2.py
 bash /home/code/verl/k8s/patch/apply_vllm-ascend.sh
 
 #! [Megatron]
@@ -55,10 +60,8 @@ cp -f /home/code/verl/k8s/patch/megatron.patch/0.12.1/Megatron-LM/megatron/core/
 
 echo -e "\033[32mApplied Megatron-core!\033[0m"
 
-#! #################  【MindSpeed patch】  #####################
-#! [MindSpeed]
-bash /home/code/verl/k8s/patch/apply_mindspeed.sh
-
+# rm -f /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
+# cp -f /home/code/verl/k8s/patch/0928/Megatron-LM/megatron/dot_product_attention.py /opt/Megatron-LM/megatron/core/transformer/dot_product_attention.py
 #######################################
 
 source /usr/local/Ascend/ascend-toolkit/set_env.sh;
@@ -169,7 +172,7 @@ while true; do
     ray stop --force
     sleep 10
 
-  # rm -rf /tmp
+   # rm -rf /tmp
     exit 1
   fi
 
