@@ -78,7 +78,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
-    actor_rollout_ref.rollout.load_format=dummy \
+    actor_rollout_ref.rollout.load_format=safetensors \
     actor_rollout_ref.rollout.skip.enable=False \
     actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
