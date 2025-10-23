@@ -3,7 +3,7 @@ set -x
 echo ">>Starting script at: $(date), path = $(pwd)"
 
 project_name='DAPO'
-exp_name='test-tp32-8nodes'
+exp_name='test-tp32-8nodes-4layers'
 
 adv_estimator=grpo
 
@@ -57,8 +57,8 @@ optimizer_offload_fraction=1
 USE_MBRIDGE=False
 USE_DIST_CKPT=True
 
-# first_layer=6
-# last_layer=7
+first_layer=1
+last_layer=1
 
 offload=True
 gen_tp=32
@@ -77,7 +77,9 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
-    +actor_rollout_ref.model.override_config.model_config.num_hidden_layers=2 \
+    +actor_rollout_ref.model.override_config.model_config.num_hidden_layers=4 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_first_pipeline_stage=$first_layer \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_pipeline_stage=$last_layer \
     actor_rollout_ref.rollout.load_format=dummy \
     actor_rollout_ref.rollout.skip.enable=False \
     actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
