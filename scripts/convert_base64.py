@@ -23,8 +23,10 @@ def dir_to_tar(input_file_path):
     input_file = io.BytesIO()
 
     tar = tarfile.open(fileobj=input_file, mode=f'w:gz')
+    print("\033[32m压缩内容中\033[0m")
     tar.add(input_file_path)
     tar.close()
+    print("\033[32m压缩完毕\033[0m")
 
     return input_file
 

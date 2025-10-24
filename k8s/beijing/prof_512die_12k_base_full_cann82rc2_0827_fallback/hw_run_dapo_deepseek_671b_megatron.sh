@@ -65,7 +65,7 @@ gen_tp=8
 gen_dp=8
 
 train_tp=8 #* 8
-train_ep=16 #* 32
+train_ep=32 #* 32
 train_pp=8 #* 8
 enable_filter_group=False
 train_cp=1
@@ -89,7 +89,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.profiler.tool_config.npu.discrete=False \
     actor_rollout_ref.actor.profiler.tool_config.npu.contents="[cpu,npu,memory,module]" \
     global_profiler.save_path=${JOB_LOG_DIR_CURR}/profile \
-    global_profiler.steps="[1,2]" \
+    global_profiler.steps="[1,2,3]" \
     global_profiler.tool="npu" \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
