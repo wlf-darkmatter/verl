@@ -42,6 +42,16 @@ export HCCL_BUFFSIZE=300
 #! 规避模型加载时 权重读取错误的问题
 bash /home/code/verl/k8s/patch/apply_vllm-ascend.sh
 
+#! vllm mtp打点
+rm -f /opt/vllm/vllm/v1/spec_decode/eagle.py
+cp -f /home/code/verl/k8s/patch/0928/verl/eagle.py /opt/vllm/vllm/v1/spec_decode/eagle.py
+echo "Overwrite vllm eager code, done."
+
+#! vllm ascend mtp打点
+rm -f /opt/vllm-ascend/vllm_ascend/worker/mtp_proposer_v1.py
+cp -f /home/code/verl/k8s/patch/0928/verl/mtp_proposer_v1.py /opt/vllm-ascend/vllm_ascend/worker/mtp_proposer_v1.py
+echo "Overwrite vllm eager code, done."
+
 #! #################  【Megatron patch】  #####################
 #! [Megatron]
 bash /home/code/verl/k8s/patch/apply_megatron.sh
@@ -87,10 +97,10 @@ cd $(dirname $0)
 #* [Verl] 一般用于打CP代码
 bash /home/code/verl/k8s/patch/apply_verl.sh
 
-#* [Verl] 开启mtp
-rm -f /opt/verl/verl/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
-cp -f /home/code/verl/k8s/patch/0928/verl/vllm_rollout_spmd.py /opt/verl/verl/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
-echo "Overwrite vllm_rollout_spmd code, done."
+# #* [Verl] 开启mtp
+# rm -f /opt/verl/verl/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
+# cp -f /home/code/verl/k8s/patch/0928/verl/vllm_rollout_spmd.py /opt/verl/verl/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
+# echo "Overwrite vllm_rollout_spmd code, done."
 
 export ServerPort=6666     # modify according to actual situation
 export DashboardPort=8888  # modify according to actual situation
@@ -166,14 +176,14 @@ while true; do
   if [[ -n $gcs_error ]]; then
     echo "ray cannot connect，Job $ray_name exit with exception"
     ray stop --force
-  # rm -rf /tmp
+   # rm -rf /tmp
     exit 1
   fi
 
 
   if [[ -n $succeeded ]]; then
     ray stop --force
-#   rm -rf /tmp
+ #   rm -rf /tmp
     echo "Job $ray_name exit without exception"
     exit 0
   fi

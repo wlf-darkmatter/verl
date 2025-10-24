@@ -578,7 +578,7 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
             )
 
         set_expandable_segments(False)
-        print("\033[33mLOAD_VALIDATION\033[0m")
+        # print("\033[33mLOAD_VALIDATION\033[0m")
         # if os.getenv("LOAD_VALIDATION","0") == "1":
         #         breakpoint()
         if self.config.rollout.free_cache_engine:
