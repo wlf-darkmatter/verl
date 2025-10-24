@@ -3,7 +3,7 @@ set -x
 echo ">>Starting script at: $(date), path = $(pwd)"
 
 project_name='DAPO'
-exp_name='DAPO-DeepSeek-671b-megatron-BASE-64NNODES'
+exp_name='DAPO-dpsk-671b-megatron-BASE-16NNODES-prof'
 
 adv_estimator=grpo
 
@@ -17,7 +17,7 @@ kl_loss_coef=0.001
 clip_ratio_low=0.2
 clip_ratio_high=0.28
 max_prompt_length=$((1024 * 2))
-max_response_length=$((6))
+max_response_length=$((2))
 enable_overlong_buffer=True
 overlong_buffer_len=$((1024 * 1))
 overlong_penalty_factor=1.0
@@ -57,28 +57,21 @@ optimizer_offload_fraction=1
 USE_MBRIDGE=False
 USE_DIST_CKPT=True
 
-
-# first_layer=6
-# last_layer=7
-# pipeline_num_transformer_layers="[[6],[8],[8],[8],[8],[8],[8],[7]]"
 first_layer=6
 last_layer=7
-# pipeline_num_transformer_layers="[[3],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[4],[2]]"
+
 offload=True
 gen_tp=8
 gen_dp=8
-# gen_world_size=$((NNODES*8))
-train_tp=8
-train_ep=64
-train_pp=8
+
+train_tp=8 #* 8
+train_ep=16 #* 32
+train_pp=8 #* 8
 enable_filter_group=False
 train_cp=1
-#    +actor_rollout_ref.actor.megatron.override_transformer_config.context_parallel_size=${train_cp} \
+
 ETP=1
-#    +actor_rollout_ref.actor.megatron.override_transformer_config.moe_router_dtype=fp32 \
-#   +actor_rollout_ref.actor.megatron.override_transformer_config.moe_grouped_gemm=True \
-#   +actor_rollout_ref.actor.megatron.override_transformer_config.moe_token_dispatcher_type="alltoall" \
-#
+
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 cd /opt/verl
 ray job submit --runtime-env="${RUNTIME_ENV}" \
@@ -89,8 +82,6 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.rollout.skip.enable=False \
     actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
-    actor_rollout_ref.rollout.profiler.enable=True \
-    actor_rollout_ref.ref.profiler.enable=False \
     actor_rollout_ref.actor.profiler.enable=True \
     actor_rollout_ref.actor.profiler.ranks="[0,1,2,3,4,5,6,7]" \
     actor_rollout_ref.actor.profiler.tool_config.npu.level=level1 \
@@ -198,4 +189,3 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.rollout_data_dir=${JOB_LOG_DIR_CURR}/rollout_data_dir \
     trainer.log_val_generations=10 \
     trainer.device="npu" $@ 2>&1
-

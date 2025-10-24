@@ -279,17 +279,6 @@ class vLLMRollout(BaseRollout):
             **self.lora_kwargs,
             **engine_kwargs,
         )
-        import os
-        if os.getenv("LOAD_VALIDATION","0") == "1":
-            #! 临时修改
-            tmp_model = self.inference_engine.llm_engine.model_executor.driver_worker.worker.model_runner
-            if torch.distributed.get_rank()==0:
-                tmp_dump_name = 'model.layers.0.mlp.experts.w2_weight'
-                torch.save(dict(tmp_model.model.named_parameters())[tmp_dump_name], f"/mnt/hpfs_test/zy/load_format_dummy/safe_初始化_{tmp_dump_name}.pt")
-                #torch.save(dict(tmp_model.model.named_parameters()),f"/mnt/hpfs_test/zy/load_format_dummy/初始化_dumy_model.pt")
-                # for key,val in tmp_model.model.named_parameters():
-                #     torch.
-            #! 临时修改
 
         kwargs = dict(
             n=1,
@@ -558,25 +547,12 @@ class vLLMRollout(BaseRollout):
             logger.info(f"vLLM load weights, loaded_params: {len(weights)}")
         else:
             from verl.utils.vllm.patch import patch_vllm_moe_model_weight_loader
-            # if os.getenv("LOAD_VALIDATION","0") == "1":
-            #     breakpoint()
+
             model = self.inference_engine.llm_engine.model_executor.driver_worker.worker.model_runner.model
-            print(f'---------------------------------------------------------------------')
-            import os
-            if os.getenv("LOAD_VALIDATION","0") == "1":
-                #! 临时修改
-                if torch.distributed.get_rank()==0:
-                    tmp_dump_name_2 = 'model.layers.0.mlp.experts.w2_weight'
-                    torch.save(dict(model.named_parameters())[tmp_dump_name_2], f"/mnt/hpfs_test/zy/load_format_dummy/resharding_patch前safe_{tmp_dump_name_2}.pt")
-                    #torch.save(dict(model.named_parameters()),f"/mnt/hpfs_test/zy/load_format_dummy/resharding_patch前dumy_model.pt")
-                #! 临时修改
+
             patch_vllm_moe_model_weight_loader(model)
             model.load_weights(weights)
-            if os.getenv("LOAD_VALIDATION","0") == "1":
-                if torch.distributed.get_rank()==0:
-                    torch.save(dict(model.named_parameters())[tmp_dump_name_2], f"/mnt/hpfs_test/zy/load_format_dummy/resharding_patch后safe_{tmp_dump_name_2}.pt")
-                    #torch.save(dict(model.named_parameters()),f"/mnt/hpfs_test/zy/load_format_dummy/resharding_patch后dumy_model.pt")
-                    breakpoint()
+
 
 
 # https://github.com/vllm-project/vllm/issues/13175

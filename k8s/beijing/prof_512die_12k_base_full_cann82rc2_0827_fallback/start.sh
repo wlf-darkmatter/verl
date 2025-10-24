@@ -5,7 +5,6 @@ export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
 export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
 export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
-# unset PYTORCH_NPU_ALLOC_CONF
 export ASCEND_GLOBAL_LOG_LEVEL=3
 
 
@@ -21,7 +20,8 @@ export CACHE_DIR=${JOB_LOG_DIR}/CACHE; mkdir -p ${CACHE_DIR}
 export ACL_OP_COMPILER_CACHE_DIR=${CACHE_DIR}/COMPILER_CACHE/${CURRENT_IP}; mkdir -p ${ACL_OP_COMPILER_CACHE_DIR}
 export VERL_CUSTOM_REWARD_RULE="1"
 #export VERL_CUSTOM_SET_MEMEXPAND_TRAIN="1" #! 0 是关掉训练的虚拟显存, 默认是 1
-export VERL_CUSTOM_PROFILING="1"
+export VERL_CUSTOM_PROFILING="2"
+# export USE_CP_PATCH=1 #! 使用CP需要声明这个环境变量才能打上 Patch
 
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
@@ -38,7 +38,6 @@ export P2P_HCCL_BUFFSIZE=30
 export HCCL_BUFFSIZE=300
 
 
-
 #! #################  【VLLM patch】  #####################
 #! 规避模型加载时 权重读取错误的问题
 bash /home/code/verl/k8s/patch/apply_vllm-ascend.sh
@@ -51,8 +50,6 @@ bash /home/code/verl/k8s/patch/apply_megatron.sh
 #! [MindSpeed]
 bash /home/code/verl/k8s/patch/apply_mindspeed.sh
 
-#! VLLM_SLEEP_LEVEL
-export VLLM_SLEEP_LEVEL="1"
 
 #######################################
 
@@ -70,9 +67,9 @@ unset LOCAL_RANK
 export NPU_PER_NODE=8  # A2 NPU Number
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
-
-rm -rf /tmp/ray
 ray stop --force
+cd $(dirname $0)
+
 sleep 1
 echo "Overwrite verl code"
 #* 提速 ray 拉起速度
