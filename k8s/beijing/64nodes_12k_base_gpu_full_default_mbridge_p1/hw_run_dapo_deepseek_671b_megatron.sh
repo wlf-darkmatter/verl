@@ -3,7 +3,7 @@ set -x
 echo ">>Starting script at: $(date), path = $(pwd)"
 
 project_name='DAPO'
-exp_name='DAPO-dpsk-671b-megatron-BASE-mbridge-test'
+exp_name='DAPO-dpsk-671b-megatron-BASE-mbridge-p1'
 
 adv_estimator=grpo
 
@@ -54,6 +54,7 @@ optimizer_offload_fraction=1
 
 # install mbridge
 # pip3 install git+https://github.com/ISEEKYAN/mbridge
+# ! USE MBRIDGE
 USE_MBRIDGE=True
 USE_DIST_CKPT=False
 
@@ -61,8 +62,8 @@ first_layer=6
 last_layer=7
 
 offload=True
-gen_tp=16
-gen_dp=4
+gen_tp=8
+gen_dp=8
 
 train_tp=8
 train_ep=32
@@ -71,7 +72,7 @@ enable_filter_group=False
 train_cp=1
 
 ETP=1
-
+#! 记得看看 +actor_rollout_ref.model.override_config.model_config.num_nextn_predict_layers=1 为啥没有生效
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 cd /opt/verl
 ray job submit --runtime-env="${RUNTIME_ENV}" \
@@ -82,7 +83,6 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.rollout.skip.enable=False \
     actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
-    +actor_rollout_ref.model.override_config.model_config.num_nextn_predict_layers=1 \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
     data.prompt_key=messages \

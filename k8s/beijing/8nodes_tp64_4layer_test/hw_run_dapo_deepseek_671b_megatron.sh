@@ -3,7 +3,7 @@ set -x
 echo ">>Starting script at: $(date), path = $(pwd)"
 
 project_name='DAPO'
-exp_name='DAPO-dpsk-671b-megatron-BASE-mbridge-test'
+exp_name='test-tp64-8nodes-4layers'
 
 adv_estimator=grpo
 
@@ -17,7 +17,7 @@ kl_loss_coef=0.001
 clip_ratio_low=0.2
 clip_ratio_high=0.28
 max_prompt_length=$((1024 * 2))
-max_response_length=$((1024 * 12))
+max_response_length=$((1024 * 1))
 enable_overlong_buffer=True
 overlong_buffer_len=$((1024 * 1))
 overlong_penalty_factor=1.0
@@ -29,7 +29,7 @@ train_prompt_mini_bsz=32
 train_ppo_micro_batch_size_per_gpu=1 #! 1017 会议决定更改
 infer_ppo_micro_batch_size_per_gpu=1 #! 1017 会议决定更改
 # Paths
-MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf-zy-mtp0"
+MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf"
 MCORE_MODEL_PATH="/data01/huawei-2025/weight/dsv3_bf16_mcore_full_base"
 
 CKPTS_DIR=/data01/huawei-2025/weight/CKPT/ckpt-${exp_name}
@@ -54,22 +54,21 @@ optimizer_offload_fraction=1
 
 # install mbridge
 # pip3 install git+https://github.com/ISEEKYAN/mbridge
-USE_MBRIDGE=True
-USE_DIST_CKPT=False
+USE_MBRIDGE=False
+USE_DIST_CKPT=True
 
-first_layer=6
-last_layer=7
+first_layer=1
+last_layer=1
 
 offload=True
-gen_tp=16
-gen_dp=4
+gen_tp=64
+gen_dp=1
 
 train_tp=8
-train_ep=32
-train_pp=8
+train_ep=1
+train_pp=1
 enable_filter_group=False
 train_cp=1
-
 ETP=1
 
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
@@ -78,11 +77,13 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
-    actor_rollout_ref.rollout.load_format=safetensors \
+    +actor_rollout_ref.model.override_config.model_config.num_hidden_layers=4 \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_first_pipeline_stage=$first_layer \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_pipeline_stage=$last_layer \
+    actor_rollout_ref.rollout.load_format=dummy \
     actor_rollout_ref.rollout.skip.enable=False \
     actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
-    +actor_rollout_ref.model.override_config.model_config.num_nextn_predict_layers=1 \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
     data.prompt_key=messages \
@@ -109,8 +110,6 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=${train_ppo_micro_batch_size_per_gpu} \
     actor_rollout_ref.actor.ppo_max_token_len_per_gpu=${actor_ppo_max_token_len} \
     actor_rollout_ref.actor.optim.lr=3e-6 \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_first_pipeline_stage=$first_layer \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_pipeline_stage=$last_layer \
     +actor_rollout_ref.actor.optim.override_optimizer_config.optimizer_offload_fraction=${optimizer_offload_fraction} \
     +actor_rollout_ref.actor.optim.override_optimizer_config.optimizer_cpu_offload=True \
     actor_rollout_ref.actor.megatron.param_offload=${offload} \
@@ -132,9 +131,10 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     ++actor_rollout_ref.actor.megatron.override_transformer_config.attention_backend=fused \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
+    actor_rollout_ref.rollout.load_format=safetensors \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=${infer_ppo_micro_batch_size_per_gpu} \
     actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu=${infer_ppo_max_token_len} \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.65 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.8 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=${gen_tp} \
     actor_rollout_ref.rollout.dp_model_parallel_size=${gen_dp} \
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
@@ -174,7 +174,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.nnodes="${NNODES}" \
     trainer.val_before_train=False \
     trainer.test_freq=-1 \
-    trainer.save_freq=-1 \
+    trainer.save_freq=10 \
     trainer.total_epochs=10 \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
@@ -182,3 +182,4 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.log_val_generations=10 \
     trainer.device="npu" $@ 2>&1
 
+# actor_rollout_ref.rollout.dp_model_parallel_size=${gen_dp} \

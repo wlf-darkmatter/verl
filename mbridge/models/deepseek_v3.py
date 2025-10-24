@@ -280,10 +280,12 @@ class DeepseekV3Bridge(LLMBridge):
         assert (
             "_extra_state" not in mcore_weights_name
         ), "extra_state should not be loaded"
+        print("\033[31m################ 【Use Mbridge Now】 ################\033[0m")
         if mcore_weights_name in self._DIRECT_MAPPING:
             return [self._DIRECT_MAPPING[mcore_weights_name]]
 
         if "mtp" in mcore_weights_name:
+            print("\033[35m################ 【Use Mbridge + MTP Now】 ################\033[0m")
             return self._convert_mtp_param(mcore_weights_name)
         elif (
             "self_attention" in mcore_weights_name
@@ -346,7 +348,6 @@ class DeepseekV3Bridge(LLMBridge):
     def _convert_mtp_param(self, name: str) -> tuple[list[str]]:
         assert self.config.mtp_num_layers == 1, "only support one mtp layer for now"
         assert self.config.num_layers == 61, "only support 61 layers for now"
-        print("\033[31m################ 【Mbridge】 ################\033[0m")
         direct_name_mapping = {
             "mtp.layers.0.enorm.weight": "model.layers.61.enorm.weight",
             "mtp.layers.0.hnorm.weight": "model.layers.61.hnorm.weight",

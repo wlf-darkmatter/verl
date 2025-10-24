@@ -74,7 +74,7 @@ sleep 1
 echo "Overwrite verl code"
 #* 提速 ray 拉起速度
 if [[ -f /home/code/verl/docker/pkg/rsync ]];then
-  /home/code/verl/docker/pkg/rsync -az /home/code/verl/* /opt/verl/ --exclude=**/kernel_meta --exclude=plog --exclude=docker --exclude=docs
+   /home/code/verl/docker/pkg/rsync -az /home/code/verl/* /opt/verl/ --exclude=**/kernel_meta --exclude=plog --exclude=docker --exclude=docs
 else
   rm -rf /opt/verl/
   cp -rf /home/code/verl /opt/verl
@@ -86,11 +86,6 @@ cd $(dirname $0)
 #! #################  【Verl patch】  #####################
 #* [Verl] 一般用于打CP代码
 bash /home/code/verl/k8s/patch/apply_verl.sh
-
-#* [Verl] 开启mtp
-rm -f /opt/verl/verl/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
-cp -f /home/code/verl/k8s/patch/0928/verl/vllm_rollout_spmd.py /opt/verl/verl/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
-echo "Overwrite vllm_rollout_spmd code, done."
 
 export ServerPort=6666     # modify according to actual situation
 export DashboardPort=8888  # modify according to actual situation
@@ -166,14 +161,14 @@ while true; do
   if [[ -n $gcs_error ]]; then
     echo "ray cannot connect，Job $ray_name exit with exception"
     ray stop --force
-  # rm -rf /tmp
+   # rm -rf /tmp
     exit 1
   fi
 
 
   if [[ -n $succeeded ]]; then
     ray stop --force
-#   rm -rf /tmp
+ #   rm -rf /tmp
     echo "Job $ray_name exit without exception"
     exit 0
   fi

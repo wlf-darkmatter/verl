@@ -3,7 +3,7 @@ set -x
 echo ">>Starting script at: $(date), path = $(pwd)"
 
 project_name='DAPO'
-exp_name='DAPO-dpsk-671b-megatron-BASE-mbridge-test'
+exp_name='DAPO-dpsk-671b-megatron-BASE-tp64'
 
 adv_estimator=grpo
 
@@ -29,7 +29,7 @@ train_prompt_mini_bsz=32
 train_ppo_micro_batch_size_per_gpu=1 #! 1017 会议决定更改
 infer_ppo_micro_batch_size_per_gpu=1 #! 1017 会议决定更改
 # Paths
-MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf-zy-mtp0"
+MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf"
 MCORE_MODEL_PATH="/data01/huawei-2025/weight/dsv3_bf16_mcore_full_base"
 
 CKPTS_DIR=/data01/huawei-2025/weight/CKPT/ckpt-${exp_name}
@@ -54,15 +54,15 @@ optimizer_offload_fraction=1
 
 # install mbridge
 # pip3 install git+https://github.com/ISEEKYAN/mbridge
-USE_MBRIDGE=True
-USE_DIST_CKPT=False
+USE_MBRIDGE=False
+USE_DIST_CKPT=True
 
 first_layer=6
 last_layer=7
 
 offload=True
-gen_tp=16
-gen_dp=4
+gen_tp=64
+gen_dp=1
 
 train_tp=8
 train_ep=32
@@ -71,7 +71,7 @@ enable_filter_group=False
 train_cp=1
 
 ETP=1
-
+#! 记得看看 +actor_rollout_ref.model.override_config.model_config.num_nextn_predict_layers=1 为啥没有生效
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 cd /opt/verl
 ray job submit --runtime-env="${RUNTIME_ENV}" \
@@ -82,7 +82,6 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.rollout.skip.enable=False \
     actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \
     actor_rollout_ref.rollout.skip.max_dump_step=500 \
-    +actor_rollout_ref.model.override_config.model_config.num_nextn_predict_layers=1 \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
     data.prompt_key=messages \

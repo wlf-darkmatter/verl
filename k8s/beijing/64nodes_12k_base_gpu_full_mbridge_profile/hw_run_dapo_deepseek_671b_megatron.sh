@@ -3,7 +3,7 @@ set -x
 echo ">>Starting script at: $(date), path = $(pwd)"
 
 project_name='DAPO'
-exp_name='DAPO-dpsk-671b-megatron-BASE-mbridge-test'
+exp_name='DAPO-dpsk-671b-megatron-BASE-mbridge-profile'
 
 adv_estimator=grpo
 
@@ -17,7 +17,7 @@ kl_loss_coef=0.001
 clip_ratio_low=0.2
 clip_ratio_high=0.28
 max_prompt_length=$((1024 * 2))
-max_response_length=$((1024 * 12))
+max_response_length=$((5))
 enable_overlong_buffer=True
 overlong_buffer_len=$((1024 * 1))
 overlong_penalty_factor=1.0
@@ -61,8 +61,8 @@ first_layer=6
 last_layer=7
 
 offload=True
-gen_tp=16
-gen_dp=4
+gen_tp=8
+gen_dp=8
 
 train_tp=8
 train_ep=32
@@ -78,6 +78,17 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
+    actor_rollout_ref.rollout.profiler.enable=True \
+    actor_rollout_ref.ref.profiler.enable=False \
+    actor_rollout_ref.actor.profiler.enable=False \
+    actor_rollout_ref.actor.profiler.ranks="[0,1,2,3,4,5,6,7]" \
+    actor_rollout_ref.actor.profiler.tool_config.npu.level=level1 \
+    actor_rollout_ref.actor.profiler.tool_config.npu.analysis=True \
+    actor_rollout_ref.actor.profiler.tool_config.npu.discrete=False \
+    actor_rollout_ref.actor.profiler.tool_config.npu.contents="[cpu,npu]" \
+    global_profiler.save_path=${JOB_LOG_DIR_CURR}/profile \
+    global_profiler.steps="[1]" \
+    global_profiler.tool="npu" \
     actor_rollout_ref.rollout.load_format=safetensors \
     actor_rollout_ref.rollout.skip.enable=False \
     actor_rollout_ref.rollout.skip.dump_dir=${JOB_LOG_DIR}/rollout_skip \

@@ -76,6 +76,7 @@ def aggressive_empty_cache(force_sync: bool = True, max_retries: int = 3) -> Non
     if not device.is_available():
         return
 
+    print(f"aggressive_empty_cache use {device=}")
     for attempt in range(max_retries):
         # Record memory status before cleanup
         before_reserved = device.memory_reserved()
