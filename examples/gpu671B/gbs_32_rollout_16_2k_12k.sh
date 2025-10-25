@@ -29,8 +29,8 @@ overlong_penalty_factor=1.0
 loss_agg_mode="token-mean"
 balance_batch=False
 train_prompt_bsz=32
-n_resp_per_prompt=8
 train_prompt_mini_bsz=32
+n_resp_per_prompt=16
 train_ppo_micro_batch_size_per_gpu=2
 infer_ppo_micro_batch_size_per_gpu=2
 # Paths
