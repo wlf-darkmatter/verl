@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek671-64-verl-moe-12k-gpu-base-default #需要修改
+  name: test-tp64-8nodes-4layers #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -12,7 +12,7 @@ spec:
   schedulerName: volcano    #需要修改 work when enableGangScheduling is true
   runPolicy:
     schedulingPolicy:
-      minAvailable: 64    #需要修改， work when enableGangScheduling is true
+      minAvailable: 8    #需要修改， work when enableGangScheduling is true
       queue: project-6-root
   successPolicy: AllWorkers
   replicaSpecs:
@@ -47,7 +47,7 @@ spec:
               command: ["/bin/bash", "-c"]
 
               args:
-                - "bash /home/code/verl/k8s/beijing/64nodes_12k_base_gpu_full_default/start.sh; sleep 7d"
+                - "bash /home/code/verl/k8s/beijing/8nodes_tp64_4layer_test/start.sh; sleep 7d"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
@@ -103,7 +103,7 @@ spec:
               hostPath:
                 path: /data02/tmp
     Worker:
-      replicas: 63  #Master can only be 1
+      replicas: 7  #Master can only be 1
       restartPolicy: Never
       template:
         metadata:
@@ -119,7 +119,7 @@ spec:
                       - key: job-name
                         operator: In
                         values:
-                          -  deepseek671-64-verl-moe-12k-gpu-base-default
+                          -  test-tp64-8nodes-4layers
                       - key: replica-type
                         operator: In
                         values:
@@ -145,7 +145,7 @@ spec:
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "bash /home/code/verl/k8s/beijing/64nodes_12k_base_gpu_full_default/start.sh; sleep 7d"
+                - "bash /home/code/verl/k8s/beijing/8nodes_tp64_4layer_test/start.sh; sleep 7d"
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify

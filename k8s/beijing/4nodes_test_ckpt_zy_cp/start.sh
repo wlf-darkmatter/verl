@@ -21,8 +21,7 @@ export ACL_OP_COMPILER_CACHE_DIR=${CACHE_DIR}/COMPILER_CACHE/${CURRENT_IP}; mkdi
 export VERL_CUSTOM_REWARD_RULE="1"
 #export VERL_CUSTOM_SET_MEMEXPAND_TRAIN="1" #! 0 是关掉训练的虚拟显存, 默认是 1
 export VERL_CUSTOM_PROFILING="1"
-# export USE_CP_PATCH=1 #! 使用CP需要声明这个环境变量才能打上 Patch
-
+export USE_CP_PATCH=1 #! 使用CP需要声明这个环境变量才能打上 Patch
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
@@ -44,11 +43,12 @@ bash /home/code/verl/k8s/patch/apply_vllm-ascend.sh
 
 #! #################  【Megatron patch】  #####################
 #! [Megatron]
-bash /home/code/verl/k8s/patch/apply_megatron.sh
+
+bash /home/code/verl/k8s/patch/apply_megatron_strict_false.sh
 
 #! #################  【MindSpeed patch】  #####################
 #! [MindSpeed]
-bash /home/code/verl/k8s/patch/apply_mindspeed.sh
+bash /home/code/verl/k8s/patch/apply_mindspeed_for_cp.sh
 
 
 #######################################
@@ -74,7 +74,7 @@ sleep 1
 echo "Overwrite verl code"
 #* 提速 ray 拉起速度
 if [[ -f /home/code/verl/docker/pkg/rsync ]];then
-  /home/code/verl/docker/pkg/rsync -az /home/code/verl/* /opt/verl/ --exclude=**/kernel_meta --exclude=plog --exclude=docker --exclude=docs
+   /home/code/verl/docker/pkg/rsync -az /home/code/verl/* /opt/verl/ --exclude=**/kernel_meta --exclude=plog --exclude=docker --exclude=docs
 else
   rm -rf /opt/verl/
   cp -rf /home/code/verl /opt/verl
@@ -86,11 +86,6 @@ cd $(dirname $0)
 #! #################  【Verl patch】  #####################
 #* [Verl] 一般用于打CP代码
 bash /home/code/verl/k8s/patch/apply_verl.sh
-
-#* [Verl] 开启mtp
-rm -f /opt/verl/verl/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
-cp -f /home/code/verl/k8s/patch/0928/verl/vllm_rollout_spmd.py /opt/verl/verl/workers/rollout/vllm_rollout/vllm_rollout_spmd.py
-echo "Overwrite vllm_rollout_spmd code, done."
 
 export ServerPort=6666     # modify according to actual situation
 export DashboardPort=8888  # modify according to actual situation
@@ -166,14 +161,14 @@ while true; do
   if [[ -n $gcs_error ]]; then
     echo "ray cannot connect，Job $ray_name exit with exception"
     ray stop --force
-  # rm -rf /tmp
+   # rm -rf /tmp
     exit 1
   fi
 
 
   if [[ -n $succeeded ]]; then
     ray stop --force
-#   rm -rf /tmp
+ #   rm -rf /tmp
     echo "Job $ray_name exit without exception"
     exit 0
   fi
