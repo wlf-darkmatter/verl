@@ -3,7 +3,7 @@ set -x
 echo ">>Starting script at: $(date), path = $(pwd)"
 
 project_name='DAPO'
-exp_name='DAPO-dpsk-671b-megatron-BASE-16NNODES-prof'
+exp_name='DAPO-dpsk-671b-megatron-BASE-256die-prof'
 
 adv_estimator=grpo
 
@@ -89,7 +89,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.profiler.tool_config.npu.discrete=False \
     actor_rollout_ref.actor.profiler.tool_config.npu.contents="[cpu,npu,memory,module]" \
     global_profiler.save_path=${JOB_LOG_DIR_CURR}/profile \
-    global_profiler.steps="[1,2]" \
+    global_profiler.steps="[0,1,2]" \
     global_profiler.tool="npu" \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
@@ -182,7 +182,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.nnodes="${NNODES}" \
     trainer.val_before_train=False \
     trainer.test_freq=-1 \
-    trainer.save_freq=10 \
+    trainer.save_freq=-1 \
     trainer.total_epochs=10 \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \

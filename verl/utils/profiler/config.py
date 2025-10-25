@@ -119,6 +119,7 @@ class ProfilerConfig(BaseConfig):
     enable: bool = False
     all_ranks: bool = False
     ranks: list[int] = field(default_factory=list)
+    steps: list[int] = field(default_factory=list)
     save_path: Optional[str] = MISSING
     tool_config: Any = MISSING  # Just a placeholder, will use configs above directly
     global_tool_config: Optional[Any] = None  # Global tool configuration for all profiling tools
@@ -130,6 +131,7 @@ class ProfilerConfig(BaseConfig):
             enable=self.enable or other.enable,
             all_ranks=self.all_ranks or other.all_ranks,
             ranks=list(set(self.ranks or []) | set(other.ranks or [])),
+            steps=list(set(self.steps or []) | set(other.steps or [])),
             save_path=self.save_path,
             tool_config=self.tool_config,
             global_tool_config=self.global_tool_config or other.global_tool_config,
