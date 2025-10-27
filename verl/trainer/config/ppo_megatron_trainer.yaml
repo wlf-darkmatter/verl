@@ -29,6 +29,7 @@ actor_rollout_ref:
       tool_config:
         npu:
           discrete: False
+      steps: []
 
   model:
 
