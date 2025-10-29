@@ -133,13 +133,14 @@ class RayDAPOTrainer(RayPPOTrainer):
                     elif os.getenv("VERL_CUSTOM_PROFILING", "0") == "2":
                         config = getattr(self.config.actor_rollout_ref, "actor").profiler
                         config.enable = True
-                        self._custom_start_profiling(
-                            not prev_step_profile and curr_step_profile
-                            if self.config.global_profiler.profile_continuous_steps
-                            else curr_step_profile,
-                            wg=self.actor_rollout_wg,
-                            role="e2e",
-                        )
+                        if 0 not in getattr(self.config, "steps"):
+                            self._custom_start_profiling(
+                                not prev_step_profile and curr_step_profile
+                                if self.config.global_profiler.profile_continuous_steps
+                                else curr_step_profile,
+                                wg=self.actor_rollout_wg,
+                                role="e2e",
+                            )
 
 
                 new_batch: DataProto = DataProto.from_single_dict(batch_dict)

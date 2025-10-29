@@ -257,6 +257,26 @@ class ActorRolloutRefWorker(MegatronWorker, DistProfilerExtension):
         DistProfilerExtension.__init__(
             self, DistProfiler(rank=self.rank, config=profiler_config, tool_config=tool_config)
         )
+        #* 判断是否需要初始化采集profiling， 必须是 VERL_CUSTOM_PROFILING="2"
+        if os.getenv("VERL_CUSTOM_PROFILING", "0") == "2":
+            config = getattr(self.config, "actor").profiler
+            print(self.config)
+            config.enable = True
+            if config.ranks is not None:
+                config.all_ranks = False
+            tool_config = config.tool_config
+            role = "e2e"
+            if 0 in getattr(config, "steps"): #! 这里不对，需要拿到一个 step 数
+                print("\033[32m[Profiler] Enable profiler from init.\033[0m")
+                assert config.enable, "Profiler is not enabled"
+
+                print(f"\033[33m初始阶段开始profiling采集: {role}\033[0m", flush=True)
+                if role not in self.dict_impl:
+                    print(f"创建profile对象: rank={self.rank}, role={role}")
+                    tool = getattr(config, "tool")
+                    self.dict_impl[role] = DistProfiler(self.rank, config, getattr(tool_config, tool))
+                # self.dict_impl[role]._impl.profile_save_path = config.save_path + f"/{role}/{profile_step}"
+                self.dict_impl[role].start(role=role, profile_step=0)
 
         # TODO(sgm): Currently, we only support reference model param offload
         # will support other offload later
