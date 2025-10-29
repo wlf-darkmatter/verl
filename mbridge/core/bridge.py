@@ -342,10 +342,7 @@ class Bridge(ABC):
                     name, param = next(model_chunk_generator)
                 except StopIteration:
                     name, param = None, None
-                if iter_name not in local_to_global_map:
-                    name = iter_name
-                else:
-                    name = local_to_global_map[iter_name]
+                name = local_to_global_map[iter_name]
             else:
                 name, param = None, None
 
