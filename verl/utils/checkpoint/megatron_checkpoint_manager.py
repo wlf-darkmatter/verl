@@ -231,7 +231,11 @@ class MegatronCheckpointManager(BaseCheckpointManager):
         return os.path.join(common_path, basename)
 
     def generate_state_dict(
-        self, generate_model: bool = True, generate_optimizer: bool = True, generate_extra: bool = True
+        self,
+        generate_model: bool = True,
+        generate_optimizer: bool = True,
+        generate_extra: bool = True,
+        is_loading: bool = False,
     ):
         # For save dist checkpointing
         state_dict = {}
@@ -247,7 +251,7 @@ class MegatronCheckpointManager(BaseCheckpointManager):
                 key = "model"
             if hasattr(model, "module"):
                 model = model.module
-            
+
             # shard_dict = model.sharded_state_dict()
             # logger.info(f"[taro_debug] Rank {self.rank} model.sharded_state_dict fix {repr(shard_dict)}")
             state_dict[key] = model.sharded_state_dict()
@@ -255,7 +259,7 @@ class MegatronCheckpointManager(BaseCheckpointManager):
         # Optimizer State Dict
         if generate_optimizer:
             torch.distributed.barrier()
-            optimizer_sharded_states = self.optimizer.sharded_state_dict(state_dict)
+            optimizer_sharded_states = self.optimizer.sharded_state_dict(state_dict, is_loading=is_loading)
             state_dict["optimizer"] = optimizer_sharded_states
 
             if self.lr_scheduler is not None:
@@ -294,12 +298,24 @@ class MegatronCheckpointManager(BaseCheckpointManager):
     def load_checkpoint(self, local_path: str, hdfs_path: str = None, del_local_after_load=False):
         if local_path is not None:
             assert os.path.exists(local_path), f"Checkpoint path {local_path} does not exist."
+        # For load optimizer dist_ckpt
+        torch.serialization.add_safe_globals([torch.optim.AdamW])
+
+        try:
+            from transformer_engine.pytorch.optimizers.fused_adam import FusedAdam
+
+            torch.serialization.add_safe_globals([FusedAdam])
+        except ImportError as e:
+            print(f"Warning: {e.__repr__()}")
 
         dist_checkpoint_path = get_dist_checkpoint_path(local_path)
 
         # Get State Dict for loading
         sharded_state_dict = self.generate_state_dict(
-            self.should_load_model and self.use_dist_checkpointing, self.should_load_optimizer, self.should_load_extra
+            self.should_load_model and self.use_dist_checkpointing,
+            self.should_load_optimizer,
+            self.should_load_extra,
+            is_loading=True,
         )
         log_with_rank(f"Generated state dict for loading: {sharded_state_dict.keys()}", rank=self.rank, logger=logger)
 
@@ -378,7 +394,6 @@ class MegatronCheckpointManager(BaseCheckpointManager):
     def save_checkpoint(self, local_path: str, hdfs_path: str = None, global_step: int = 0, max_ckpt_to_keep=None):
         # record the previous global step
         self.previous_global_step = global_step
-
         # remove previous local_path
         if (
             max_ckpt_to_keep
@@ -401,7 +416,6 @@ class MegatronCheckpointManager(BaseCheckpointManager):
                 self.should_save_model, self.should_save_optimizer, self.should_save_extra
             )
             log_with_rank(f"Generated state dict for saving: {state_dict.keys()}", rank=self.rank, logger=logger)
-            
             # for key, value in state_dict.items():
             #     state_dict[key] = self.fix_pin(key, value)
             for vpp_rank, model in enumerate(self.model):
