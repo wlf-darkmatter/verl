@@ -43,3 +43,58 @@ cp -rf /data01/huawei-2025/tmp/vllm-ascend-0110 /opt/vllm-ascend
 
 3. 还有一个代码要回退，`\cp k8s/patch/mindspeed.patch/2.2.0_core_r0.12.1/MindSpeed/mindspeed/te/pytorch/module/grouped_linear.py /opt/MindSpeed/mindspeed/te/pytorch/module/grouped_linear.py`
 
+
+
+## 开启确定性计算
+
+代码已经加入到 verl/workers/megatron_workers.py 中
+
+
+替换了 set_random_seed() 函数的实现
+```python
+
+import random
+import numpy as np
+import torch
+import torch_npu
+
+def set_random_seed(seed):
+    import random
+
+    import numpy as np
+    import torch
+
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+    if get_torch_device().device_count() > 0:
+        from megatron.core import tensor_parallel
+
+        tensor_parallel.model_parallel_cuda_manual_seed(seed)
+    # FIXME: torch cumsum not support deterministic (used in vllm sampler),
+    # https://github.com/pytorch/pytorch/issues/89492
+    # torch.use_deterministic_algorithms(True, warn_only=True)
+    # os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
+    if os.getenv("USE_SEED","0") == "1":
+        random.seed(seed)
+        os.environ['PYTHONHASHSEED'] = str(seed)
+        os.environ['HCCL_DETERMINISTIC'] = str(True)
+        os.environ['LCCL_DETERMINISTIC'] = str(1)
+        os.environ['CLOSE_MATMUL_K_SHIFT'] = str(1)
+        os.environ['ATB_LLM_LCOC_ENABLE'] = "0"
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.use_deterministic_algorithms(True)
+
+        torch_npu.npu.manual_seed_all(seed)
+        torch_npu.npu.manual_seed(seed)
+
+```
+
+
+经过这个修改，配置文件中的种子不再适用，环境变量 `USE_SEED` 设置了 (不要设置成0) ，则启用deterministic计算
+
+
+
+
+

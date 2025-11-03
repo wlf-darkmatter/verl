@@ -78,6 +78,10 @@ from verl.workers.rollout import get_rollout_class
 logger = logging.getLogger(__file__)
 logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
 
+import random
+import numpy as np
+import torch
+import torch_npu
 
 def set_random_seed(seed):
     import random
@@ -96,7 +100,35 @@ def set_random_seed(seed):
     # https://github.com/pytorch/pytorch/issues/89492
     # torch.use_deterministic_algorithms(True, warn_only=True)
     # os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
+    if os.getenv("USE_SEED", "0") != "0":
+        seed = int(os.getenv("USE_SEED"))
+        random.seed(seed)
+        os.environ['PYTHONHASHSEED'] = str(seed)
+        os.environ['HCCL_DETERMINISTIC'] = str(True)
+        os.environ['LCCL_DETERMINISTIC'] = str(1)
+        os.environ['CLOSE_MATMUL_K_SHIFT'] = str(1)
+        os.environ['ATB_LLM_LCOC_ENABLE'] = "0"
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.use_deterministic_algorithms(True)
 
+        torch_npu.npu.manual_seed_all(seed)
+        torch_npu.npu.manual_seed(seed)
+
+if os.getenv("USE_SEED", "0") != "0":
+    seed = int(os.getenv("USE_SEED"))
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    os.environ['HCCL_DETERMINISTIC'] = str(True)
+    os.environ['LCCL_DETERMINISTIC'] = str(1)
+    os.environ['CLOSE_MATMUL_K_SHIFT'] = str(1)
+    os.environ['ATB_LLM_LCOC_ENABLE'] = "0"
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.use_deterministic_algorithms(True)
+
+    torch_npu.npu.manual_seed_all(seed)
+    torch_npu.npu.manual_seed(seed)
 
 class MegatronWorker(Worker):
     def _init_hf_config_and_tf_config(
