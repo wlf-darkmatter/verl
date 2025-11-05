@@ -52,7 +52,7 @@ from torch.distributed.device_mesh import DeviceMesh
 from vllm import LLM, SamplingParams
 from vllm.config import CompilationConfig, CompilationLevel, LoRAConfig
 from vllm.lora.request import LoRARequest
-from vllm.model_executor.sampling_metadata import SamplingMetadata
+
 from vllm.worker.worker_base import WorkerWrapperBase
 
 from verl import DataProto
@@ -557,14 +557,15 @@ def _monkey_patch_compute_logits(model, vocab_size: int):
 
     def compute_logits(
         self,
-        hidden_states: torch.Tensor,
-        sampling_metadata: SamplingMetadata,
+        *args,
+        **kwargs,
     ) -> torch.Tensor:
-        logits = original_compute_logits(hidden_states, sampling_metadata)
+        logits = original_compute_logits(*args, **kwargs)
         logits[..., vocab_size:] = float("-inf")
         return logits
 
     model.compute_logits = MethodType(compute_logits, model)
+
 
 
 class vLLMAsyncRollout(BaseRollout):

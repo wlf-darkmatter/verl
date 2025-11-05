@@ -308,6 +308,7 @@ class MegatronCheckpointManager(BaseCheckpointManager):
         except ImportError as e:
             print(f"Warning: {e.__repr__()}")
 
+
         dist_checkpoint_path = get_dist_checkpoint_path(local_path)
 
         # Get State Dict for loading
@@ -392,6 +393,10 @@ class MegatronCheckpointManager(BaseCheckpointManager):
             return value
 
     def save_checkpoint(self, local_path: str, hdfs_path: str = None, global_step: int = 0, max_ckpt_to_keep=None):
+        from megatron.core.dist_checkpointing.mapping import ShardedObject
+
+        torch.serialization.add_safe_globals([ShardedObject])
+
         # record the previous global step
         self.previous_global_step = global_step
         # remove previous local_path
