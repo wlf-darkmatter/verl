@@ -114,6 +114,12 @@ def set_random_seed(seed=1234):
 
         torch_npu.npu.manual_seed_all(seed)
         torch_npu.npu.manual_seed(seed)
+    elif os.getenv("USE_COMM_DET", "0") == "1":
+        os.environ['HCCL_DETERMINISTIC'] = str(True)
+        os.environ['LCCL_DETERMINISTIC'] = str(1)
+
+        pass
+
 
 if os.getenv("USE_SEED", "0") != "0":
     seed = int(os.getenv("USE_SEED"))
@@ -129,6 +135,9 @@ if os.getenv("USE_SEED", "0") != "0":
 
     torch_npu.npu.manual_seed_all(seed)
     torch_npu.npu.manual_seed(seed)
+elif os.getenv("USE_COMM_DET", "0") == "1":
+    os.environ['HCCL_DETERMINISTIC'] = str(True)
+    os.environ['LCCL_DETERMINISTIC'] = str(1)
 
 class MegatronWorker(Worker):
     def _init_hf_config_and_tf_config(
