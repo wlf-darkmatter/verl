@@ -256,6 +256,23 @@ class vLLMRollout(BaseRollout):
             _init_dp_envs(config)
             enable_infer_ep = True
 
+        # patch for dsv3 torch air
+        if not config.enforce_eager:
+            torchair_graph = not config.enforce_eager
+            ascend_scheduler_config = {"enabled": True}
+            graph_batch_sizes = [config.max_num_seqs] if torchair_graph else []
+            additional_config = {
+                "torchair_graph_config": {
+                    "enabled": torchair_graph,
+                    "use_cached_graph": False,
+                    "graph_batch_sizes_init": False,
+                    "graph_batch_sizes": graph_batch_sizes,
+                },
+                "ascend_scheduler_config": ascend_scheduler_config,
+                "refresh": True,
+            }
+            engine_kwargs["additional_config"] = additional_config
+
         self.inference_engine = LLM(
             model=model_path,
             enable_sleep_mode=config.free_cache_engine,
