@@ -83,7 +83,7 @@ import numpy as np
 import torch
 import torch_npu
 
-def set_random_seed(seed):
+def set_random_seed(seed=1234):
     import random
 
     import numpy as np
