@@ -95,7 +95,7 @@ spec:
                 path: /etc/localtime                               # Configure the Docker time.
             - name: start-path
               hostPath:
-                path: /data01/huawei-2025/zjx
+                path: /data01/huawei-2025/wlf
             - name: data-path
               hostPath:
                 path: /data01
@@ -191,7 +191,7 @@ spec:
                 path: /etc/localtime                               # Configure the Docker time.
             - name: start-path
               hostPath:
-                path: /data01/huawei-2025/zjx
+                path: /data01/huawei-2025/wlf
             - name: data-path
               hostPath:
                 path: /data01

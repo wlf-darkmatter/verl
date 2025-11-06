@@ -30,7 +30,7 @@ train_prompt_mini_bsz=32
 train_ppo_micro_batch_size_per_gpu=2
 infer_ppo_micro_batch_size_per_gpu=2
 # Paths
-MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf-wlf-mtp1"
+MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf"
 DIST_CKPT_PATH="/data01/huawei-2025/weight/dsv3_bf16_mcore_full_base"
 
 CKPTS_DIR=/data01/huawei-2025/weight/CKPT/ckpt-${exp_name}
@@ -55,7 +55,7 @@ COMMON_PP=${COMMON_PP:-16} #* GPU 是 16
 COMMON_VPP=${COMMON_VPP:-null}
 COMMON_CP=${COMMON_CP:-1}
 COMMON_TP=${COMMON_TP:-8}
-COMMON_EP=${COMMON_EP:-32} #* GPU 是 8
+COMMON_EP=${COMMON_EP:-16} #* GPU 是 8
 COMMON_ETP=${COMMON_ETP:-1}
 TRAIN_TP=${TRAIN_TP:-$COMMON_TP}
 INFER_TP=8
@@ -138,6 +138,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +actor_rollout_ref.actor.megatron.override_transformer_config.num_layers_in_last_pipeline_stage=$last_layer \
     +actor_rollout_ref.actor.optim.override_optimizer_config.optimizer_offload_fraction=${optimizer_offload_fraction} \
     +actor_rollout_ref.actor.optim.override_optimizer_config.optimizer_cpu_offload=True \
+    +actor_rollout_ref.actor.optim.override_optimizer_config.use_precision_aware_optimizer=True \
     actor_rollout_ref.actor.megatron.param_offload=True \
     actor_rollout_ref.actor.megatron.optimizer_offload=True \
     actor_rollout_ref.actor.megatron.grad_offload=True \
