@@ -42,7 +42,7 @@ spec:
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: harbor.ai-bj.cn/library/verl:verl_0928   ##image
+              image: harbor.ai-bj.cn/library/rl_npu:verl-A2-cann82rc2-vllm0100-mcore012-torch27   ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
 
@@ -141,7 +141,7 @@ spec:
             host-arch: huawei-arm
           containers:
             - name: ascend # do not modify
-              image: harbor.ai-bj.cn/library/verl:verl_0928  ##image
+              image: harbor.ai-bj.cn/library/rl_npu:verl-A2-cann82rc2-vllm0100-mcore012-torch27  ##image
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:

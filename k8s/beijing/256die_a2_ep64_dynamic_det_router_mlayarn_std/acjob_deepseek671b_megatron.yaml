@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: deepseek671-gpu-npu-4nodes #需要修改
+  name: dpsk671-256die-12k-base-std  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -12,7 +12,7 @@ spec:
   schedulerName: volcano    #需要修改 work when enableGangScheduling is true
   runPolicy:
     schedulingPolicy:
-      minAvailable: 4    #需要修改， work when enableGangScheduling is true
+      minAvailable: 32    #需要修改， work when enableGangScheduling is true
       queue: project-6-root
   successPolicy: AllWorkers
   replicaSpecs:
@@ -47,7 +47,7 @@ spec:
               command: ["/bin/bash", "-c"]
 
               args:
-                - "bash /home/code/verl-gpu/k8s/beijing/4nodes_12k_base_npu_full/start.sh; sleep 7d"
+                - "bash /home/code/verl-gpu/k8s/beijing/256die_a2_ep64_dynamic_det_router_mlayarn_std/start.sh ;sleep 7d"
 
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
@@ -59,10 +59,10 @@ spec:
               resources:
                 limits:
                   huawei.com/Ascend910: 8 #目前需要和requests保持一致
-                  memory: "800Gi"
+                  memory: "1000Gi"
                 requests:
                   huawei.com/Ascend910: 8  #需要的NPU芯片个数为8
-                  memory: "800Gi"
+                  memory: "1000Gi"
 
               volumeMounts:
                 - name: npu-smi
@@ -77,6 +77,8 @@ spec:
                   mountPath: /home/code
                 - name: data-path
                   mountPath: /data01
+                - name: tmp-path
+                  mountPath: /tmp
           volumes:
             - name: dshm
               emptyDir:
@@ -93,12 +95,15 @@ spec:
                 path: /etc/localtime                               # Configure the Docker time.
             - name: start-path
               hostPath:
-                path: /data01/huawei-2025/zjx/
+                path: /data01/huawei-2025/zjx
             - name: data-path
               hostPath:
                 path: /data01
+            - name: tmp-path
+              hostPath:
+                path: /data02/tmp
     Worker:
-      replicas: 3  #Master can only be 1
+      replicas: 31  #Master can only be 1
       restartPolicy: Never
       template:
         metadata:
@@ -114,7 +119,7 @@ spec:
                       - key: job-name
                         operator: In
                         values:
-                          -  deepseek671-gpu-npu-4nodes
+                          -  dpsk671-256die-12k-base-std
                       - key: replica-type
                         operator: In
                         values:
@@ -140,7 +145,7 @@ spec:
               imagePullPolicy: IfNotPresent
               command: ["/bin/bash", "-c"]
               args:
-                - "bash /home/code/verl-gpu/k8s/beijing/4nodes_12k_base_npu_full/start.sh; sleep 7d"
+                - "bash /home/code/verl-gpu/k8s/beijing/256die_a2_ep64_dynamic_det_router_mlayarn_std/start.sh ;sleep 7d"
               ports:                          # default value containerPort: 2222 name: ascendjob-port if not set #  export MS_DEV_DUMP_IR_PASSES=hwopt_d_after_stream_assign,hwopt_d_end_opt_ge_graph,step_parallel_,validate,valid;
                 - containerPort: 60350        # determined by user
                   name: ascendjob-port        # do not modify
@@ -151,10 +156,10 @@ spec:
               resources:
                 limits:
                   huawei.com/Ascend910: 8 #目前需要和requests保持一致
-                  memory: "800Gi"
+                  memory: "1000Gi"
                 requests:
                   huawei.com/Ascend910: 8  #需要的NPU芯片个数为8
-                  memory: "800Gi"
+                  memory: "1000Gi"
               volumeMounts:
                 - name: npu-smi
                   mountPath: /usr/local/bin/npu-smi
@@ -168,6 +173,8 @@ spec:
                   mountPath: /home/code
                 - name: data-path
                   mountPath: /data01
+                - name: tmp-path
+                  mountPath: /tmp
           volumes:
             - name: dshm
               emptyDir:
@@ -184,7 +191,10 @@ spec:
                 path: /etc/localtime                               # Configure the Docker time.
             - name: start-path
               hostPath:
-                path: /data01/huawei-2025/zjx/
+                path: /data01/huawei-2025/zjx
             - name: data-path
               hostPath:
                 path: /data01
+            - name: tmp-path
+              hostPath:
+                path: /data02/tmp
