@@ -1,3 +1,4 @@
+
 set -x
 
 echo ">>Starting script at: $(date), path = $(pwd)"
@@ -64,8 +65,8 @@ COMMON_TP=${COMMON_TP:-8}
 COMMON_EP=${COMMON_EP:-16} #* GPU 是 8
 COMMON_ETP=${COMMON_ETP:-1}
 TRAIN_TP=${TRAIN_TP:-$COMMON_TP}
-INFER_TP=8
-INFER_EP=8
+INFER_TP=4
+INFER_EP=64
 
 ACTOR_PP=${ACTOR_PP:-$COMMON_PP}
 ACTOR_VPP=${ACTOR_VPP:-$COMMON_VPP}
@@ -208,7 +209,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     trainer.balance_batch=False \
     trainer.test_freq=-1 \
     trainer.save_freq=-1 \
-    trainer.total_epochs=10 \
+    trainer.total_epochs=100 \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.resume_mode=auto \
     trainer.rollout_data_dir=${JOB_LOG_DIR_CURR}/rollout_data_dir \

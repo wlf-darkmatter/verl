@@ -197,4 +197,3 @@ spec:
                 path: /data01
             - name: tmp-path
               hostPath:
-                path: /data02/tmp
