@@ -65,8 +65,8 @@ COMMON_TP=${COMMON_TP:-8}
 COMMON_EP=${COMMON_EP:-16} #* GPU 是 8
 COMMON_ETP=${COMMON_ETP:-1}
 TRAIN_TP=${TRAIN_TP:-$COMMON_TP}
-INFER_TP=4
-INFER_EP=64
+INFER_TP=8
+INFER_EP=8
 
 ACTOR_PP=${ACTOR_PP:-$COMMON_PP}
 ACTOR_VPP=${ACTOR_VPP:-$COMMON_VPP}
@@ -102,7 +102,10 @@ USE_DIST_CKPT=False
 
 first_layer=3
 last_layer=2
-
+# 128*16 /4
+echo "推理单实例大小: $((INFER_TP*INFER_EP))"
+echo "实例数: $((WORLD_SIZE/(INFER_TP*INFER_EP))) "
+echo "每个实例分配到的样本数: $((train_prompt_bsz*n_resp_per_prompt/(WORLD_SIZE/(INFER_TP*INFER_EP))))"
 
 RUNTIME_ENV=verl/trainer/mc2_env.yaml
 cd /opt/verl
@@ -171,7 +174,8 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.rollout.tensor_model_parallel_size=${INFER_TP} \
     actor_rollout_ref.rollout.dp_model_parallel_size=${INFER_EP} \
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
-    actor_rollout_ref.rollout.max_num_batched_tokens=$((max_prompt_length + max_response_length)) \
+    actor_rollout_ref.rollout.max_num_batched_tokens=$((max_prompt_length)) \
+    actor_rollout_ref.rollout.max_num_seqs=$((8*16)) \
     actor_rollout_ref.rollout.temperature=${temperature} \
     actor_rollout_ref.rollout.top_p=${top_p} \
     actor_rollout_ref.rollout.top_k=${top_k} \

@@ -1,7 +1,7 @@
 apiVersion: mindxdl.gitee.com/v1
 kind: AscendJob
 metadata:
-  name: dpsk671-256die-gbs128-8k-nodet-base-std  #sp-64-train-3b-moe-msrun #需要修改
+  name: dpsk671-256die-gbs128-8k-det-base-std  #sp-64-train-3b-moe-msrun #需要修改
   labels:
     framework: pytorch
     fault-scheduling: "force"
@@ -119,7 +119,7 @@ spec:
                       - key: job-name
                         operator: In
                         values:
-                          -  dpsk671-256die-gbs128-8k-nodet-base-std
+                          -  dpsk671-256die-gbs128-8k-det-base-std
                       - key: replica-type
                         operator: In
                         values:

@@ -12,6 +12,10 @@ export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
 export ASCEND_GLOBAL_LOG_LEVEL=3
 export USE_SEED=1234
 
+export USE_VLLM_PREFILL_MLA=1 #!设置为1生效. vllm0100 可能会需要这个来控制prefill的逻辑（verl代码中 vllm_rollout_spmd.py 添加了 additional_config chunked_prefill_for_mla
+
+export HCCL_IF_BASE_PORT="14999"
+
 echo "Overwrite verl code"
 if [[ ! -d ../../../k8s ]];then
   echo -e "\033[1;31m路径层级不对，请确保 start.sh 在 verl/k8s/???/???/ 下\033[0m"
