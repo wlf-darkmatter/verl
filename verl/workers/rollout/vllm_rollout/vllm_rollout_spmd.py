@@ -52,7 +52,8 @@ from torch.distributed.device_mesh import DeviceMesh
 from vllm import LLM, SamplingParams
 from vllm.config import CompilationConfig, CompilationLevel, LoRAConfig
 from vllm.lora.request import LoRARequest
-
+from vllm.model_executor.model_loader.utils import \
+    process_weights_after_loading
 from vllm.worker.worker_base import WorkerWrapperBase
 
 from verl import DataProto
@@ -61,7 +62,8 @@ from verl.utils.device import is_npu_available
 from verl.utils.distributed import initialize_global_process_group_ray
 from verl.utils.profiler import GPUMemoryLogger
 from verl.utils.ray_utils import ray_noset_visible_devices
-from verl.utils.torch_functional import get_response_mask, pad_2d_list_to_length
+from verl.utils.torch_functional import (get_response_mask,
+                                         pad_2d_list_to_length)
 from verl.utils.vllm import TensorLoRARequest, VLLMHijack, is_version_ge
 from verl.workers.config import HFModelConfig, RolloutConfig
 from verl.workers.rollout.base import BaseRollout
@@ -91,6 +93,7 @@ if is_version_ge(pkg="vllm", minver="0.7.3"):
 
 def get_cluster_info():
     import torch.distributed as dist
+
     # 确保分布式环境已初始化
     if not dist.is_initialized():
         raise RuntimeError("Distributed environment not initialized")
@@ -561,11 +564,15 @@ class vLLMRollout(BaseRollout):
             self.inference_engine.llm_engine.add_lora(lora_reqest)
             logger.info(f"vLLM load weights, loaded_params: {len(weights)}")
         else:
-            from verl.utils.vllm.patch import patch_vllm_moe_model_weight_loader
+            from verl.utils.vllm.patch import \
+                patch_vllm_moe_model_weight_loader
 
             model = self.inference_engine.llm_engine.model_executor.driver_worker.worker.model_runner.model
             patch_vllm_moe_model_weight_loader(model)
             model.load_weights(weights)
+            vllm_config = self.inference_engine.llm_engine.vllm_config.model_config
+            device = next(model.parameters()).device
+            process_weights_after_loading(model, vllm_config, device)
 
 
 # https://github.com/vllm-project/vllm/issues/13175
@@ -714,7 +721,8 @@ class vLLMAsyncRollout(BaseRollout):
             self.inference_engine.worker.add_lora(lora_reqest)
             logger.info(f"vLLM load weights, loaded_params: {len(weights)}")
         else:
-            from verl.utils.vllm.patch import patch_vllm_moe_model_weight_loader
+            from verl.utils.vllm.patch import \
+                patch_vllm_moe_model_weight_loader
 
             model = self.inference_engine.worker.model_runner.model
             patch_vllm_moe_model_weight_loader(model)
