@@ -312,7 +312,9 @@ class vLLMRollout(BaseRollout):
             if hasattr(SamplingParams(), str(k)) and k != "seed":
                 kwargs[k] = config.get(k)
         kwargs["n"] = 1  # already repeat in ray_trainer
-        kwargs['stop'] = "</answer>"
+        import os
+        if os.getenv("VERL_CUSTOM_REWARD_RULE") == "1":
+            kwargs['stop'] = "</answer>" #!! 1009客户改动
         # logger.info(f"[taro_debug] stop: {kwargs['stop']}")
         print(f"kwargs: {kwargs}")
         self.sampling_params = SamplingParams(**kwargs)
