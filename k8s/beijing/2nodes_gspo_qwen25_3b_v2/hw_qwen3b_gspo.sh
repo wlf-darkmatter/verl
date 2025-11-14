@@ -14,7 +14,7 @@ MODEL_PATH=/data01/huawei-2025/weight/qwen25-3b
 offload=true # it's a small model, offloading will just slow-down training
 rollout_engine=vllm
 rollout_mode=sync # can be async to speedup large scale xps
-gpu_memory_utilization=0.8
+gpu_memory_utilization=0.6
 reward_manager=dapo
 adv_estimator=grpo
 shuffle_dataset=true
@@ -57,12 +57,13 @@ top_k=-1 # 0 for HF rollout, -1 for vLLM rollout
 val_top_p=0.7
 
 # Performance Related Parameter
-sp_size=1
+sp_size=8
 use_dynamic_bsz=true
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 1)) #!省内存
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 1)) #!省内存
 offload=true
-gen_tp=8
+gen_tp=4
+# gen_dp=4
 entropy_checkpointing=true # This enables entropy recomputation specifically for the entropy calculation, lowering memory usage during training.
 
 # ------------------------------------- train/val data preparation ---------------------------------------
@@ -143,6 +144,8 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     +reward_model.reward_kwargs.overlong_buffer_cfg.penalty_factor=${overlong_penalty_factor} \
     +reward_model.reward_kwargs.overlong_buffer_cfg.log=false \
     +reward_model.reward_kwargs.max_resp_len=${max_response_length} \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
+    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
     trainer.logger='["console"]' \
     actor_rollout_ref.rollout.enforce_eager=True \
     actor_rollout_ref.actor.use_torch_compile=False \
