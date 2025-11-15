@@ -570,9 +570,11 @@ class vLLMRollout(BaseRollout):
             model = self.inference_engine.llm_engine.model_executor.driver_worker.worker.model_runner.model
             patch_vllm_moe_model_weight_loader(model)
             model.load_weights(weights)
-            vllm_config = self.inference_engine.llm_engine.vllm_config.model_config
-            device = next(model.parameters()).device
-            process_weights_after_loading(model, vllm_config, device)
+            if os.getenv("VLLM_FIX_WEIGHT_LOADING", "0") == "1":
+                print("\033[1;33mWARNING: vLLM fix weight loading\033[0m", flush=True)
+                vllm_config = self.inference_engine.llm_engine.vllm_config.model_config
+                device = next(model.parameters()).device
+                process_weights_after_loading(model, vllm_config, device)
 
 
 # https://github.com/vllm-project/vllm/issues/13175
