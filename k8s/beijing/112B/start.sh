@@ -62,6 +62,10 @@ bash /opt/verl/k8s/patch/apply_megatron.sh
 #! [MindSpeed]
 bash /opt/verl/k8s/patch/apply_mindspeed.sh
 
+#! #################  【ep384 patch】  #####################
+#! [ep384]
+bash /opt/verl/k8s/patch/apply_ep384.sh
+
 
 #######################################
 

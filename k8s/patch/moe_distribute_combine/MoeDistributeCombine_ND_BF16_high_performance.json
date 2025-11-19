@@ -1,0 +1,291 @@
+{
+    "binFileName": "MoeDistributeCombine_ND_BF16_high_performance",
+    "binFileSuffix": ".o",
+    "blockDim": -1,
+    "coreType": "MIX",
+    "intercoreSync": 1,
+    "kernelName": "MoeDistributeCombine_ND_BF16_high_performance",
+    "magic": "RT_DEV_BINARY_MAGIC_ELF",
+    "memoryStamping": [],
+    "opParaSize": 704,
+    "parameters": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ],
+    "sha256": "f537bd6978aa4b79acd50aa5f2616adcdef68acf80520304b5934fc09fde3e32",
+    "workspace": {
+        "num": 1,
+        "size": [
+            -1
+        ],
+        "type": [
+            0
+        ]
+    },
+    "taskRation": "0:1",
+    "kernelList": [
+        {
+            "kernelName": "MoeDistributeCombine_ND_BF16_high_performance_1100"
+        },
+        {
+            "kernelName": "MoeDistributeCombine_ND_BF16_high_performance_1000"
+        },
+        {
+            "kernelName": "MoeDistributeCombine_ND_BF16_high_performance_1120"
+        },
+        {
+            "kernelName": "MoeDistributeCombine_ND_BF16_high_performance_1020"
+        },
+        {
+            "kernelName": "MoeDistributeCombine_ND_BF16_high_performance_2000"
+        },
+        {
+            "kernelName": "MoeDistributeCombine_ND_BF16_high_performance_3000"
+        },
+        {
+            "kernelName": "MoeDistributeCombine_ND_BF16_high_performance_3100"
+        }
+    ],
+    "optionalInputMode": "gen_placeholder",
+    "optionalOutputMode": "gen_placeholder",
+    "supportSuperKernel": 1,
+    "debugOptions": "assert",
+    "debugBufSize": 76800,
+    "compileInfo": {},
+    "supportInfo": {
+        "implMode": "high_performance",
+        "int64Mode": false,
+        "simplifiedKeyMode": 0,
+        "simplifiedKey": [
+            "MoeDistributeCombine/d=0,p=1/27,2/3,2/3,2/3,2/0,2/27,2",
+            "MoeDistributeCombine/d=0,p=0/27,2/3,2/3,2/3,2/0,2/27,2",
+            "MoeDistributeCombine/d=1,p=1/27,2/3,2/3,2/3,2/0,2/27,2",
+            "MoeDistributeCombine/d=1,p=0/27,2/3,2/3,2/3,2/0,2/27,2"
+        ],
+        "optionalInputMode": "gen_placeholder",
+        "optionalOutputMode": "gen_placeholder",
+        "staticKey": "cb3e4ae41f5bbb6cf256571c27469c769a96c2e8711b711f349676cf968ca7f7,f02230f41372f0824c18e775454dc886fb5c276014a6baa98b3835181542ffe6",
+        "inputs": [
+            {
+                "name": "expand_x",
+                "index": 0,
+                "dtype": "bfloat16",
+                "format": "ND",
+                "paramType": "required",
+                "shape": [
+                    -2
+                ],
+                "format_match_mode": "FormatAgnostic"
+            },
+            {
+                "name": "expert_ids",
+                "index": 1,
+                "dtype": "int32",
+                "format": "ND",
+                "paramType": "required",
+                "shape": [
+                    -2
+                ],
+                "format_match_mode": "FormatAgnostic"
+            },
+            {
+                "name": "expand_idx",
+                "index": 2,
+                "dtype": "int32",
+                "format": "ND",
+                "paramType": "required",
+                "shape": [
+                    -2
+                ],
+                "format_match_mode": "FormatAgnostic"
+            },
+            {
+                "name": "ep_send_counts",
+                "index": 3,
+                "dtype": "int32",
+                "format": "ND",
+                "paramType": "required",
+                "shape": [
+                    -2
+                ],
+                "format_match_mode": "FormatAgnostic"
+            },
+            {
+                "name": "expert_scales",
+                "index": 4,
+                "dtype": "float32",
+                "format": "ND",
+                "paramType": "required",
+                "shape": [
+                    -2
+                ],
+                "format_match_mode": "FormatAgnostic"
+            },
+            {
+                "name": "tp_send_counts",
+                "index": 5,
+                "dtype": "int32",
+                "format": "ND",
+                "paramType": "optional",
+                "shape": [
+                    -2
+                ],
+                "format_match_mode": "FormatAgnostic"
+            },
+            {
+                "name": "x_active_mask",
+                "index": 6,
+                "dtype": "bool",
+                "format": "ND",
+                "paramType": "optional",
+                "shape": [
+                    -2
+                ],
+                "format_match_mode": "FormatAgnostic"
+            },
+            {
+                "name": "activation_scale",
+                "index": 7,
+                "dtype": "float32",
+                "format": "ND",
+                "paramType": "optional",
+                "shape": [
+                    -2
+                ],
+                "format_match_mode": "FormatAgnostic"
+            },
+            {
+                "name": "weight_scale",
+                "index": 8,
+                "dtype": "float32",
+                "format": "ND",
+                "paramType": "optional",
+                "shape": [
+                    -2
+                ],
+                "format_match_mode": "FormatAgnostic"
+            },
+            {
+                "name": "group_list",
+                "index": 9,
+                "dtype": "int64",
+                "format": "ND",
+                "paramType": "optional",
+                "shape": [
+                    -2
+                ],
+                "format_match_mode": "FormatAgnostic"
+            },
+            {
+                "name": "expand_scales",
+                "index": 10,
+                "dtype": "float32",
+                "format": "ND",
+                "paramType": "optional",
+                "shape": [
+                    -2
+                ],
+                "format_match_mode": "FormatAgnostic"
+            }
+        ],
+        "outputs": [
+            {
+                "name": "x",
+                "index": 0,
+                "dtype": "bfloat16",
+                "format": "ND",
+                "paramType": "required",
+                "shape": [
+                    -2
+                ],
+                "format_match_mode": "FormatAgnostic"
+            }
+        ],
+        "attrs": [
+            {
+                "name": "group_ep",
+                "dtype": "string",
+                "value": ""
+            },
+            {
+                "name": "ep_world_size",
+                "dtype": "int",
+                "value": 0
+            },
+            {
+                "name": "ep_rank_id",
+                "dtype": "int",
+                "value": 0
+            },
+            {
+                "name": "moe_expert_num",
+                "dtype": "int",
+                "value": 0
+            },
+            {
+                "name": "group_tp",
+                "dtype": "string",
+                "value": ""
+            },
+            {
+                "name": "tp_world_size",
+                "dtype": "int",
+                "value": 0
+            },
+            {
+                "name": "tp_rank_id",
+                "dtype": "int",
+                "value": 0
+            },
+            {
+                "name": "expert_shard_type",
+                "dtype": "int",
+                "value": 0
+            },
+            {
+                "name": "shared_expert_num",
+                "dtype": "int",
+                "value": 1
+            },
+            {
+                "name": "shared_expert_rank_num",
+                "dtype": "int",
+                "value": 0
+            },
+            {
+                "name": "global_bs",
+                "dtype": "int",
+                "value": 0
+            },
+            {
+                "name": "out_dtype",
+                "dtype": "int",
+                "value": 0
+            },
+            {
+                "name": "comm_quant_mode",
+                "dtype": "int",
+                "value": 0
+            },
+            {
+                "name": "group_list_type",
+                "dtype": "int",
+                "value": 0
+            }
+        ],
+        "opMode": "dynamic",
+        "deterministic": "ignore"
+    },
+    "filePath": "ascend910b/moe_distribute_combine/MoeDistributeCombine_ND_BF16_high_performance.json"
+}
