@@ -88,7 +88,7 @@ class TaskRunner:
 
         trust_remote_code = config.data.get("trust_remote_code", False)
         tokenizer = hf_tokenizer(local_path, trust_remote_code=trust_remote_code)
-        processor = hf_processor(local_path, trust_remote_code=trust_remote_code, use_fast=True)  # 
+        processor = hf_processor(local_path, trust_remote_code=trust_remote_code, use_fast=True)  #
 
         from verl.single_controller.ray import RayWorkerGroup
 
