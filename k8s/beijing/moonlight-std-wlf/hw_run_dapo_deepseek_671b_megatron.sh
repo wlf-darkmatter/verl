@@ -1,10 +1,10 @@
 set -x
 
 echo ">>Starting script at: $(date), path = $(pwd)"
-
+EXP_DIR=/home/code/wlf/logs/$(date +%Y%m%d_%H%M%S)
 NGPUS_PER_NODES=${NPU_PER_NODE}
-project_name='DAPO'
-exp_name='DAPO-dpsk-671b-megatron-BASE-256die-nodet'
+project_name='moonlight'
+exp_name='DAPO-MoonLight-16b-megatron-2NODES-nodet'
 
 adv_estimator=grpo
 
@@ -18,7 +18,7 @@ kl_loss_coef=0.001
 clip_ratio_low=0.2
 clip_ratio_high=0.28
 max_prompt_length=$((1024 * 2))
-max_response_length=$((1024 * 8))
+max_response_length=$((1024 * 16))
 enable_overlong_buffer=False
 overlong_buffer_len=$((1024 * 1))
 overlong_penalty_factor=1.0
@@ -33,8 +33,8 @@ train_ppo_micro_batch_size_per_gpu=2
 infer_ppo_micro_batch_size_per_gpu=2
 
 # Paths
-MODEL_PATH="/data01/huawei-2025/weight/dsv3-base-hf"
-DIST_CKPT_PATH="/data01/huawei-2025/weight/dsv3_bf16_mcore_full_base"
+MODEL_PATH=/data01/huawei-2025/gxj/Moonlight-16B-A3B-Instruct
+DIST_CKPT_PATH=/data01/huawei-2025/gxj/mcore_dist
 
 CKPTS_DIR=/data01/huawei-2025/weight/CKPT/ckpt-${exp_name}
 
@@ -57,15 +57,15 @@ infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
 
 optimizer_offload_fraction=1
 
-COMMON_PP=${COMMON_PP:-16}
+COMMON_PP=${COMMON_PP:-4}
 COMMON_VPP=${COMMON_VPP:-null}
 COMMON_CP=${COMMON_CP:-1}
-COMMON_TP=${COMMON_TP:-8}
-COMMON_EP=${COMMON_EP:-16} #* GPU 是 8
+COMMON_TP=${COMMON_TP:-4}
+COMMON_EP=${COMMON_EP:-4}
 COMMON_ETP=${COMMON_ETP:-1}
+
 TRAIN_TP=${TRAIN_TP:-$COMMON_TP}
-INFER_TP=8
-INFER_EP=8
+INFER_TP=${INFER_TP:-8}
 
 ACTOR_PP=${ACTOR_PP:-$COMMON_PP}
 ACTOR_VPP=${ACTOR_VPP:-$COMMON_VPP}
@@ -99,8 +99,12 @@ USE_MBRIDGE=True
 USE_DIST_CKPT=False
 
 
-first_layer=3
-last_layer=2
+# first_layer=6
+# last_layer=7
+# pipeline_num_transformer_layers="[[6],[8],[8],[8],[8],[8],[8],[7]]"
+
+first_layer=7
+last_layer=6
 # 128*16 /4
 echo "推理单实例大小: $((INFER_TP*INFER_EP))"
 echo "实例数: $((WORLD_SIZE/(INFER_TP*INFER_EP))) "
@@ -112,6 +116,7 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
+    actor_rollout_ref.nccl_timeout=7200 \
     +actor_rollout_ref.actor.megatron.override_transformer_config.tensor_model_parallel_size=${ACTOR_TP} \
     +actor_rollout_ref.actor.megatron.override_transformer_config.multi_latent_attention=True \
     +actor_rollout_ref.actor.megatron.override_transformer_config.use_flash_attn=True \
@@ -122,12 +127,14 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     data.max_prompt_length=${max_prompt_length} \
     data.max_response_length=${max_response_length} \
     data.train_batch_size=${train_prompt_bsz} \
+    data.trust_remote_code=True \
     actor_rollout_ref.rollout.n=${n_resp_per_prompt} \
     algorithm.adv_estimator=${adv_estimator} \
     algorithm.use_kl_in_reward=${use_kl_in_reward} \
     algorithm.kl_penalty=${kl_penalty} \
     algorithm.kl_ctrl.kl_coef=${kl_coef} \
     actor_rollout_ref.model.path="${MODEL_PATH}" \
+    actor_rollout_ref.model.trust_remote_code=True \
     actor_rollout_ref.actor.use_kl_loss=${use_kl_loss} \
     actor_rollout_ref.actor.kl_loss_coef=${kl_loss_coef} \
     actor_rollout_ref.actor.policy_loss.loss_mode=vanilla \
@@ -171,10 +178,8 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu=${infer_ppo_max_token_len} \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.8 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=${INFER_TP} \
-    actor_rollout_ref.rollout.dp_model_parallel_size=${INFER_EP} \
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
-    actor_rollout_ref.rollout.max_num_batched_tokens=$((max_prompt_length)) \
-    actor_rollout_ref.rollout.max_num_seqs=$((8*16)) \
+    actor_rollout_ref.rollout.max_num_batched_tokens=$((max_prompt_length + max_response_length)) \
     actor_rollout_ref.rollout.temperature=${temperature} \
     actor_rollout_ref.rollout.top_p=${top_p} \
     actor_rollout_ref.rollout.top_k=${top_k} \

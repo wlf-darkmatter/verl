@@ -10,7 +10,8 @@ export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
 export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
 export ASCEND_GLOBAL_LOG_LEVEL=3
-export USE_SEED=1234
+# export USE_SEED=1234
+export VLLM_FIX_WEIGHT_LOADING=1
 
 
 export HCCL_IF_BASE_PORT="14999"
@@ -78,6 +79,10 @@ bash /opt/verl/k8s/patch/pre_mindspeed_compile.sh
 
 LIB_PATH=/opt/python3.10/lib/
 export LD_LIBRARY_PATH=$LIB_PATH:$LD_LIBRARY_PATH
+
+pip install /data01/huawei-2025/gxj/blobfile-3.0.0-py3-none-any.whl --no-deps
+pip install /data01/huawei-2025/gxj/lxml-6.0.2-cp310-cp310-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl --no-deps
+
 
 unset LOCAL_WORLD_SIZE
 # unset WORLD_SIZE

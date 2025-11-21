@@ -16,6 +16,7 @@ fi
 if [[ ${vllm_version} == '0.10.0' ]];then
   rm -f /opt/vllm-ascend/vllm_ascend/models/deepseek_v2.py
   cp -f ./vllm.patch/0.10.0/vllm-ascend/vllm_ascend/models/deepseek_v2.py /opt/vllm-ascend/vllm_ascend/models/deepseek_v2.py
+  cp -f ./vllm.patch/0.10.0/vllm-ascend/vllm_ascend/ascend_config.py /opt/vllm-ascend/vllm_ascend/ascend_config.py #! 为了使能mla的chunck prefill
   echo -e "\033[32mApplied VLLM-ASCEND ${vllm_version}!\033[0m"
 fi
 if [[ ${vllm_version} == '0.11.0' ]];then

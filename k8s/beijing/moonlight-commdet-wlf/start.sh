@@ -1,7 +1,3 @@
-cwd=$(dirname $(realpath $0))
-echo "dealing $cwd"
-cd $cwd
-
 export HCCL_SOCKET_IFNAME=ens45 # modify according to actual situation
 export TP_SOCKET_IFNAME=ens45   # modify according to actual situation
 export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
@@ -10,35 +6,24 @@ export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
 export PYTORCH_NPU_ALLOC_CONF="max_split_size_mb:2048"
 export ASCEND_GLOBAL_LOG_LEVEL=3
-export USE_SEED=1234
+# export USE_SEED=1234
+export USE_COMM_DET=1
 
-
-export HCCL_IF_BASE_PORT="14999"
-
-echo "Overwrite verl code"
-if [[ ! -d ../../../k8s ]];then
-  echo -e "\033[1;31m路径层级不对，请确保 start.sh 在 verl/k8s/???/???/ 下\033[0m"
-  exit 1
-fi
-
-#! 如果有rsync命令
-if [[ -x "$(command -v rsync)" ]];then
-  echo "rsync exists"
-  rsync -az ../../../* /opt/verl/ --exclude=**/kernel_meta --exclude=plog --exclude=docker
-else
-  echo "rsync not exists"
-  \cp -r ../../../* /opt/verl/
-fi
-rm -f /opt/verl/.gitignore
-
-echo "Overwrite verl code, done."
 #! 注意，自定义配置
 # * 确保 JOB_LOG_DIR 在共享盘下
-REAL_HOME_CODE=$(realpath $cwd/../../../..)
 CURRENT_IP=$(ifconfig $TP_SOCKET_IFNAME | grep -Eo 'inet (addr:)?([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $NF}')
-export JOB_LOG_DIR=$REAL_HOME_CODE/logs/$(basename $cwd)
+export JOB_LOG_DIR=/home/code/logs/$(basename $(dirname $0))
 export JOB_LOG_DIR_CURR=${JOB_LOG_DIR}/$(date +"%Y-%m-%d_%H")
 export ASCEND_PROCESS_LOG_PATH=${JOB_LOG_DIR_CURR}/plog/${CURRENT_IP}
+# export VERL_MEMORY_LOG_DIR=${JOB_LOG_DIR_CURR}/memory_log
+
+# export CACHE_DIR=${JOB_LOG_DIR}/CACHE; mkdir -p ${CACHE_DIR}
+# export ACL_OP_COMPILER_CACHE_DIR=${CACHE_DIR}/COMPILER_CACHE/${CURRENT_IP}; mkdir -p ${ACL_OP_COMPILER_CACHE_DIR}
+# export VERL_CUSTOM_REWARD_RULE="1"
+#export VERL_CUSTOM_SET_MEMEXPAND_TRAIN="1" #! 0 是关掉训练的虚拟显存, 默认是 1
+# export VERL_CUSTOM_PROFILING="2"
+# export USE_CP_PATCH=1 #! 使用CP需要声明这个环境变量才能打上 Patch
+
 
 #! 注意，0929加了这 1 个优化参数， libjemalloc 需要重新编译
 # export LD_PRELOAD="/usr/local/lib/libjemalloc.so.2"
@@ -53,17 +38,19 @@ export HCCL_ASYNC_ERROR_HANDLING=0
 export P2P_HCCL_BUFFSIZE=30
 export HCCL_BUFFSIZE=300
 
+# rm -rf /opt/MindSpeed ; \cp -rf /home/code/MindSpeed /opt/MindSpeed
+# cd /opt/MindSpeed ; pip install -e . --no-deps
 #! #################  【VLLM patch】  #####################
 #! 规避模型加载时 权重读取错误的问题
-bash /opt/verl/k8s/patch/apply_vllm-ascend.sh
+bash /home/code/verl-gpu/k8s/patch/apply_vllm-ascend.sh
 
 #! #################  【Megatron patch】  #####################
 #! [Megatron]
-bash /opt/verl/k8s/patch/apply_megatron.sh
+bash /home/code/verl-gpu/k8s/patch/apply_megatron.sh
 
 #! #################  【MindSpeed patch】  #####################
 #! [MindSpeed]
-bash /opt/verl/k8s/patch/apply_mindspeed.sh
+bash /home/code/verl-gpu/k8s/patch/apply_mindspeed.sh
 
 
 #######################################
@@ -72,25 +59,45 @@ source /usr/local/Ascend/ascend-toolkit/set_env.sh;
 source /usr/local/Ascend/nnal/atb/set_env.sh;
 source /opt/pyvenv/bin/activate;
 
-#! #################  【MindSpeed 预编译】  #####################
-bash /opt/verl/k8s/patch/pre_mindspeed_compile.sh
 
 
 LIB_PATH=/opt/python3.10/lib/
 export LD_LIBRARY_PATH=$LIB_PATH:$LD_LIBRARY_PATH
 
+pip install /data01/huawei-2025/gxj/blobfile-3.0.0-py3-none-any.whl --no-deps
+pip install /data01/huawei-2025/gxj/lxml-6.0.2-cp310-cp310-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl --no-deps
+
+
 unset LOCAL_WORLD_SIZE
 # unset WORLD_SIZE
 unset LOCAL_RANK
 
-export NPU_PER_NODE=8
-export NNODES=$((WORLD_SIZE/NPU_PER_NODE))
+export NPU_PER_NODE=8  # A2 NPU Number
+export NNODES=$((WORLD_SIZE/NPU_PER_NODE))         # example is 4 Nodes
 
+ray stop --force
+cd $(dirname $0)
+
+sleep 1
+echo "Overwrite verl code"
+#* 提速 ray 拉起速度
+if [[ -f /home/code/verl-gpu/docker/pkg/rsync ]];then
+   /home/code/verl-gpu/docker/pkg/rsync -az /home/code/verl-gpu/* /opt/verl/ --exclude=**/kernel_meta --exclude=plog --exclude=docker --exclude=docs
+else
+  rm -rf /opt/verl/
+  cp -rf /home/code/verl-gpu /opt/verl
+fi
+echo "Overwrite verl code, done."
+
+rm -f /opt/verl/.gitignore
+cd $(dirname $0)
+#! #################  【Verl patch】  #####################
+#* [Verl] 一般用于打CP代码
+# bash /home/code/verl-gpu/k8s/patch/apply_verl.sh
 
 export ServerPort=6666     # modify according to actual situation
 export DashboardPort=8888  # modify according to actual situation
 
-cd $cwd
 cnt=0
 if [ "$RANK" = "0" ]; then
   # head start
@@ -101,8 +108,8 @@ if [ "$RANK" = "0" ]; then
 #   ln -s ${JOB_LOG_DIR_CURR}/ray_host /tmp/ray
   #* 拷贝当前脚本文件
   mkdir -p ${JOB_LOG_DIR_CURR}/script.bak
-  cp $cwd/*.sh ${JOB_LOG_DIR_CURR}/script.bak/
-  cp $cwd/*.yaml ${JOB_LOG_DIR_CURR}/script.bak/
+  cp $(dirname $0)/*.sh ${JOB_LOG_DIR_CURR}/script.bak/
+  cp $(dirname $0)/*.yaml ${JOB_LOG_DIR_CURR}/script.bak/
 
   ray start --head --ray-debugger-external --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
 
@@ -114,7 +121,7 @@ if [ "$RANK" = "0" ]; then
     # judge npu_count_int bigger than NNODES*NPU_PER_NODE
     if [ "$npu_count_int" -ge "$((NNODES*NPU_PER_NODE))" ]; then
       echo "Ray cluster is ready with $npu_count_int npu (from $npu_count NPU resources), starting Python script."
-      bash $cwd/hw_run_dapo_deepseek_671b_megatron.sh | tee ${JOB_LOG_DIR_CURR}/ray_host/$(date +"%Y-%m-%d_%H-%M-%S")_ray.log
+      bash hw_run_dapo_deepseek_671b_megatron.sh | tee ${JOB_LOG_DIR_CURR}/ray_host/$(date +"%Y-%m-%d_%H-%M-%S")_ray.log
       break
     fi
 
