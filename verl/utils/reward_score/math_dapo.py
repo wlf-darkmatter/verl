@@ -179,18 +179,17 @@ def is_correct_minerva(
     # Extract answer from solution
     # match = re.findall(answer_pattern, solution_str)
     # extracted_answer = match[-1] if match else "[INVALID]"
-    # match = re.search(r'<answer>\s*(.*?)(?:\s*</answer>|$)', solution_str, re.DOTALL)
-    # extracted_answer = match.group(1) if match else "[INVALID]"
-    # @xiaohui: add format reward 
-    pattern = r'<think>\s*(.*?)\s*</think>.*?<answer>\s*(.*?)(?:\s*</answer>|$)'
-    match = re.search(pattern, solution_str, re.DOTALL)
-    extracted_answer = "[INVALID]"
-    if match:
-        think = match.group(1).strip()
-        current_answer = match.group(2).strip()
+    match = re.search(r'<answer>\s*(.*?)(?:\s*</answer>|$)', solution_str, re.DOTALL)
+    extracted_answer = match.group(1) if match else "[INVALID]"
+    # pattern = r'<think>\s*(.*?)\s*</think>.*?<answer>\s*(.*?)(?:\s*</answer>|$)'
+    # match = re.search(pattern, solution_str, re.DOTALL)
+    # extracted_answer = "[INVALID]"
+    # if match:
+        # think = match.group(1).strip()
+        # current_answer = match.group(2).strip()
         # If the think part is too short, we consider the answer as invalid
-        if current_answer is not None and think is not None and len(think) > 10:
-            extracted_answer = current_answer
+        # if current_answer is not None and think is not None and len(think) > 10:
+        #     extracted_answer = current_answer
     pred = normalize_final_answer(extracted_answer)
 
     # Process ground truth
@@ -269,7 +268,7 @@ def compute_score(
         Reward score (1.0 for correct, -1.0 for incorrect)
     """
     # Limit solution length for efficiency
-    # solution_str = solution_str[-300:]  # The longest answer in MATH-500 has 159 characters
+    solution_str = solution_str[-300:]  # The longest answer in MATH-500 has 159 characters
 
     # Verify the solution
     correct, pred = verify(solution_str, ground_truth, strict_box_verify, pause_tokens_index)
