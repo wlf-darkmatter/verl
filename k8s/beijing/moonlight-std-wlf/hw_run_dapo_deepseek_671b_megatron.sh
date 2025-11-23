@@ -4,7 +4,7 @@ echo ">>Starting script at: $(date), path = $(pwd)"
 EXP_DIR=/home/code/wlf/logs/$(date +%Y%m%d_%H%M%S)
 NGPUS_PER_NODES=${NPU_PER_NODE}
 project_name='moonlight'
-exp_name='DAPO-MoonLight-16b-megatron-2NODES-nodet'
+exp_name='DAPO-MoonLight-16b-megatron-4NODES'
 
 adv_estimator=grpo
 
@@ -31,9 +31,8 @@ train_prompt_mini_bsz=32
 n_resp_per_prompt=16
 train_ppo_micro_batch_size_per_gpu=2
 infer_ppo_micro_batch_size_per_gpu=2
-
 # Paths
-MODEL_PATH=/data01/huawei-2025/gxj/Moonlight-16B-A3B-Instruct
+MODEL_PATH=/data01/huawei-2025/weight/Moonlight-16B-A3B-Instruct-32k
 DIST_CKPT_PATH=/data01/huawei-2025/gxj/mcore_dist
 
 CKPTS_DIR=/data01/huawei-2025/weight/CKPT/ckpt-${exp_name}
@@ -60,12 +59,13 @@ optimizer_offload_fraction=1
 COMMON_PP=${COMMON_PP:-4}
 COMMON_VPP=${COMMON_VPP:-null}
 COMMON_CP=${COMMON_CP:-1}
-COMMON_TP=${COMMON_TP:-4}
-COMMON_EP=${COMMON_EP:-4}
+COMMON_TP=${COMMON_TP:-8}
+COMMON_EP=${COMMON_EP:-8}
 COMMON_ETP=${COMMON_ETP:-1}
 
 TRAIN_TP=${TRAIN_TP:-$COMMON_TP}
-INFER_TP=${INFER_TP:-8}
+INFER_TP=${INFER_TP:-4}
+INFER_DP=${INFER_DP:-2}
 
 ACTOR_PP=${ACTOR_PP:-$COMMON_PP}
 ACTOR_VPP=${ACTOR_VPP:-$COMMON_VPP}
@@ -103,8 +103,8 @@ USE_DIST_CKPT=False
 # last_layer=7
 # pipeline_num_transformer_layers="[[6],[8],[8],[8],[8],[8],[8],[7]]"
 
-first_layer=7
-last_layer=6
+first_layer=8
+last_layer=1
 # 128*16 /4
 echo "推理单实例大小: $((INFER_TP*INFER_EP))"
 echo "实例数: $((WORLD_SIZE/(INFER_TP*INFER_EP))) "
@@ -116,10 +116,15 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     -- python3 -m recipe.dapo.main_dapo \
     --config-path=config \
     --config-name="dapo_megatron_trainer" \
+    actor_rollout_ref.rollout.skip_rollout=False \
+    actor_rollout_ref.rollout.skip_dump_dir="/home/code/tmp/rollout_dump" \
     actor_rollout_ref.nccl_timeout=7200 \
     +actor_rollout_ref.actor.megatron.override_transformer_config.tensor_model_parallel_size=${ACTOR_TP} \
     +actor_rollout_ref.actor.megatron.override_transformer_config.multi_latent_attention=True \
     +actor_rollout_ref.actor.megatron.override_transformer_config.use_flash_attn=True \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_method=uniform \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_granularity=full \
+    +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=1 \
     data.train_files="${TRAIN_FILE}" \
     data.val_files="${TEST_FILE}" \
     data.prompt_key=messages \
@@ -168,18 +173,16 @@ ray job submit --runtime-env="${RUNTIME_ENV}" \
     actor_rollout_ref.actor.megatron.expert_model_parallel_size=${ACTOR_EP} \
     actor_rollout_ref.actor.megatron.expert_tensor_parallel_size=${ACTOR_ETP} \
     +actor_rollout_ref.actor.megatron.override_transformer_config.moe_router_dtype=fp32 \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_method=uniform \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_granularity=full \
-    +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_num_layers=1 \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
-    actor_rollout_ref.rollout.load_format=safetensors \
+    actor_rollout_ref.rollout.load_format=dummy \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=${infer_ppo_micro_batch_size_per_gpu} \
     actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu=${infer_ppo_max_token_len} \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.8 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=${INFER_TP} \
+    actor_rollout_ref.rollout.dp_model_parallel_size=${INFER_DP} \
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
-    actor_rollout_ref.rollout.max_num_batched_tokens=$((max_prompt_length + max_response_length)) \
+    actor_rollout_ref.rollout.max_num_batched_tokens=$((max_prompt_length)) \
     actor_rollout_ref.rollout.temperature=${temperature} \
     actor_rollout_ref.rollout.top_p=${top_p} \
     actor_rollout_ref.rollout.top_k=${top_k} \
