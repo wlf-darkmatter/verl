@@ -378,6 +378,8 @@ class vLLMRollout(BaseRollout):
                     LoRARequest(lora_name=f"{lora_int_id}", lora_int_id=lora_int_id, lora_path="/simon-stub-path")
                 ] * batch_size
 
+        from transformers import AutoTokenizer
+        tokenizer = AutoTokenizer.from_pretrained("/mnt/hpfs_test/weights/Moonlight-16B-A3B-Instruct-32k", trust_remote_code=True)
         # users can customize different sampling_params at different run
         with self.update_sampling_params(**kwargs):
             outputs = self.inference_engine.generate(
@@ -386,6 +388,30 @@ class vLLMRollout(BaseRollout):
                 lora_request=lora_requests,
                 use_tqdm=False,
             )
+
+                        #! 打印推理结果信息
+            try:
+                rank = torch.distributed.get_rank()
+                if rank == 0: #* 只打印 rank0 的
+                    for output in outputs:
+                        #* 写死的，只打印 1 份
+                        #* 只打印部分
+                        print_n_gen = 1 # len(output.outputs)
+                        for sample_id in range(print_n_gen):
+                            response_text = tokenizer.decode(output.outputs[sample_id].token_ids)
+                            print(f"===>Output===>", flush=True)
+                            if len(response_text) <= 820:
+                                print(response_text, flush=True)
+                            else:
+                                print(response_text[:400], flush=True)
+                                print("\n...\n...\n", flush=True)
+                                print(response_text[-400:], flush=True)
+
+                            print(f"<===END, 生成结束原因: {output.outputs[sample_id].finish_reason}", flush=True)
+
+            except Exception as e:
+                print(f"Print generation failed! \nreason is {e.__repr__()}")
+
 
             # TODO(sgm): disable logprob when recompute_log_prob is enable
             # if n = 1: (bs, response_length) ; if n > 1: (bs * n, response_length)
