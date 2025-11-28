@@ -1,0 +1,14 @@
+diff --git a/mindspeed/core/context_parallel/dot_product_attention.py b/mindspeed/core/context_parallel/dot_product_attention.py
+index 46d4bca4..fde60a37 100644
+--- a/mindspeed/core/context_parallel/dot_product_attention.py
++++ b/mindspeed/core/context_parallel/dot_product_attention.py
+@@ -48,7 +48,8 @@ class CPDotProductAttentionImpl:
+                  attention_type,
+                  attention_dropout: float = None,
+                  softmax_scale: float = None,
+-                 cp_comm_type: str = None):
++                 cp_comm_type: str = None,
++                 **kwargs):
+         cp_size = config.context_parallel_size
+         config.context_parallel_size = 1
+         self.config = config
