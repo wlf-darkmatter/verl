@@ -224,4 +224,10 @@ class MegatronVLLMShardingManager(BaseShardingManager):
         # DP_COMPUTE_PROTO: all training ranks are dp, the same as fsdp
         if self.infer_tp_size == 1:
             return data
+        
+        if len(data) % self.infer_tp_size != 0:
+            chunk_size = (len(data) + self.infer_tp_size - 1) // self.infer_tp_size
+            start = self.tp_rank * chunk_size
+            end = min(start + chunk_size, len(data))
+            return data[start:end]
         return data.chunk(chunks=self.infer_tp_size)[self.infer_tp_rank]
