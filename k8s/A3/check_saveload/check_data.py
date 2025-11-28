@@ -33,7 +33,7 @@ def check():
     list_before.sort()
     list_after.sort()
     pass
-    breakpoint()
+    #breakpoint()
     for path_pt_i, path_pt_j in zip(list_before, list_after):
         pt_i = torch.load(path_pt_i, weights_only=False)
         pt_j = torch.load(path_pt_j, weights_only=False)
