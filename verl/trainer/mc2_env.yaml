@@ -1,0 +1,11 @@
+working_dir: ./
+excludes: ["/.git/", "/k8s", "/docker", "/doc", "/tmp", "/kernel_meta", "/plog"]
+env_vars:
+
+  VLLM_USE_V1: "1"
+  # VLLM_VERSION: "0.11."
+  # HCCL_IF_BASE_PORT: "23999"
+  # HCCL_ASYNC_ERROR_HANDLING: "0"
+
+  # PYTORCH_NPU_ALLOC_CONF: "max_split_size_mb:2048"
+
