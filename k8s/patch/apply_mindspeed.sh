@@ -23,8 +23,11 @@ git reset --hard origin/2.2.0_core_r0.12.1
 
 cd $cwd
 
-cd /opt/MindSpeed
-git apply $cwd/mindspeed.patch/2.2.0_core_r0.12.1/grouped_linear.diff
+# cd /opt/MindSpeed
+# git apply $cwd/mindspeed.patch/2.2.0_core_r0.12.1/grouped_linear.diff
+
+\cp ./mindspeed.patch/2.2.0_core_r0.12.1/MindSpeed/mindspeed/te/pytorch/module/grouped_linear.py /opt/MindSpeed/mindspeed/te/pytorch/module/grouped_linear.py
+echo -e "\033[1;32mApplied MindSpeed grouped_linear\033[0m"
 
 \cp $cwd/mindspeed.patch/2.2.0_core_r0.12.1/MindSpeed/mindspeed/core/transformer/flash_attention/flash_attention/adaptor.py /opt/MindSpeed/mindspeed/core/transformer/flash_attention/flash_attention/adaptor.py
 echo -e "\033[1;32mApplied MindSpeed Attention Scale\033[0m"

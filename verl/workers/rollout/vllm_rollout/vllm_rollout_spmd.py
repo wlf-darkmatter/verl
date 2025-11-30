@@ -331,7 +331,7 @@ class vLLMRollout(BaseRollout):
             repetition_penalty=config.get("repetition_penalty", 1.0),
         )
 
-        kwargs["detokenize"] = False
+        kwargs["detokenize"] = True
 
         # supporting adding any sampling params from the config file
         for k in config.keys():
@@ -450,8 +450,7 @@ class vLLMRollout(BaseRollout):
                     LoRARequest(lora_name=f"{lora_int_id}", lora_int_id=lora_int_id, lora_path="/simon-stub-path")
                 ] * batch_size
 
-        from transformers import AutoTokenizer
-        tokenizer = AutoTokenizer.from_pretrained("/mnt/hpfs_test/weights/Moonlight-16B-A3B-Instruct-32k", trust_remote_code=True)
+
         # users can customize different sampling_params at different run
         with self.update_sampling_params(**kwargs):
             outputs = self.inference_engine.generate(
@@ -461,7 +460,7 @@ class vLLMRollout(BaseRollout):
                 use_tqdm=False,
             )
 
-                        #! 打印推理结果信息
+            #! 打印推理结果信息
             try:
                 rank = torch.distributed.get_rank()
                 if rank == 0: #* 只打印 rank0 的
@@ -470,7 +469,7 @@ class vLLMRollout(BaseRollout):
                         #* 只打印部分
                         print_n_gen = 1 # len(output.outputs)
                         for sample_id in range(print_n_gen):
-                            response_text = tokenizer.decode(output.outputs[sample_id].token_ids)
+                            response_text = output.outputs[sample_id].text
                             print(f"===>Output===>", flush=True)
                             if len(response_text) <= 820:
                                 print(response_text, flush=True)
