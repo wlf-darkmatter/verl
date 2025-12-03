@@ -1,10 +1,15 @@
+pkill -9 python
+ray stop --force
+
+pip install swanlab
+
 cwd=$(dirname $(realpath $0))
 echo "dealing $cwd"
 cd $cwd
 
-export HCCL_SOCKET_IFNAME=ens45 # modify according to actual situation
-export TP_SOCKET_IFNAME=ens45   # modify according to actual situation
-export GLOO_SOCKET_IFNAME=ens45 # modify according to actual situation
+export HCCL_SOCKET_IFNAME=eth0 # modify according to actual situation
+export TP_SOCKET_IFNAME=eth0   # modify according to actual situation
+export GLOO_SOCKET_IFNAME=eth0 # modify according to actual situation
 # export HYDRA_FULL_ERROR=1
 export RAY_DEDUP_LOGS=1
 # export HCCL_EXEC_TIMEOUT=3600
@@ -52,15 +57,15 @@ export HCCL_BUFFSIZE=300
 
 #! #################  【VLLM patch】  #####################
 #! 规避模型加载时 权重读取错误的问题
-bash /opt/verl/k8s/patch/apply_vllm-ascend.sh
+bash /work/share/zjc/verl/verl_061/k8s/patch/apply_vllm-ascend.sh
 
 #! #################  【Megatron patch】  #####################
 #! [Megatron]
-bash /opt/verl/k8s/patch/apply_megatron.sh
+bash /work/share/zjc/verl/verl_061/k8s/patch/apply_megatron.sh
 
 #! #################  【MindSpeed patch】  #####################
 #! [MindSpeed]
-bash /opt/verl/k8s/patch/apply_mindspeed.sh
+bash /work/share/zjc/verl/verl_061/k8s/patch/apply_mindspeed.sh
 
 
 #######################################
@@ -70,22 +75,24 @@ source /usr/local/Ascend/nnal/atb/set_env.sh;
 source /opt/pyvenv/bin/activate;
 
 #! #################  【MindSpeed 预编译】  #####################
-bash /opt/verl/k8s/patch/pre_mindspeed_compile.sh
+bash /work/share/zjc/verl/verl_061/k8s/patch/pre_mindspeed_compile.sh
 
 
-LIB_PATH=/opt/python3.10/lib/
-export LD_LIBRARY_PATH=$LIB_PATH:$LD_LIBRARY_PATH
+# LIB_PATH=/opt/python3.10/lib/
+# export LD_LIBRARY_PATH=$LIB_PATH:$LD_LIBRARY_PATH
 
 unset LOCAL_WORLD_SIZE
 # unset WORLD_SIZE
 unset LOCAL_RANK
 
+RANK=0
+export WORLD_SIZE=8
 export NPU_PER_NODE=8
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))
 
 
-export ServerPort=6666     # modify according to actual situation
-export DashboardPort=8888  # modify according to actual situation
+export ServerPort=6766     # modify according to actual situation
+export DashboardPort=8260  # modify according to actual situation
 
 cd $cwd
 cnt=0
@@ -111,7 +118,7 @@ if [ "$RANK" = "0" ]; then
     # judge npu_count_int bigger than NNODES*NPU_PER_NODE
     if [ "$npu_count_int" -ge "$((NNODES*NPU_PER_NODE))" ]; then
       echo "Ray cluster is ready with $npu_count_int npu (from $npu_count NPU resources), starting Python script."
-      bash $cwd/hw_run_dapo_deepseek_671b_megatron.sh | tee ${JOB_LOG_DIR_CURR}/ray_host/$(date +"%Y-%m-%d_%H-%M-%S")_ray.log
+      bash $cwd/zjc-req_run_dapo_moonlight_16b_megatron_1node.sh | tee ${JOB_LOG_DIR_CURR}/ray_host/$(date +"%Y-%m-%d_%H-%M-%S")_ray.log
       break
     fi
 

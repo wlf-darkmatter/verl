@@ -28,6 +28,7 @@ import torch
 from torch.utils.data import Dataset, Sampler
 from tqdm import tqdm
 
+import ray
 from verl import DataProto
 from verl.protocol import pad_dataproto_to_divisor
 from verl.single_controller.base import Worker
@@ -37,7 +38,6 @@ from verl.trainer.ppo.metric_utils import (
     compute_data_metrics,
     compute_throughout_metrics,
     compute_timing_metrics,
-    reduce_metrics,
     process_validation_metrics,
 )
 from verl.trainer.ppo.ray_trainer import (
@@ -49,6 +49,8 @@ from verl.trainer.ppo.ray_trainer import (
     compute_advantage,
     compute_response_mask,
 )
+from verl.trainer.ppo.reward import compute_reward, compute_reward_async
+from verl.utils.metric import reduce_metrics
 from verl.utils.profiler import marked_timer
 from verl.utils.rollout_skip import RolloutSkip
 
@@ -61,6 +63,7 @@ WorkerType = type[Worker]
 class RayDAPOSchedTrainer(RayPPOTrainer):
     """
     DAPO Trainer with Request Scheduler integrated.
+    Runs on the driver process on a single CPU/GPU node.
     """
 
     def __init__(
@@ -101,10 +104,36 @@ class RayDAPOSchedTrainer(RayPPOTrainer):
             config=self.config.req_scheduler,
         )
 
+    def compute_kl_related_metrics(self, batch: DataProto, metrics: dict, timing_raw: dict):
+        batch.batch["response_mask"] = compute_response_mask(batch)
+
+        # recompute old_log_probs
+        with marked_timer("old_log_prob", timing_raw, "blue"):
+            old_log_prob = self.actor_rollout_wg.compute_log_prob(batch)
+            entropys = old_log_prob.batch["entropys"]
+            response_masks = batch.batch["response_mask"]
+            loss_agg_mode = self.config.actor_rollout_ref.actor.loss_agg_mode
+            entropy_agg = agg_loss(loss_mat=entropys, loss_mask=response_masks, loss_agg_mode=loss_agg_mode)
+            old_log_prob_metrics = {"actor/entropy": entropy_agg.detach().item()}
+            metrics.update(old_log_prob_metrics)
+            old_log_prob.batch.pop("entropys")
+            batch = batch.union(old_log_prob)
+
+        if self.use_reference_policy:
+            # compute reference log_prob
+            with marked_timer("ref", timing_raw, "olive"):
+                if not self.ref_in_actor:
+                    ref_log_prob = self.ref_policy_wg.compute_ref_log_prob(batch)
+                else:
+                    ref_log_prob = self.actor_rollout_wg.compute_ref_log_prob(batch)
+                batch = batch.union(ref_log_prob)
+
+        return batch
+
     def _validate(self):
         """
         Override validation to support request scheduling.
-        This follows the logic of RayPPOTrainer._validate but injects scheduling.
+        Uses ReqScheduler to schedule validation batches and restore order.
         """
         data_source_lst = []
         reward_extra_infos_dict: dict[str, list] = defaultdict(list)
@@ -161,12 +190,14 @@ class RayDAPOSchedTrainer(RayPPOTrainer):
                 "validate": True,
             }
 
-            # [ReqScheduler] Handle Validation N samples
-            n_samples = self.config.actor_rollout_ref.rollout.val_kwargs.get("n", 1)
+            # [CRITICAL Fix for Megatron Worker]
+            # Megatron Worker uses self.config.rollout.n (training N) to repeat prompts.
+            # We must use the same N here to correctly restore order and dimension.
+            n_samples = self.config.actor_rollout_ref.rollout.n
 
             test_gen_batch_padded, _ = pad_dataproto_to_divisor(test_gen_batch, self.actor_rollout_wg.world_size)
 
-            # Generation (Output will be Size B*N)
+            # Generation (Worker outputs B * N)
             test_output_gen_batch = self.actor_rollout_wg.generate_sequences(test_gen_batch_padded)
             
             # [ReqScheduler] Restore the order of the generated sequences
@@ -179,14 +210,13 @@ class RayDAPOSchedTrainer(RayPPOTrainer):
             output_texts = [self.tokenizer.decode(ids, skip_special_tokens=True) for ids in output_ids]
             sample_outputs.extend(output_texts)
 
-            # Align test_batch with output (Repeat test_batch to match B*N output)
+            # Align test_batch (Size B) with output (Size B*N)
             if n_samples > 1:
                 test_batch = test_batch.repeat(repeat_times=n_samples, interleave=True)
             
             test_batch = test_batch.union(test_output_gen_batch)
 
             # evaluate using reward_function
-            # NOTE: validation logic usually uses simple try-except or direct call as in RayPPOTrainer
             result = self.val_reward_fn(test_batch, return_dict=True)
             reward_tensor = result["reward_tensor"]
             scores = reward_tensor.sum(-1).cpu().tolist()
@@ -291,7 +321,7 @@ class RayDAPOSchedTrainer(RayPPOTrainer):
         timing_raw = defaultdict(float)
         batch = None
         num_prompt_in_batch = 0
-        num_gen_batches = 0        
+        num_gen_batches = 0
         for epoch in range(self.config.trainer.total_epochs):
             # [ReqScheduler] Use enumerate to get bs_idx for logging
             for bs_idx, batch_dict in enumerate(self.train_dataloader):
@@ -315,7 +345,8 @@ class RayDAPOSchedTrainer(RayPPOTrainer):
 
                 new_batch: DataProto = DataProto.from_single_dict(batch_dict)
                 num_gen_batches += 1
-                # [ReqScheduler] Identify keys to pop, preserving original DAPO logic
+                
+                # [ReqScheduler] Pop logic matching DAPO but ensuring scheduler keys are handled
                 non_tensor_keys = ["raw_prompt_ids"]
                 if "multi_modal_data" in new_batch.non_tensor_batch.keys():
                     non_tensor_keys.append("multi_modal_data")
@@ -324,7 +355,7 @@ class RayDAPOSchedTrainer(RayPPOTrainer):
                     non_tensor_keys.append("reqs_idx")
                 if "pre_outlens" in new_batch.non_tensor_batch:
                     non_tensor_keys.append("pre_outlens")
-                    
+
                 gen_batch = new_batch.pop(
                     batch_keys=["input_ids", "attention_mask", "position_ids"],
                     non_tensor_batch_keys=non_tensor_keys,
@@ -334,7 +365,8 @@ class RayDAPOSchedTrainer(RayPPOTrainer):
                 reqs_idx = gen_batch.non_tensor_batch["reqs_idx"]
                 raw_prompt_ids = gen_batch.non_tensor_batch["raw_prompt_ids"]
 
-                # DAPO n (we don't repeat gen_batch here, worker handles it)
+                # [CRITICAL] gen_batch MUST BE SIZE B here. 
+                # The worker (recipe/req_sched/megatron_workers.py) handles filtering and repeating.
                 n_samples = self.config.actor_rollout_ref.rollout.n
                 gen_batch_output = gen_batch
 
@@ -348,36 +380,57 @@ class RayDAPOSchedTrainer(RayPPOTrainer):
                         gen_batch_output.meta_info.pop("timing", None)
                     
                     # [ReqScheduler] Restore order after generation
+                    # gen_batch_output size is B*N. reqs_idx size is B.
+                    # restore_order will repeat reqs_idx to B*N internally to match.
                     self.req_scheduler.restore_order(
                         gen_batch_output,
                         reqs_idx,
-                        n_samples,
+                        n_samples=n_samples,
                     )
 
+                    baseline_rewards_bn = None
                     if self.config.algorithm.adv_estimator == AdvantageEstimator.REMAX:
                         with marked_timer("gen_max", timing_raw, "red"):
                             gen_baseline_batch = deepcopy(gen_batch)
                             gen_baseline_batch.meta_info["do_sample"] = False
+                            
+                            # Baseline generation: Worker will STILL repeat this N times if config n > 1.
                             gen_baseline_output = self.actor_rollout_wg.generate_sequences(gen_baseline_batch)
-                            # [ReqScheduler] Restore order for baseline too (n=1)
-                            self.req_scheduler.restore_order(gen_baseline_output, reqs_idx, n_samples=1)
+                            
+                            # [ReqScheduler] Restore order using n_samples (Worker output B*N)
+                            self.req_scheduler.restore_order(gen_baseline_output, reqs_idx, n_samples=n_samples)
 
-                            new_batch = new_batch.union(gen_baseline_output)
-                            reward_baseline_tensor = self.reward_fn(new_batch)
-                            reward_baseline_tensor = reward_baseline_tensor.sum(dim=-1)
+                            # new_batch (Size B) needs to align with baseline output (Size B*N)
+                            # We repeat new_batch to match baseline
+                            new_batch_baseline = new_batch.repeat(repeat_times=n_samples, interleave=True)
+                            new_batch_baseline = new_batch_baseline.union(gen_baseline_output)
+                            
+                            # Compute rewards (Size B*N)
+                            # We assume reward model supports this batch size
+                            if self.use_rm and "rm_scores" not in new_batch_baseline.batch.keys():
+                                rm_scores = self.rm_wg.compute_rm_score(new_batch_baseline)
+                                new_batch_baseline = new_batch_baseline.union(rm_scores)
 
-                            new_batch.pop(batch_keys=list(gen_baseline_output.batch.keys()))
+                            reward_baseline_tensor, _ = compute_reward(new_batch_baseline, self.reward_fn)
+                            reward_baseline_tensor = reward_baseline_tensor.sum(dim=-1) # (B*N,)
 
-                            new_batch.batch["reward_baselines"] = reward_baseline_tensor
+                            # Store baseline values to be attached later
+                            baseline_rewards_bn = reward_baseline_tensor
 
-                            del gen_baseline_batch, gen_baseline_output
+                            # Clean up
+                            del gen_baseline_batch, gen_baseline_output, new_batch_baseline
 
                     new_batch.non_tensor_batch["uid"] = np.array(
                         [str(uuid.uuid4()) for _ in range(len(new_batch.batch))], dtype=object
                     )
                     # repeat to align with repeated responses in rollout
+                    # new_batch becomes B * N
                     new_batch = new_batch.repeat(repeat_times=n_samples, interleave=True)
                     new_batch = new_batch.union(gen_batch_output)
+
+                    if self.config.algorithm.adv_estimator == AdvantageEstimator.REMAX and baseline_rewards_bn is not None:
+                        # Attach the computed baselines (Size B*N) to the main batch (Size B*N)
+                        new_batch.batch["reward_baselines"] = baseline_rewards_bn
 
                     # [ReqScheduler] Log sequence lengths and update table
                     # We need to expand raw_prompt_ids to match the repeated batch size (B*N) for logging alignment
@@ -400,25 +453,26 @@ class RayDAPOSchedTrainer(RayPPOTrainer):
                         unpadded,
                     )
 
+                    if self.config.algorithm.use_kl_in_reward:
+                        # We need these metrics for apply_kl_penalty if using kl in reward
+                        new_batch = self.compute_kl_related_metrics(new_batch, metrics, timing_raw)
+                        # otherwise, we will compute those after dynamic sampling
+
                     with marked_timer("reward", timing_raw, "yellow"):
                         # compute scores. Support both model and function-based.
                         # We first compute the scores using reward model. Then, we call reward_fn to combine
                         # the results from reward model and rule-based results.
-                        if self.use_rm:
+                        if self.use_rm and "rm_scores" not in new_batch.batch.keys():
                             # we first compute reward model score
                             reward_tensor = self.rm_wg.compute_rm_score(new_batch)
                             new_batch = new_batch.union(reward_tensor)
-
-                        # we combine with rule-based rm
-                        reward_extra_infos_dict: dict[str, list]
-                        try:
-                            reward_result = self.reward_fn(new_batch, return_dict=True)
-                            reward_tensor = reward_result["reward_tensor"]
-                            reward_extra_infos_dict = reward_result.get("reward_extra_info", {})
-                        except Exception as e:
-                            print(f"Error in reward_fn: {e}")
-                            reward_tensor = self.reward_fn(new_batch)
-                            reward_extra_infos_dict = {}
+                        
+                        if self.config.reward_model.launch_reward_fn_async:
+                            # Support async reward calculation if config enabled (from sched_ray_trainer inspiration)
+                            future_reward = compute_reward_async.remote(new_batch, self.config, self.tokenizer)
+                            reward_tensor, reward_extra_infos_dict = ray.get(future_reward)
+                        else:
+                            reward_tensor, reward_extra_infos_dict = compute_reward(new_batch, self.reward_fn)
 
                         new_batch.batch["token_level_scores"] = reward_tensor
 
@@ -485,7 +539,6 @@ class RayDAPOSchedTrainer(RayPPOTrainer):
                             max_num_gen_batches = self.config.algorithm.filter_groups.max_num_gen_batches
                             if max_num_gen_batches <= 0 or num_gen_batches < max_num_gen_batches:
                                 print(f"{num_gen_batches=}. Keep generating...")
-                                progress_bar.update(1)
                                 self.gen_steps += 1
                                 is_last_step = self.global_steps >= self.total_training_steps
                                 continue
@@ -499,16 +552,8 @@ class RayDAPOSchedTrainer(RayPPOTrainer):
                             # Align the batch
                             traj_bsz = self.config.data.train_batch_size * n_samples
                             batch = batch[:traj_bsz]
-                            
-                    # Log rollout generations if enabled
-                    rollout_data_dir = self.config.trainer.get("rollout_data_dir", None)
-                    if rollout_data_dir:
-                        self._log_rollout_data(batch, reward_extra_infos_dict, timing_raw, rollout_data_dir)
 
                     # === Updating ===
-
-                    batch.batch["response_mask"] = compute_response_mask(batch)
-
                     # Balance the number of valid tokens across DP ranks.
                     # NOTE: This usually changes the order of data in the `batch`,
                     # which won't affect the advantage calculation (since it's based on uid),
@@ -520,29 +565,23 @@ class RayDAPOSchedTrainer(RayPPOTrainer):
                     # compute global_valid tokens
                     batch.meta_info["global_token_num"] = torch.sum(batch.batch["attention_mask"], dim=-1).tolist()
 
-                    # recompute old_log_probs
-                    with marked_timer("old_log_prob", timing_raw, "blue"):
-                        old_log_prob = self.actor_rollout_wg.compute_log_prob(batch)
-                        entropys = old_log_prob.batch["entropys"]
-                        response_masks = batch.batch["response_mask"]
-                        loss_agg_mode = self.config.actor_rollout_ref.actor.loss_agg_mode
-                        entropy_agg = agg_loss(loss_mat=entropys, loss_mask=response_masks, loss_agg_mode=loss_agg_mode)
-                        old_log_prob_metrics = {"actor/entropy": entropy_agg.detach().item()}
-                        metrics.update(old_log_prob_metrics)
-                        old_log_prob.batch.pop("entropys")
-                        batch = batch.union(old_log_prob)
-
-                    if self.use_reference_policy:
-                        # compute reference log_prob
-                        with marked_timer("ref", timing_raw, "olive"):
-                            ref_log_prob = self.ref_policy_wg.compute_ref_log_prob(batch)
-                            batch = batch.union(ref_log_prob)
+                    if not self.config.algorithm.use_kl_in_reward:
+                        batch = self.compute_kl_related_metrics(batch, metrics, timing_raw)
 
                     # compute values
                     if self.use_critic:
                         with marked_timer("values", timing_raw, "cyan"):
                             values = self.critic_wg.compute_values(batch)
                             batch = batch.union(values)
+
+                    # Compute rollout correction weights and off-policy metrics (inherited from RayPPOTrainer)
+                    from verl.trainer.ppo.rollout_corr_helper import compute_rollout_correction_and_add_to_batch
+
+                    rollout_corr_config = self.config.algorithm.get("rollout_correction", None)
+                    if rollout_corr_config is not None and "rollout_log_probs" in batch.batch:
+                        batch, is_metrics = compute_rollout_correction_and_add_to_batch(batch, rollout_corr_config)
+                        # IS and off-policy metrics already have rollout_corr/ prefix
+                        metrics.update(is_metrics)
 
                     with marked_timer("adv", timing_raw, "brown"):
                         # compute advantages, executed on the driver process
@@ -571,6 +610,10 @@ class RayDAPOSchedTrainer(RayPPOTrainer):
                         actor_output_metrics = reduce_metrics(actor_output.meta_info["metrics"])
                         metrics.update(actor_output_metrics)
 
+                    # Log rollout generations if enabled
+                    rollout_data_dir = self.config.trainer.get("rollout_data_dir", None)
+                    if rollout_data_dir:
+                        self._log_rollout_data(batch, reward_extra_infos_dict, timing_raw, rollout_data_dir)
 
                 # validate
                 if (
