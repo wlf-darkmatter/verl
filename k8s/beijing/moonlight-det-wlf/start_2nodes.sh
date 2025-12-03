@@ -1,7 +1,7 @@
 pkill -9 python
 ray stop --force
 
-# pip install swanlab
+pip install swanlab
 
 cwd=$(dirname $(realpath $0))
 echo "dealing $cwd"
@@ -57,15 +57,15 @@ export HCCL_BUFFSIZE=300
 
 #! #################  【VLLM patch】  #####################
 #! 规避模型加载时 权重读取错误的问题
-bash /work/share/zjc/verl/verl_npu/k8s/patch/apply_vllm-ascend.sh
+bash /work/share/zjc/verl/verl_061/k8s/patch/apply_vllm-ascend.sh
 
 #! #################  【Megatron patch】  #####################
 #! [Megatron]
-bash /work/share/zjc/verl/verl_npu/k8s/patch/apply_megatron.sh
+bash /work/share/zjc/verl/verl_061/k8s/patch/apply_megatron.sh
 
 #! #################  【MindSpeed patch】  #####################
 #! [MindSpeed]
-bash /work/share/zjc/verl/verl_npu/k8s/patch/apply_mindspeed.sh
+bash /work/share/zjc/verl/verl_061/k8s/patch/apply_mindspeed.sh
 
 
 #######################################
@@ -75,7 +75,7 @@ source /usr/local/Ascend/nnal/atb/set_env.sh;
 source /opt/pyvenv/bin/activate;
 
 #! #################  【MindSpeed 预编译】  #####################
-bash /work/share/zjc/verl/verl_npu/k8s/patch/pre_mindspeed_compile.sh
+bash /work/share/zjc/verl/verl_061/k8s/patch/pre_mindspeed_compile.sh
 
 
 # LIB_PATH=/opt/python3.10/lib/
@@ -85,8 +85,8 @@ unset LOCAL_WORLD_SIZE
 # unset WORLD_SIZE
 unset LOCAL_RANK
 
-RANK=0
-export WORLD_SIZE=8
+# RANK=0
+export WORLD_SIZE=16
 export NPU_PER_NODE=8
 export NNODES=$((WORLD_SIZE/NPU_PER_NODE))
 
@@ -108,7 +108,7 @@ if [ "$RANK" = "0" ]; then
   cp $cwd/*.sh ${JOB_LOG_DIR_CURR}/script.bak/
   cp $cwd/*.yaml ${JOB_LOG_DIR_CURR}/script.bak/
 
-  ray start --head --ray-debugger-external --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$CURRENT_IP --dashboard-host=$CURRENT_IP --disable-usage-stats
+  ray start --head --ray-debugger-external --port $ServerPort --dashboard-port=$DashboardPort --node-ip-address=$PET_MASTER_ADDR --dashboard-host=$PET_MASTER_ADDR --disable-usage-stats
 
   while [[ $cnt -lt 100 ]]; do
     ray_status_output=$(ray status)
@@ -118,7 +118,7 @@ if [ "$RANK" = "0" ]; then
     # judge npu_count_int bigger than NNODES*NPU_PER_NODE
     if [ "$npu_count_int" -ge "$((NNODES*NPU_PER_NODE))" ]; then
       echo "Ray cluster is ready with $npu_count_int npu (from $npu_count NPU resources), starting Python script."
-      bash $cwd/zjc-req-hw_run_dapo_deepseek_671b_megatron.sh | tee ${JOB_LOG_DIR_CURR}/ray_host/$(date +"%Y-%m-%d_%H-%M-%S")_ray.log
+      bash $cwd/zjc-reqsched-magetron_Moonlight-16B-A3B-2nodes.sh | tee ${JOB_LOG_DIR_CURR}/ray_host/$(date +"%Y-%m-%d_%H-%M-%S")_ray.log
       break
     fi
 
@@ -130,7 +130,7 @@ if [ "$RANK" = "0" ]; then
 else
   echo "This is worker node"
   sleep 10
-  ray start --address="$MASTER_ADDR:$ServerPort" --disable-usage-stats
+  ray start --address="$PET_MASTER_ADDR:$ServerPort" --disable-usage-stats
 fi
 
 # start Mark 1
