@@ -33,34 +33,49 @@ class ActorRolloutRefWorker(BaseMegatronWorker):
 
         # 1. 获取并移除调度信息
         reqs_idx = prompts.non_tensor_batch.pop("reqs_idx", None)
-        pre_outlens = prompts.non_tensor_batch.pop("pre_outlens")
+        pre_outlens = prompts.non_tensor_batch.pop("pre_outlens", None)
 
-        # 2. 筛选属于当前 DP Rank 的请求
-        # 这里的 reqs_idx 是基于原始 Prompt (Size B) 的分配
-        my_idx = [i for i, idx in enumerate(reqs_idx) if idx == my_req_idx]
-        
-        if is_first_tp_rank:
-            total_reqs = len(reqs_idx) if reqs_idx is not None else 0
-            print(f"[ReqSched-Debug] Rank {rank} (DP-{my_req_idx}): Assigned {len(my_idx)}/{total_reqs} prompts.", flush=True)
+        # 变量初始化，用于后续统计
+        my_idx = None
+        pre_longest = 0
+        pre_avg = 0.0
+        predict_totallens = []
+        pre_outlens_filtered = []
 
-        prompts = prompts.select_idxs(my_idx)
-        
-        # 统计预测信息
-        if len(my_idx) > 0:
-            pre_outlens = [pre_outlens[i] for i in my_idx]
-            pre_longest = max(pre_outlens)
-            pre_shortest = min(pre_outlens)
-            pre_avg = np.mean(pre_outlens)
+        # 2. 筛选逻辑
+        if reqs_idx is not None:
+            # 筛选属于当前 DP Rank 的请求
+            my_idx = [i for i, idx in enumerate(reqs_idx) if idx == my_req_idx]
             
-            original_prompt_ids = prompts.non_tensor_batch["raw_prompt_ids"]
-            inlens = [len(i) for i in original_prompt_ids]
-            predict_totallens = [i + j for i, j in zip(inlens, pre_outlens, strict=False)]
-        else:
-            pre_longest = pre_shortest = pre_avg = 0
-            inlens = []
-            predict_totallens = []
+            if is_first_tp_rank:
+                total_reqs = len(reqs_idx)
+                print(f"[ReqSched-Debug] Rank {rank} (DP-{my_req_idx}): Assigned {len(my_idx)}/{total_reqs} prompts.", flush=True)
 
-        if is_first_tp_rank and len(my_idx) > 0:
+            # 执行筛选
+            prompts = prompts.select_idxs(my_idx)
+            
+            # 统计预测信息
+            if len(my_idx) > 0 and pre_outlens is not None:
+                pre_outlens_filtered = [pre_outlens[i] for i in my_idx]
+                pre_longest = max(pre_outlens_filtered)
+                pre_shortest = min(pre_outlens_filtered)
+                pre_avg = np.mean(pre_outlens_filtered)
+                
+                if "raw_prompt_ids" in prompts.non_tensor_batch:
+                    original_prompt_ids = prompts.non_tensor_batch["raw_prompt_ids"]
+                    # 注意：此时 prompts 已经被 select_idxs 过了，所以 raw_prompt_ids 也是筛选后的
+                    inlens = [len(i) for i in original_prompt_ids]
+                    predict_totallens = [i + j for i, j in zip(inlens, pre_outlens_filtered, strict=False)]
+            else:
+                pre_longest = pre_shortest = pre_avg = 0
+        else:
+            # 如果没有 reqs_idx，说明调度信息丢失或未启用，直接处理收到的所有数据
+            if is_first_tp_rank:
+                print(f"[ReqSched-Warning] Rank {rank}: 'reqs_idx' missing. Skipping scheduler filtering and falling back to standard generation.", flush=True)
+            # 不做 select_idxs，prompts 保持原样
+
+        # 打印统计日志
+        if is_first_tp_rank and my_idx is not None and len(my_idx) > 0:
             print(
                 f"[GEN-Megatron]: rank={rank}, len(my_idx)={len(my_idx)}, "
                 f"pre_longest={pre_longest}, pre_avg={pre_avg:.2f}"
@@ -108,7 +123,7 @@ class ActorRolloutRefWorker(BaseMegatronWorker):
             log_gpu_memory_usage("After switch to trainer mode", logger=logger)
             
             # 统计实际输出
-            if is_first_tp_rank and len(my_idx) > 0:
+            if is_first_tp_rank and my_idx is not None and len(my_idx) > 0:
                 responses = output.batch["responses"]
                 pad_id = self.tokenizer.pad_token_id
                 
@@ -123,8 +138,8 @@ class ActorRolloutRefWorker(BaseMegatronWorker):
                 actual_max = np.max(actual_outlen)
                 actual_min = np.min(actual_outlen)
                 
-                predict_tsum = sum(predict_totallens)
-                pre_osum = sum(pre_outlens)
+                predict_tsum = sum(predict_totallens) if predict_totallens else 0
+                pre_osum = sum(pre_outlens_filtered) if pre_outlens_filtered else 0
                 
                 # 这里的 Predict 数据需要乘以 N 才能与 Actual (B*N) 对比
                 print(
