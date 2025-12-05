@@ -8,7 +8,7 @@ tools:
     memory_limit_mb: 128
     num_workers: 32
     rate_limit: 32
-    sandbox_fusion_url: http://10.119.17.72:8080/run_code_with_log
+    sandbox_fusion_url: http://10.1.186.251:8080/run
     type: native
   tool_schema:
     function:
