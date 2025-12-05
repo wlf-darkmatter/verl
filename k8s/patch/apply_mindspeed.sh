@@ -25,7 +25,6 @@ cd $cwd
 
 # cd /opt/MindSpeed
 # git apply $cwd/mindspeed.patch/2.2.0_core_r0.12.1/grouped_linear.diff
-
 \cp ./mindspeed.patch/2.2.0_core_r0.12.1/MindSpeed/mindspeed/te/pytorch/module/grouped_linear.py /opt/MindSpeed/mindspeed/te/pytorch/module/grouped_linear.py
 echo -e "\033[1;32mApplied MindSpeed grouped_linear\033[0m"
 
@@ -40,7 +39,6 @@ if [[ ${USE_CP_PATCH} == 1 ]];then
     git apply $cwd/mindspeed.patch/2.2.0_core_r0.12.1-cp/dot_product_attention.diff
     echo -e "\033[1;33mApplied MindSpeed CP \033[0m"
     set +e
-
 
     cd /opt/verl
     git apply $cwd/verl.patch/patch_v012.diff
