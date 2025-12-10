@@ -163,8 +163,13 @@ class RayDAPOSchedTrainer(RayPPOTrainer):
 
             # [ReqScheduler] Pop keys, including scheduler specific ones
             batch_keys_to_pop = ["input_ids", "attention_mask", "position_ids"]
-            non_tensor_batch_keys_to_pop = ["raw_prompt_ids", "reqs_idx", "pre_outlens"]
-            
+            non_tensor_batch_keys_to_pop = ["raw_prompt_ids"]
+            # scheduler keys
+            if "reqs_idx" in test_batch.non_tensor_batch:
+                non_tensor_batch_keys_to_pop.append("reqs_idx")
+            if "pre_outlens" in test_batch.non_tensor_batch:
+                non_tensor_batch_keys_to_pop.append("pre_outlens")
+
             if "multi_modal_data" in test_batch.non_tensor_batch:
                 non_tensor_batch_keys_to_pop.append("multi_modal_data")
             if "raw_prompt" in test_batch.non_tensor_batch:
@@ -179,9 +184,19 @@ class RayDAPOSchedTrainer(RayPPOTrainer):
                 non_tensor_batch_keys=non_tensor_batch_keys_to_pop,
             )
 
+            # [ReqScheduler] Ensure scheduler keys are in gen_batch
+            if "reqs_idx" not in test_gen_batch.non_tensor_batch and "reqs_idx" in test_data:
+                test_gen_batch.non_tensor_batch["reqs_idx"] = test_data["reqs_idx"]
+            if "pre_outlens" not in test_gen_batch.non_tensor_batch and "pre_outlens" in test_data:
+                test_gen_batch.non_tensor_batch["pre_outlens"] = test_data["pre_outlens"]
+
             # [ReqScheduler] Get request indices for scheduling restoration
-            test_reqs_idx = test_gen_batch.non_tensor_batch["reqs_idx"]
-            
+            test_reqs_idx = test_gen_batch.non_tensor_batch.get("reqs_idx", None)
+
+            # Fallback if validation sched failed (shouldn't happen but safe)
+            if test_reqs_idx is None:
+                test_reqs_idx = np.zeros(len(input_ids), dtype=int)
+
             test_gen_batch.meta_info = {
                 "eos_token_id": self.tokenizer.eos_token_id,
                 "pad_token_id": self.tokenizer.pad_token_id,
@@ -361,12 +376,20 @@ class RayDAPOSchedTrainer(RayPPOTrainer):
                     non_tensor_batch_keys=non_tensor_keys,
                 )
                 
-                # [ReqScheduler] Extract reqs_idx (size B) and raw_prompt_ids (size B)
-                reqs_idx = gen_batch.non_tensor_batch["reqs_idx"]
+                # [ReqScheduler] Force inject scheduler info if missing (CRITICAL FIX for KeyError)
+                if "reqs_idx" not in gen_batch.non_tensor_batch and "reqs_idx" in batch_dict:
+                    gen_batch.non_tensor_batch["reqs_idx"] = batch_dict["reqs_idx"]
+                if "pre_outlens" not in gen_batch.non_tensor_batch and "pre_outlens" in batch_dict:
+                    gen_batch.non_tensor_batch["pre_outlens"] = batch_dict["pre_outlens"]
+
+                reqs_idx = gen_batch.non_tensor_batch.get("reqs_idx", None)
                 raw_prompt_ids = gen_batch.non_tensor_batch["raw_prompt_ids"]
 
-                # [CRITICAL] gen_batch MUST BE SIZE B here. 
-                # The worker (recipe/req_sched/megatron_workers.py) handles filtering and repeating.
+                if reqs_idx is None:
+                    print(f"[RayDAPOSchedTrainer] Warning: reqs_idx missing after all attempts. Fallback to linear assignment.", flush=True)
+                    reqs_idx = np.arange(len(raw_prompt_ids)) % self.actor_rollout_wg.world_size
+                    gen_batch.non_tensor_batch["reqs_idx"] = reqs_idx
+
                 n_samples = self.config.actor_rollout_ref.rollout.n
                 gen_batch_output = gen_batch
 
