@@ -1,7 +1,8 @@
 set -x
 
 echo "login swanlab..."
-swanlab login -k iWDBp3noHzECcN9N2jJ8z
+# 填入自己账号的api-key
+swanlab login -k xxxx
 
 echo ">>Starting script at: $(date), path = $(pwd)"
 EXP_DIR=/work/share/zjc/verl/verl_061/logs/$(date +%Y%m%d_%H%M%S)
